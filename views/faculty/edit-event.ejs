@@ -1,0 +1,393 @@
+<%- include('../partials/header') %>
+
+<style>
+/* Edit Event Styles */
+.edit-event-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+}
+
+.edit-header {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.form-container {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    outline: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4338ca, #6d28d9);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+}
+
+.poster-preview {
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+}
+
+.poster-upload {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.poster-upload:hover {
+    border-color: #4f46e5;
+    background: #f9fafb;
+}
+
+.category-section {
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .edit-header {
+        padding: 1.5rem 0;
+    }
+    
+    .edit-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .form-container {
+        padding: 1.5rem;
+        margin: 0 1rem 2rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
+
+<div class="edit-event-container">
+    <%- include('../partials/sidebar') %>
+    
+    <main class="flex-1">
+        <!-- Header Section -->
+        <div class="edit-header">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Edit Event</h1>
+                        <p class="text-blue-100">Update your event details</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <a href="/faculty/my-events" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors shadow-lg">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to My Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="container mx-auto px-4">
+            <div class="form-container">
+                <!-- Flash Messages -->
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <%= error %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <% } %>
+
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <%= success %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <% } %>
+
+                <form action="/faculty/events/<%= event._id %>/edit" method="POST" enctype="multipart/form-data">
+                    <!-- Basic Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h3 class="h5 mb-3">Basic Information</h3>
+                        </div>
+                        
+                        <div class="col-md-8 mb-3">
+                            <label for="title" class="form-label">Event Title *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="title" 
+                                   name="title" 
+                                   value="<%= formData.title || event.title %>"
+                                   required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="category" class="form-label">Category *</label>
+                            <select class="form-select" id="category" name="category" required onchange="toggleSubCategory()">
+                                <option value="">Select Category</option>
+                                <option value="technical" <%= (formData.category || event.category) === 'technical' ? 'selected' : '' %>>Technical</option>
+                                <option value="cultural" <%= (formData.category || event.category) === 'cultural' ? 'selected' : '' %>>Cultural</option>
+                                <option value="sports" <%= (formData.category || event.category) === 'sports' ? 'selected' : '' %>>Sports</option>
+                                <option value="seminar" <%= (formData.category || event.category) === 'seminar' ? 'selected' : '' %>>Seminar</option>
+                                <option value="workshop" <%= (formData.category || event.category) === 'workshop' ? 'selected' : '' %>>Workshop</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="5" 
+                                      required><%= formData.description || event.description %></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Event Type -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h3 class="h5 mb-3">Event Type</h3>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="eventType" class="form-label">Event Type</label>
+                            <select class="form-select" id="eventType" name="eventType" onchange="toggleTeamSize()">
+                                <option value="individual" <%= (formData.eventType || event.eventType) === 'individual' ? 'selected' : '' %>>Individual</option>
+                                <option value="team" <%= (formData.eventType || event.eventType) === 'team' ? 'selected' : '' %>>Team</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3" id="teamSizeField" style="display: none;">
+                            <label for="teamSize" class="form-label">Team Size *</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="teamSize" 
+                                   name="teamSize" 
+                                   value="<%= formData.teamSize || event.teamSize %>"
+                                   min="2">
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="maxParticipants" class="form-label">Max Participants</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="maxParticipants" 
+                                   name="maxParticipants" 
+                                   value="<%= formData.maxParticipants || event.maxParticipants %>"
+                                   min="1">
+                        </div>
+                    </div>
+
+                    <!-- Subcategory for Sports -->
+                    <div class="row mb-4" id="subCategoryField" style="display: none;">
+                        <div class="col-12">
+                            <h3 class="h5 mb-3">Sports Subcategory</h3>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="subCategory" class="form-label">Subcategory</label>
+                            <select class="form-select" id="subCategory" name="subCategory">
+                                <option value="">Select Subcategory</option>
+                                <option value="cricket" <%= (formData.subCategory || event.subCategory) === 'cricket' ? 'selected' : '' %>>Cricket</option>
+                                <option value="football" <%= (formData.subCategory || event.subCategory) === 'football' ? 'selected' : '' %>>Football</option>
+                                <option value="basketball" <%= (formData.subCategory || event.subCategory) === 'basketball' ? 'selected' : '' %>>Basketball</option>
+                                <option value="volleyball" <%= (formData.subCategory || event.subCategory) === 'volleyball' ? 'selected' : '' %>>Volleyball</option>
+                                <option value="badminton" <%= (formData.subCategory || event.subCategory) === 'badminton' ? 'selected' : '' %>>Badminton</option>
+                                <option value="table-tennis" <%= (formData.subCategory || event.subCategory) === 'table-tennis' ? 'selected' : '' %>>Table Tennis</option>
+                                <option value="athletics" <%= (formData.subCategory || event.subCategory) === 'athletics' ? 'selected' : '' %>>Athletics</option>
+                                <option value="chess" <%= (formData.subCategory || event.subCategory) === 'chess' ? 'selected' : '' %>>Chess</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h3 class="h5 mb-3">Schedule</h3>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="date" class="form-label">Date *</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="date" 
+                                   name="date" 
+                                   value="<% if (formData.date) { %><%= new Date(formData.date).toISOString().split('T')[0] %><% } else { %><%= new Date(event.date).toISOString().split('T')[0] %><% } %>"
+                                   required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="startTime" class="form-label">Start Time *</label>
+                            <input type="time" 
+                                   class="form-control" 
+                                   id="startTime" 
+                                   name="startTime" 
+                                   value="<%= formData.startTime || event.startTime %>"
+                                   required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="endTime" class="form-label">End Time *</label>
+                            <input type="time" 
+                                   class="form-control" 
+                                   id="endTime" 
+                                   name="endTime" 
+                                   value="<%= formData.endTime || event.endTime %>"
+                                   required>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="venue" class="form-label">Venue *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="venue" 
+                                   name="venue" 
+                                   value="<%= formData.venue || event.venue %>"
+                                   placeholder="Enter venue location"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Event Poster -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h3 class="h5 mb-3">Event Poster</h3>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="poster" class="form-label">Update Poster (Optional)</label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="poster" 
+                                   name="poster" 
+                                   accept="image/*">
+                            <small class="text-muted">Leave empty to keep current poster</small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Current Poster</label>
+                            <% if (event.poster && event.poster.trim() !== '') { %>
+                                <img src="<%= event.poster %>" 
+                                     alt="Current Event Poster" 
+                                     class="poster-preview">
+                            <% } else { %>
+                                <div class="poster-preview d-flex align-items-center justify-content-center bg-light">
+                                    <i class="fas fa-calendar-alt text-3xl text-muted"></i>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex gap-3 justify-content-end">
+                                <a href="/faculty/my-events" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    Update Event
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+// Toggle subcategory based on category
+function toggleSubCategory() {
+    const category = document.getElementById('category').value;
+    const subCategoryField = document.getElementById('subCategoryField');
+    
+    if (category === 'sports') {
+        subCategoryField.style.display = 'block';
+    } else {
+        subCategoryField.style.display = 'none';
+    }
+}
+
+// Toggle team size based on event type
+function toggleTeamSize() {
+    const eventType = document.getElementById('eventType').value;
+    const teamSizeField = document.getElementById('teamSizeField');
+    
+    if (eventType === 'team') {
+        teamSizeField.style.display = 'block';
+        document.getElementById('teamSize').setAttribute('required', 'required');
+    } else {
+        teamSizeField.style.display = 'none';
+        document.getElementById('teamSize').removeAttribute('required');
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleSubCategory();
+    toggleTeamSize();
+});
+</script>

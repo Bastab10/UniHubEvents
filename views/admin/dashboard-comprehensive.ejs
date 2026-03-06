@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - College Event Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-800 text-white flex flex-col">
+            <div class="p-6 border-b border-gray-700">
+                <h2 class="text-lg font-bold">Admin Panel</h2>
+                <p class="text-sm text-gray-300">Event Management System</p>
+            </div>
+            
+            <nav class="flex-1 p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/admin/dashboard" class="flex items-center space-x-3 p-3 rounded-lg bg-gray-700 hover:bg-gray-600">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/students" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-600">
+                            <i class="fas fa-graduation-cap w-5"></i>
+                            <span>Students</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/faculty" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-600">
+                            <i class="fas fa-chalkboard-teacher w-5"></i>
+                            <span>Faculty</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/events" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-600">
+                            <i class="fas fa-calendar w-5"></i>
+                            <span>Events</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm border-b">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+                    <div class="flex items-center space-x-4">
+                        <a href="/auth/logout" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="p-6">
+                <!-- 1. Dashboard Features -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
+                        <h3 class="text-sm font-medium text-gray-600">Total Events</h3>
+                        <p class="text-2xl font-bold text-gray-800"><%= stats.totalEvents %></p>
+                        <p class="text-xs text-gray-500">All events in system</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+                        <h3 class="text-sm font-medium text-gray-600">Total Students</h3>
+                        <p class="text-2xl font-bold text-gray-800"><%= stats.totalStudents %></p>
+                        <p class="text-xs text-gray-500">Registered students</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-purple-500">
+                        <h3 class="text-sm font-medium text-gray-600">Total Faculty</h3>
+                        <p class="text-2xl font-bold text-gray-800"><%= stats.totalFaculty %></p>
+                        <p class="text-xs text-gray-500">Faculty members</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
+                        <h3 class="text-sm font-medium text-gray-600">Pending Approvals</h3>
+                        <p class="text-2xl font-bold text-gray-800"><%= stats.pendingEvents %></p>
+                        <p class="text-xs text-gray-500">Events awaiting approval</p>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Registration Status</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Pending Registrations</span>
+                                <span class="font-bold text-yellow-600">12</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Approved Registrations</span>
+                                <span class="font-bold text-green-600">245</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Rejected Registrations</span>
+                                <span class="font-bold text-red-600">8</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Events</h3>
+                        <div class="space-y-2">
+                            <% allEvents.slice(0, 3).forEach(event => { %>
+                                <div class="flex justify-between items-center text-sm">
+                                    <div class="flex-1">
+                                        <span><%= event.title %></span>
+                                        <span class="text-xs text-gray-500">by <%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %></span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-2 py-1 text-xs rounded-full 
+                                            <% if (event.status === 'pending') { %>
+                                                bg-yellow-100 text-yellow-800
+                                            <% } else if (event.status === 'approved') { %>
+                                                bg-green-100 text-green-800
+                                            <% } else if (event.status === 'rejected') { %>
+                                                bg-red-100 text-red-800
+                                            <% } else { %>
+                                                bg-gray-100 text-gray-800
+                                            <% } %>">
+                                            <%= event.status.charAt(0).toUpperCase() + event.status.slice(1) %>
+                                        </span>
+                                        <% if (event.status === 'pending') { %>
+                                            <button onclick="approveEvent('<%= event._id %>')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs">
+                                                <i class="fas fa-check mr-1"></i>
+                                                Approve
+                                            </button>
+                                            <button onclick="rejectEvent('<%= event._id %>')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs ml-2">
+                                                <i class="fas fa-times mr-1"></i>
+                                                Reject
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Pending Student Registrations</h3>
+                        <div class="space-y-2">
+                            <% if (recentRegistrations && recentRegistrations.length > 0) { %>
+                                <% recentRegistrations.forEach(event => { %>
+                                    <% event.registrations.forEach(registration => { %>
+                                        <% if (registration.status === 'pending') { %>
+                                            <div class="flex justify-between items-center text-sm bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                                                <div class="flex-1">
+                                                    <span class="font-medium text-yellow-800"><%= event.title %></span>
+                                                    <span class="text-xs text-yellow-600 block">by <%= registration.student.profile.firstName %> <%= registration.student.profile.lastName %></span>
+                                                    <span class="text-xs text-gray-500">Registered: <%= new Date(registration.registeredAt).toLocaleDateString() %></span>
+                                                    <span class="text-xs text-gray-500">Email: <%= registration.student.profile.email %></span>
+                                                    <span class="text-xs text-gray-500">College ID: <%= registration.student.profile.collegeId || 'N/A' %></span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                                        <i class="fas fa-clock mr-1"></i>
+                                                        Pending
+                                                    </span>
+                                                    <button onclick="viewRegistrationDetails('<%= registration._id %>', '<%= registration.student._id %>')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">
+                                                        <i class="fas fa-eye mr-1"></i>
+                                                        Details
+                                                    </button>
+                                                    <button onclick="approveRegistration('<%= registration._id %>')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition">
+                                                        <i class="fas fa-check mr-1"></i>
+                                                        Approve
+                                                    </button>
+                                                    <button onclick="rejectRegistration('<%= registration._id %>')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">
+                                                        <i class="fas fa-times mr-1"></i>
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        <% } %>
+                                    <% }) %>
+                                <% }) %>
+                            <% } else { %>
+                                <p class="text-gray-500 text-sm">No pending registrations found</p>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions - Approved Registrations</h3>
+                        <div class="space-y-2">
+                            <% if (recentRegistrations && recentRegistrations.length > 0) { %>
+                                <% recentRegistrations.forEach(event => { %>
+                                    <% event.registrations.forEach(registration => { %>
+                                        <% if (registration.status === 'approved') { %>
+                                            <div class="flex justify-between items-center text-sm bg-green-50 p-3 rounded-lg">
+                                                <div class="flex-1">
+                                                    <span class="font-medium text-green-800"><%= event.title %></span>
+                                                    <span class="text-xs text-green-600 block">by <%= registration.student.profile.firstName %> <%= registration.student.profile.lastName %></span>
+                                                    <span class="text-xs text-gray-500">Approved: <%= new Date(registration.approvalDate || registration.registeredAt).toLocaleDateString() %></span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                                        <i class="fas fa-check-circle mr-1"></i>
+                                                        Approved
+                                                    </span>
+                                                    <button onclick="viewRegistrationDetails('<%= registration._id %>', '<%= registration.student._id %>')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">
+                                                        <i class="fas fa-eye mr-1"></i>
+                                                        Details
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        <% } %>
+                                    <% }) %>
+                                <% }) %>
+                            <% } else { %>
+                                <p class="text-gray-500 text-sm">No approved registrations found</p>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">System Status</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Database Status</span>
+                                <span class="font-bold text-green-600">Connected</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Server Status</span>
+                                <span class="font-bold text-green-600">Running</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Last Backup</span>
+                                <span class="font-bold text-blue-600">Today</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white p-6 rounded-lg shadow mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <a href="/admin/students" class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-center hover:bg-blue-100">
+                            <i class="fas fa-user-plus text-blue-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium">Manage Students</p>
+                        </a>
+                        <a href="/admin/faculty" class="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center hover:bg-green-100">
+                            <i class="fas fa-chalkboard-teacher text-green-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium">Manage Faculty</p>
+                        </a>
+                        <a href="/admin/approved-events" class="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 text-center hover:bg-purple-100">
+                            <i class="fas fa-calendar-check text-purple-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium">Approved Events</p>
+                        </a>
+                        <a href="/admin/approved-registrations" class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 text-center hover:bg-yellow-100">
+                            <i class="fas fa-users-check text-yellow-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium">Approved Registrations</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activities</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded">
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-800">New faculty member "Dr. Smith" approved</p>
+                                <p class="text-xs text-gray-500">2 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-800">Event "Tech Workshop" approved</p>
+                                <p class="text-xs text-gray-500">3 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded">
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-800">Time clash detected for events</p>
+                                <p class="text-xs text-gray-500">5 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded">
+                            <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-800">Student registration rejected</p>
+                                <p class="text-xs text-gray-500">6 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Dashboard functionality - charts removed as requested
+        console.log('Admin Dashboard loaded successfully');
+        
+        // Event approval functions
+        function approveEvent(eventId) {
+            if (confirm('Are you sure you want to approve this event?')) {
+                fetch('/admin/events/' + eventId + '/approve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error approving event: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error approving event');
+                });
+            }
+        }
+        
+        function rejectEvent(eventId) {
+            const reason = prompt('Please enter rejection reason:');
+            if (reason) {
+                fetch('/admin/events/' + eventId + '/reject', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason: reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error rejecting event: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error rejecting event');
+                });
+            }
+        }
+        
+        // Registration approval functions
+        function approveRegistration(registrationId) {
+            if (confirm('Are you sure you want to approve this registration?')) {
+                fetch('/admin/registrations/' + registrationId + '/approve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error approving registration: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error approving registration');
+                });
+            }
+        }
+        
+        function rejectRegistration(registrationId) {
+            const reason = prompt('Please enter rejection reason:');
+            if (reason) {
+                fetch('/admin/registrations/' + registrationId + '/reject', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason: reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error rejecting registration: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error rejecting registration');
+                });
+            }
+        }
+        
+        function viewRegistrationDetails(registrationId, studentId) {
+            // Fetch student details and show in modal
+            fetch(`/admin/students/${studentId}/details`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStudentModal(data.student, data.registration);
+                    } else {
+                        alert('Error loading student details: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error loading student details');
+                });
+        }
+        
+        function showStudentModal(student, registration) {
+            // Create modal HTML
+            const modalHtml = `
+                <div id="studentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                        <div class="mt-3">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium text-gray-900">Student Details</h3>
+                                <button onclick="closeStudentModal()" class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-4">
+                                    <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-500 text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-900">
+                                            ${student.profile.firstName} ${student.profile.lastName}
+                                        </h4>
+                                        <p class="text-sm text-gray-500">${student.profile.email}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-t pt-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-700">College ID:</span>
+                                            <p class="text-sm text-gray-900">${student.profile.collegeId || 'N/A'}</p>
+                                        </div>
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-700">Department:</span>
+                                            <p class="text-sm text-gray-900">${student.profile.department || 'N/A'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-t pt-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-medium text-gray-700">Verification Status:</span>
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            ${student.profile.verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                            ${student.profile.verified ? '<i class="fas fa-check-circle mr-1"></i>Verified' : '<i class="fas fa-exclamation-triangle mr-1"></i>Not Verified'}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                ${registration ? `
+                                <div class="border-t pt-4">
+                                    <h5 class="text-sm font-medium text-gray-700 mb-2">Registration Information</h5>
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-600">Status:</span>
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                ${registration.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                                  registration.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                                                  'bg-red-100 text-red-800'}">
+                                                ${registration.status.charAt(0).toUpperCase() + registration.status.slice(1)}
+                                            </span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-600">Registered Date:</span>
+                                            <span class="text-sm text-gray-900">${new Date(registration.registeredAt).toLocaleDateString()}</span>
+                                        </div>
+                                        ${registration.teamName ? `
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-600">Team Name:</span>
+                                            <span class="text-sm text-gray-900">${registration.teamName}</span>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <button onclick="closeStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
+                                    Close
+                                </button>
+                                <button onclick="viewFullDetails('${student._id}')" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    View Full Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function closeStudentModal() {
+            const modal = document.getElementById('studentModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        function viewFullDetails(studentId) {
+            closeStudentModal();
+            window.location.href = `/admin/students/${studentId}`;
+        }
+    </script>
+</body>
+</html>

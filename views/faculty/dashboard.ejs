@@ -1,0 +1,117 @@
+<%- include('../partials/header') %>
+
+<div class="flex min-h-screen">
+    <%- include('../partials/sidebar') %>
+    
+    <main class="flex-1 bg-white">
+        <div class="p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Faculty Dashboard</h1>
+                <p class="text-gray-600">Welcome back, <%= currentUser.profile.firstName %>! Manage your events and track participation.</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm text-gray-500">Total Events</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= stats.totalEvents %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-100 rounded-full">
+                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm text-gray-500">Pending Approval</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= stats.pendingEvents %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm text-gray-500">Approved Events</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= stats.approvedEvents %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Events -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Recent Events</h2>
+                        <a href="/faculty/events/create" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                            <i class="fas fa-plus mr-1"></i>Create Event
+                        </a>
+                    </div>
+                    <div class="space-y-3">
+                        <% if (recentEvents && recentEvents.length > 0) { %>
+                            <% recentEvents.forEach(event => { %>
+                                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium text-gray-800"><%= event.title %></h3>
+                                            <p class="text-sm text-gray-600">
+                                                <i class="fas fa-calendar-alt mr-1"></i>
+                                                <%= new Date(event.date).toLocaleDateString() %>
+                                            </p>
+                                            <p class="text-sm text-gray-600">
+                                                <i class="fas fa-tag mr-1"></i>
+                                                <%= event.category %>
+                                            </p>
+                                        </div>
+                                        <span class="px-2 py-1 text-xs font-medium 
+                                            <% if (event.status === 'approved') { %>bg-green-100 text-green-800<% } else if (event.status === 'pending') { %>bg-yellow-100 text-yellow-800<% } else { %>bg-red-100 text-red-800<% } %> rounded-full">
+                                            <%= event.status.charAt(0).toUpperCase() + event.status.slice(1) %>
+                                        </span>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-gray-500 text-center py-4">No events created yet</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <a href="/faculty/events/create" class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                        <i class="fas fa-plus-circle text-blue-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Create Event</span>
+                    </a>
+                    <a href="/faculty/events" class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition">
+                        <i class="fas fa-list text-green-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">My Events</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                        <i class="fas fa-chart-line text-purple-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Analytics</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition">
+                        <i class="fas fa-bell text-yellow-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Notifications</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<%- include('../partials/footer') %>

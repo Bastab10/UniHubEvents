@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - NLU Event Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../partials/header') %>
+    
+    <div class="flex h-screen">
+        <%- include('../partials/sidebar') %>
+        
+        <main class="flex-1 overflow-y-auto">
+            <div class="p-6">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">Event Details</h1>
+                            <p class="text-gray-600">Complete event information and management</p>
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="/admin/events" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Events
+                            </a>
+                            <a href="/admin/dashboard" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-tachometer-alt mr-2"></i>
+                                Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Information -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Event Details -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center mb-4">
+                            <div class="h-16 w-16 rounded-full bg-blue-200 flex items-center justify-center">
+                                <i class="fas fa-calendar text-blue-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h2 class="text-xl font-bold text-gray-900"><%= event.title %></h2>
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <% if (event.status === 'pending') { %>
+                                        bg-yellow-100 text-yellow-800
+                                    <% } else if (event.status === 'approved') { %>
+                                        bg-green-100 text-green-800
+                                    <% } else if (event.status === 'rejected') { %>
+                                        bg-red-100 text-red-800
+                                    <% } else { %>
+                                        bg-gray-100 text-gray-800
+                                    <% } %>
+                                ">
+                                    <%= event.status.charAt(0).toUpperCase() + event.status.slice(1) %>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-2">Event Information</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Category:</span>
+                                        <span class="text-sm font-medium text-gray-900"><%= event.category %></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Date:</span>
+                                        <span class="text-sm font-medium text-gray-900"><%= new Date(event.date).toLocaleDateString() %></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Time:</span>
+                                        <span class="text-sm font-medium text-gray-900"><%= event.time || 'Not specified' %></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Duration:</span>
+                                        <span class="text-sm font-medium text-gray-900"><%= event.duration || 'Not specified' %></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Venue:</span>
+                                        <span class="text-sm font-medium text-gray-900"><%= event.venue %></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Max Participants:</span>
+                                        <span class="text-sm font-medium text-gray-900"><%= event.maxParticipants || 'Unlimited' %></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-700 mb-2">Organizer Information</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Name:</span>
+                                        <span class="text-sm font-medium text-gray-900">
+                                            <% if (event.organizer) { %>
+                                                <%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %>
+                                            <% } else { %>
+                                                N/A
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Email:</span>
+                                        <span class="text-sm font-medium text-gray-900">
+                                            <% if (event.organizer) { %>
+                                                <%= event.organizer.profile.email %>
+                                            <% } else { %>
+                                                N/A
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Department:</span>
+                                        <span class="text-sm font-medium text-gray-900">
+                                            <% if (event.organizer) { %>
+                                                <%= event.organizer.profile.department || 'N/A' %>
+                                            <% } else { %>
+                                                N/A
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Created:</span>
+                                        <span class="text-sm font-medium text-gray-900"><%= new Date(event.createdAt).toLocaleDateString() %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">Description</h3>
+                            <p class="text-sm text-gray-600"><%= event.description || 'No description provided' %></p>
+                        </div>
+                    </div>
+
+                    <!-- Registration Statistics -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center mb-4">
+                            <div class="h-16 w-16 rounded-full bg-green-200 flex items-center justify-center">
+                                <i class="fas fa-users text-green-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Registration Statistics</h3>
+                                <p class="text-sm text-gray-600">Student registration overview</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-blue-600">
+                                    <%= event.registrations ? event.registrations.length : 0 %>
+                                </div>
+                                <p class="text-sm text-gray-600">Total Registrations</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-green-600">
+                                    <%= event.registrations ? event.registrations.filter(reg => reg.status === 'approved').length : 0 %>
+                                </div>
+                                <p class="text-sm text-gray-600">Approved</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-yellow-600">
+                                    <%= event.registrations ? event.registrations.filter(reg => reg.status === 'pending').length : 0 %>
+                                </div>
+                                <p class="text-sm text-gray-600">Pending</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-red-600">
+                                    <%= event.registrations ? event.registrations.filter(reg => reg.status === 'rejected').length : 0 %>
+                                </div>
+                                <p class="text-sm text-gray-600">Rejected</p>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-6 flex space-x-4">
+                            <% if (event.status === 'pending') { %>
+                                <button onclick="approveEvent('<%= event._id %>')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-check mr-2"></i>
+                                    Approve Event
+                                </button>
+                                <button onclick="rejectEvent('<%= event._id %>')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                                    <i class="fas fa-times mr-2"></i>
+                                    Reject Event
+                                </button>
+                            <% } %>
+                            <button onclick="viewRegistrations()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-users mr-2"></i>
+                                View All Registrations
+                            </button>
+                            <button onclick="editEvent('<%= event._id %>')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-edit mr-2"></i>
+                                Edit Event
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Registrations -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="h-16 w-16 rounded-full bg-indigo-200 flex items-center justify-center">
+                            <i class="fas fa-user-check text-indigo-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Registrations</h3>
+                            <p class="text-sm text-gray-600">Latest student registrations</p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Student Name
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Email
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        College ID
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Registration Date
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <% if (event.registrations && event.registrations.length > 0) { %>
+                                    <% event.registrations.slice(0, 5).forEach(registration => { %>
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    <% if (registration.student) { %>
+                                                        <%= registration.student.profile.firstName %> <%= registration.student.profile.lastName %>
+                                                    <% } else { %>
+                                                        Student Not Found
+                                                    <% } %>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <% if (registration.student) { %>
+                                                    <%= registration.student.profile.email %>
+                                                <% } else { %>
+                                                    N/A
+                                                <% } %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <% if (registration.student) { %>
+                                                    <%= registration.student.profile.collegeId || 'N/A' %>
+                                                <% } else { %>
+                                                    N/A
+                                                <% } %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <%= new Date(registration.registeredAt).toLocaleDateString() %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                    <% if (registration.status === 'pending') { %>
+                                                        bg-yellow-100 text-yellow-800
+                                                    <% } else if (registration.status === 'approved') { %>
+                                                        bg-green-100 text-green-800
+                                                    <% } else if (registration.status === 'rejected') { %>
+                                                        bg-red-100 text-red-800
+                                                    <% } else { %>
+                                                        bg-gray-100 text-gray-800
+                                                    <% } %>
+                                                ">
+                                                    <%= registration.status.charAt(0).toUpperCase() + registration.status.slice(1) %>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <% if (registration.student) { %>
+                                                    <button onclick="viewStudentDetails('<%= registration.student._id %>')" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition">
+                                                        <i class="fas fa-user mr-1"></i>
+                                                        View Student
+                                                    </button>
+                                                <% } %>
+                                                <% if (registration.status === 'pending') { %>
+                                                    <button onclick="approveRegistration('<%= registration._id %>')" class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 transition ml-2">
+                                                        <i class="fas fa-check mr-1"></i>
+                                                        Approve
+                                                    </button>
+                                                    <button onclick="rejectRegistration('<%= registration._id %>')" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition ml-2">
+                                                        <i class="fas fa-times mr-1"></i>
+                                                        Reject
+                                                    </button>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                                            <div class="flex flex-col items-center">
+                                                <i class="fas fa-user-times text-4xl text-gray-300 mb-4"></i>
+                                                <p class="text-lg font-medium">No registrations found</p>
+                                                <p class="text-sm">No students have registered for this event yet.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function approveEvent(eventId) {
+            if (confirm('Are you sure you want to approve this event?')) {
+                fetch(`/admin/events/${eventId}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Event approved successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Error approving event: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error approving event');
+                });
+            }
+        }
+
+        function rejectEvent(eventId) {
+            const reason = prompt('Please enter rejection reason:');
+            if (reason) {
+                fetch(`/admin/events/${eventId}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Event rejected successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Error rejecting event: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error rejecting event');
+                });
+            }
+        }
+
+        function viewRegistrations() {
+            window.location.href = `/admin/events/${event._id}/registrations`;
+        }
+
+        function viewStudentDetails(studentId) {
+            window.location.href = `/admin/students/${studentId}`;
+        }
+
+        function approveRegistration(registrationId) {
+            if (confirm('Are you sure you want to approve this registration?')) {
+                fetch(`/admin/registrations/${registrationId}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Registration approved successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Error approving registration: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error approving registration');
+                });
+            }
+        }
+
+        function rejectRegistration(registrationId) {
+            const reason = prompt('Please enter rejection reason:');
+            if (reason) {
+                fetch(`/admin/registrations/${registrationId}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Registration rejected successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Error rejecting registration: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error rejecting registration');
+                });
+            }
+        }
+
+        function editEvent(eventId) {
+            // Redirect to event edit page (to be implemented)
+            alert('Edit functionality coming soon!');
+        }
+    </script>
+</body>
+</html>

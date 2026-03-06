@@ -1,0 +1,357 @@
+<% if (currentUser) { %>
+
+<!-- Simple Working Sidebar -->
+<style>
+/* Sidebar Styles - Mobile First */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1030;
+    overflow-y: auto;
+}
+
+@media (min-width: 640px) {
+    .sidebar {
+        top: 56px;
+        height: calc(100vh - 56px);
+        width: 280px;
+        left: -280px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .sidebar {
+        top: 64px;
+        height: calc(100vh - 64px);
+    }
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+@media (min-width: 640px) {
+    .sidebar-header {
+        padding: 2rem 1.5rem;
+    }
+}
+
+.sidebar-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+    .sidebar-close-btn {
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding-left: 1.5rem;
+}
+
+.sidebar-nav a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: white;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-nav a:hover::before {
+    transform: scaleY(1);
+}
+
+.sidebar-nav i {
+    width: 24px;
+    margin-right: 0.75rem;
+    font-size: 1rem;
+}
+
+@media (min-width: 640px) {
+    .sidebar-nav {
+        padding: 1.5rem 0;
+    }
+    
+    .sidebar-nav a {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .sidebar-nav a:hover {
+        padding-left: 2rem;
+    }
+    
+    .sidebar-nav i {
+        width: 20px;
+        margin-right: 1rem;
+        font-size: 1.125rem;
+    }
+}
+
+.sidebar-divider {
+    margin: 1.5rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav a.logout-link {
+    color: #ff6b6b;
+    margin-top: 1rem;
+}
+
+.sidebar-nav a.logout-link:hover {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1025;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+    .overlay {
+        top: 56px;
+        height: calc(100vh - 56px);
+    }
+}
+
+@media (min-width: 1024px) {
+    .overlay {
+        top: 64px;
+        height: calc(100vh - 64px);
+    }
+}
+
+.overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    /* Hide sidebar toggle on tablet and show only mobile menu */
+    .sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 639px) {
+    .sidebar {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-header h3 {
+        font-size: 1rem;
+    }
+    
+    .sidebar-header p {
+        display: none;
+    }
+    
+    .sidebar-nav a {
+        padding: 0.875rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .sidebar-nav i {
+        width: 20px;
+        margin-right: 0.625rem;
+        font-size: 0.875rem;
+    }
+    
+    .sidebar-divider {
+        margin: 1rem 0.75rem;
+    }
+}
+
+/* Show sidebar only on desktop */
+@media (min-width: 1025px) {
+    .sidebar {
+        display: block;
+    }
+}
+</style>
+
+<!-- Sidebar -->
+<aside id="mainSidebar" class="sidebar">
+    <div class="sidebar-header">
+        <h3 class="text-white font-bold text-xl mb-1">
+            <i class="fas fa-graduation-cap mr-2"></i>
+            Campus Events
+        </h3>
+        <p class="text-white text-sm opacity-75">Event Management System</p>
+        <button class="sidebar-close-btn" onclick="closeSidebar()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <% if (currentUser.role === 'admin') { %>
+            <a href="/admin/dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            <a href="/admin/students">
+                <i class="fas fa-graduation-cap"></i>
+                Students
+            </a>
+            <a href="/admin/faculty">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Faculty
+            </a>
+            <a href="/admin/events">
+                <i class="fas fa-calendar"></i>
+                Events
+            </a>
+
+            <div class="sidebar-divider"></div>
+
+            <a href="/auth/logout" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        <% } else if (currentUser.role === 'faculty') { %>
+            <a href="/faculty/dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+
+            <div class="sidebar-divider"></div>
+
+            <a href="/faculty/events/create" class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition">
+                <i class="fas fa-plus-circle mr-3"></i> Create Event
+            </a>
+            <a href="/faculty/events" class="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition">
+                <i class="fas fa-calendar mr-3"></i> My Events
+            </a>
+
+            <div class="sidebar-divider"></div>
+
+            <a href="/auth/logout" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        <% } else if (currentUser.role === 'student') { %>
+            <a href="/student/dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            <a href="/student/events">
+                <i class="fas fa-calendar"></i>
+                Browse Events
+            </a>
+            <a href="/student/my-events">
+                <i class="fas fa-ticket-alt"></i>
+                My Registrations
+            </a>
+
+            <div class="sidebar-divider"></div>
+
+            <a href="/auth/logout" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        <% } %>
+    </nav>
+</aside>
+
+<!-- Overlay -->
+<div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+<script>
+function openSidebar() {
+    const sidebar = document.getElementById('mainSidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.add('open');
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('mainSidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// Close sidebar on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeSidebar();
+    }
+});
+</script>
+
+<% } %>

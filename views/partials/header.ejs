@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - NLU Event Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/professional-ui.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <style>
+        /* Enhanced Sticky Navbar */
+        .navbar-enhanced {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .navbar-enhanced.scrolled {
+            background: rgba(102, 126, 234, 0.95);
+            backdrop-filter: blur(25px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .logo-container {
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+        
+        .search-enhanced {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .search-enhanced:focus {
+            background: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .user-dropdown {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+        }
+        
+        .dropdown-animation {
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .user-avatar {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.1);
+        }
+        
+        .nav-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .nav-button:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .quick-filter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .quick-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+        
+        /* Z-index fixes */
+        .navbar-z-index {
+            z-index: 9999 !important;
+        }
+        
+        /* Body padding for fixed navbar */
+        body {
+            padding-top: 56px !important;
+        }
+        
+        @media (min-width: 640px) {
+            body {
+                padding-top: 64px !important;
+            }
+        }
+        
+        .dropdown-z-index {
+            z-index: 1050;
+        }
+        
+        /* Mobile Navigation Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 320px;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.active {
+            left: 0;
+        }
+        
+        .mobile-menu-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        .mobile-menu-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .mobile-menu-nav {
+            padding: 1.5rem 0;
+        }
+        
+        .mobile-menu-nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+        
+        .mobile-menu-nav a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: white;
+            padding-left: 2rem;
+        }
+        
+        .mobile-menu-nav i {
+            width: 20px;
+            margin-right: 1rem;
+            font-size: 1.125rem;
+        }
+        
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1045;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Responsive Design - Mobile First Approach */
+        
+        /* Extra Small Devices (320px - 479px) */
+        @media (max-width: 479px) {
+            .navbar-enhanced .max-w-7xl {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            
+            .navbar-enhanced .h-16 {
+                height: 3.5rem;
+            }
+            
+            .logo-container {
+                padding: 0.5rem;
+            }
+            
+            .logo-container i {
+                font-size: 1rem;
+            }
+            
+            .logo-text {
+                display: none;
+            }
+            
+            .nav-button {
+                padding: 0.5rem;
+            }
+            
+            .nav-button i {
+                font-size: 1rem;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .mobile-menu {
+                width: 90%;
+            }
+        }
+        
+        /* Small Devices (480px - 767px) */
+        @media (min-width: 480px) and (max-width: 767px) {
+            .navbar-enhanced .max-w-7xl {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .logo-text h1 {
+                font-size: 1rem;
+            }
+            
+            .logo-text p {
+                display: none;
+            }
+            
+            .user-info {
+                display: none;
+            }
+        }
+        
+        /* Medium Devices (768px - 1023px) - Tablets */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .search-enhanced {
+                max-width: 280px;
+            }
+            
+            .quick-filter-btn {
+                display: none;
+            }
+            
+            .user-dropdown {
+                width: 14rem;
+                right: -1rem;
+            }
+        }
+        
+        /* Large Devices (1024px - 1279px) - Small Laptops */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            .search-enhanced {
+                max-width: 320px;
+            }
+            
+            .quick-filter-btn {
+                display: none;
+            }
+        }
+        
+        /* Extra Large Devices (1280px - 1535px) - Laptops */
+        @media (min-width: 1280px) and (max-width: 1535px) {
+            .search-enhanced {
+                max-width: 400px;
+            }
+        }
+        
+        /* Ultra Wide Devices (1536px+) - Large Desktops */
+        @media (min-width: 1536px) {
+            .navbar-enhanced .max-w-7xl {
+                max-width: 1400px;
+            }
+            
+            .search-enhanced {
+                max-width: 500px;
+            }
+        }
+        
+        /* Hide mobile menu button on desktop */
+        @media (min-width: 768px) {
+            .mobile-menu-btn {
+                display: none !important;
+            }
+        }
+        
+        /* Show desktop elements only on larger screens */
+        
+        /* Improved touch targets for mobile */
+        @media (max-width: 767px) {
+            .nav-button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Mobile search optimizations */
+            .search-enhanced {
+                font-size: 16px !important; /* Prevents zoom on iOS */
+                min-height: 40px;
+            }
+            
+            .search-enhanced::placeholder {
+                font-size: 14px;
+            }
+        }
+        
+        /* Small mobile adjustments */
+        @media (max-width: 480px) {
+            .search-enhanced {
+                font-size: 14px !important;
+                min-height: 36px;
+            }
+            
+            .search-enhanced::placeholder {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Enhanced Modern Navbar -->
+    <nav class="navbar-enhanced navbar-transition navbar-z-index fixed top-0 left-0 right-0">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14 sm:h-16">
+                <!-- Left Section: Mobile Menu Button + Sidebar Toggle + Logo -->
+                <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileMenu()" 
+                            class="mobile-menu-btn nav-button text-white hover:bg-white/10 p-2 sm:p-2.5 rounded-lg sm:rounded-xl"
+                            title="Mobile Menu">
+                        <i class="fas fa-bars text-base sm:text-lg"></i>
+                    </button>
+                    
+                    <!-- Sidebar Toggle Button (Desktop) -->
+                    <button onclick="openSidebar()" 
+                            class="nav-button text-white hover:bg-white/10 p-2 sm:p-2.5 lg:p-3 rounded-lg sm:rounded-xl hidden md:flex"
+                            title="Toggle Menu">
+                        <i class="fa-solid fa-sliders text-base sm:text-lg"></i>
+                    </button>
+                    
+                    <!-- Logo/Brand -->
+                    <div class="flex items-center space-x-2 sm:space-x-3">
+                        <div class="logo-container bg-white p-1.5 sm:p-2 lg:p-2.5 rounded-lg sm:rounded-xl shadow-lg">
+                            <i class="fa-brands fa-squarespace text-sm sm:text-base lg:text-lg"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1 class="text-white text-sm sm:text-base lg:text-lg xl:text-xl font-bold tracking-tight">Campus Event</h1>
+                            <p class="text-blue-100 text-xs sm:text-xs font-medium hidden md:block">NLU Event Management System</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="flex items-center flex-1 mx-1 sm:mx-2 lg:mx-6 xl:mx-8">
+                    <div class="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-md xl:max-w-lg">
+                        <input type="text" 
+                               id="eventSearch" 
+                               placeholder="Search events..." 
+                               class="search-enhanced w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 pl-8 sm:pl-10 md:pl-12 pr-16 sm:pr-20 md:pr-24 text-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-white/50 text-xs sm:text-sm md:text-base">
+                        <div class="absolute left-2 sm:left-3 md:left-4 top-1/2 transform -translate-y-1/2">
+                            <i class="fas fa-search text-gray-400 text-xs sm:text-sm md:text-base"></i>
+                        </div>
+                        <!-- Quick Category Filters - Hidden on smaller screens -->
+                        <!-- <div class="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 flex space-x-1 hidden lg:hidden xl:flex">
+                            <button onclick="quickSearch('Technical')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200">T</button>
+                            <button onclick="quickSearch('Cultural')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200">C</button>
+                            <button onclick="quickSearch('Sports')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200">S</button>
+                            <button onclick="quickSearch('Seminar')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200">Se</button>
+                        </div> -->
+                        <!-- Full Quick Filters - Only on large screens -->
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1 hidden 2xl:flex">
+                            <button onclick="quickSearch('Technical')" class="quick-filter-btn px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200">Technical</button>
+                            <button onclick="quickSearch('Cultural')" class="quick-filter-btn px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200">Cultural</button>
+                            <button onclick="quickSearch('Sports')" class="quick-filter-btn px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200">Sports</button>
+                            <button onclick="quickSearch('Seminar')" class="quick-filter-btn px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200">Seminar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Side Actions -->
+                <div class="flex items-center justify-end ml-auto">
+                    <% if (currentUser) { %>
+                        <!-- User Profile Dropdown -->
+                        <div class="relative">
+                            <button onclick="toggleUserDropdown()" class="nav-button flex items-center space-x-2 sm:space-x-3 text-white hover:bg-white/10 px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl">
+                               <h2><i class="fa-solid fa-circle-user text-base sm:text-lg"></i></h2>
+                                <!-- <img src="<%= currentUser.profile.avatar || '/images/default-avatar.png' %>" 
+                                     alt="Profile" 
+                                     class="user-avatar h-8 w-8 lg:h-9 lg:w-9 rounded-full object-cover"> -->
+                                <div class="user-info text-left hidden sm:block">
+                                    <p class="text-xs sm:text-sm font-semibold">
+                                        <%= currentUser.profile.firstName %> <%= currentUser.profile.lastName %>
+                                    </p>
+                                    <p class="text-xs text-blue-100 capitalize">
+                                        <%= currentUser.role %>
+                                    </p>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs sm:text-sm transition-transform duration-300 hidden lg:block"></i>
+                            </button>
+                            
+                            <!-- Enhanced Dropdown Menu -->
+                            <div id="userDropdown" class="hidden user-dropdown absolute right-0 mt-2 sm:mt-3 w-48 sm:w-56 lg:w-64 py-2 dropdown-z-index dropdown-animation">
+                                <div class="px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-100">
+                                    <p class="text-xs sm:text-sm font-bold text-gray-800">
+                                        <%= currentUser.profile.firstName %> <%= currentUser.profile.lastName %>
+                                    </p>
+                                    <p class="text-xs text-gray-500 capitalize">
+                                        <%= currentUser.role %>
+                                        <% if (currentUser.profile.department) { %>
+                                            • <%= currentUser.profile.department %>
+                                        <% } %>
+                                    </p>
+                                </div>
+                                <a href="/<%= currentUser.role %>/profile" class="flex items-center px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-user-circle mr-2 sm:mr-3 text-gray-400 text-sm"></i>
+                                    My Profile
+                                </a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <!-- Login Button -->
+                        <a href="/auth/login" class="bg-white text-blue-600 px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 rounded-lg sm:rounded-xl font-medium hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xs sm:text-sm">
+                            <i class="fas fa-sign-in-alt mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                            <span class="hidden sm:inline">Login</span>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+        <div class="mobile-menu-header">
+            <h3 class="text-white font-bold text-lg sm:text-xl mb-1">
+                <i class="fas fa-graduation-cap mr-2 text-base sm:text-lg"></i>
+                Campus Events
+            </h3>
+            <p class="text-white text-xs sm:text-sm opacity-75">Event Management System</p>
+            <button class="mobile-menu-close" onclick="closeMobileMenu()">
+                <i class="fas fa-times text-base sm:text-lg"></i>
+            </button>
+        </div>
+        
+        <nav class="mobile-menu-nav">
+            <% if (currentUser) { %>
+                <% if (currentUser.role === 'admin') { %>
+                    <a href="/admin/dashboard">
+                        <i class="fas fa-tachometer-alt text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Dashboard</span>
+                    </a>
+                    <a href="/admin/students">
+                        <i class="fas fa-graduation-cap text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Students</span>
+                    </a>
+                    <a href="/admin/faculty">
+                        <i class="fas fa-chalkboard-teacher text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Faculty</span>
+                    </a>
+                    <a href="/admin/events">
+                        <i class="fas fa-calendar text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Events</span>
+                    </a>
+                    <a href="/admin/profile">
+                        <i class="fas fa-user text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">My Profile</span>
+                    </a>
+                <% } else if (currentUser.role === 'faculty') { %>
+                    <a href="/faculty/dashboard">
+                        <i class="fas fa-tachometer-alt text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Dashboard</span>
+                    </a>
+                    <a href="/faculty/events/create">
+                        <i class="fas fa-plus-circle text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Create Event</span>
+                    </a>
+                    <a href="/faculty/events">
+                        <i class="fas fa-calendar text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">My Events</span>
+                    </a>
+                    <a href="/faculty/profile">
+                        <i class="fas fa-user text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">My Profile</span>
+                    </a>
+                <% } else if (currentUser.role === 'student') { %>
+                    <a href="/student/dashboard">
+                        <i class="fas fa-tachometer-alt text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Dashboard</span>
+                    </a>
+                    <a href="/student/events">
+                        <i class="fas fa-calendar text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Browse Events</span>
+                    </a>
+                    <a href="/student/my-events">
+                        <i class="fas fa-ticket-alt text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">My Registrations</span>
+                    </a>
+                    <a href="/student/profile">
+                        <i class="fas fa-user text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">My Profile</span>
+                    </a>
+                <% } %>
+                
+                <div style="margin: 1.5rem 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
+                
+                <a href="/auth/logout" style="color: #ff6b6b;">
+                    <i class="fas fa-sign-out-alt text-base sm:text-lg"></i>
+                    <span class="text-sm sm:text-base">Logout</span>
+                </a>
+            <% } else { %>
+                <a href="/auth/login">
+                    <i class="fas fa-sign-in-alt text-base sm:text-lg"></i>
+                    <span class="text-sm sm:text-base">Login</span>
+                </a>
+                <a href="/auth/register">
+                    <i class="fas fa-user-plus text-base sm:text-lg"></i>
+                    <span class="text-sm sm:text-base">Register</span>
+                </a>
+            <% } %>
+        </nav>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Flash Messages -->
+    <% if (success) { %>
+        <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-4 shadow-md transition-opacity duration-500">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium"><%= success %></p>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Auto-hide success message after 4 seconds
+            setTimeout(function() {
+                const successMessage = document.getElementById('successMessage');
+                if (successMessage) {
+                    successMessage.style.opacity = '0';
+                    setTimeout(function() {
+                        successMessage.remove();
+                    }, 500); // Wait for fade out animation
+                }
+            }, 4000);
+        </script>
+    <% } %>
+
+    <% if (error) { %>
+        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 shadow-md">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium"><%= error %></p>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 shadow-md">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium">Please fix the following errors:</p>
+                    <ul class="mt-2 list-disc list-inside text-sm space-y-1">
+                        <% errors.forEach(error => { %>
+                            <li><%= error.msg %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <script>
+        // Sticky Navbar Scroll Effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar-enhanced');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            const chevron = event.currentTarget.querySelector('.fa-chevron-down');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                dropdown.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        // Search functionality
+        function quickSearch(category) {
+            const searchInput = document.getElementById('eventSearch');
+            searchInput.value = category;
+            performSearch();
+        }
+        
+        function performSearch() {
+            const searchTerm = document.getElementById('eventSearch').value.trim();
+            if (searchTerm) {
+                // Redirect to events page with search parameter
+                const currentRole = '<%= currentUser ? currentUser.role : "student" %>';
+                window.location.href = `/${currentRole}/events?search=${encodeURIComponent(searchTerm)}`;
+            }
+        }
+        
+        // Handle Enter key in search
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('eventSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const button = event.target.closest('button');
+            const chevron = document.querySelector('.fa-chevron-down');
+            
+            if (!button || !button.onclick || button.onclick.toString().indexOf('toggleUserDropdown') === -1) {
+                dropdown.classList.add('hidden');
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Close dropdown on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const dropdown = document.getElementById('userDropdown');
+                const chevron = document.querySelector('.fa-chevron-down');
+                dropdown.classList.add('hidden');
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            if (mobileMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+        
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            mobileMenu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuBtn = event.target.closest('.mobile-menu-btn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active') && 
+                !mobileMenu.contains(event.target) && !mobileMenuBtn) {
+                closeMobileMenu();
+            }
+        });
+        
+        // Close mobile menu on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu && mobileMenu.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            }
+        });
+    </script>

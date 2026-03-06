@@ -1,0 +1,988 @@
+<%- include('../partials/header') %>
+
+<style>
+/* Dashboard Container Styles */
+.dashboard-container {
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        background: #f9fafb;
+    }
+}
+</style>
+
+<div class="dashboard-container">
+    <%- include('../partials/sidebar') %>
+    
+    <main class="flex-1">
+        <div class="p-6">
+
+            <!-- Page Header -->
+            <div class="mb-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+                    <p class="text-gray-600 mt-2">
+                        Welcome back, <%= currentUser.profile.firstName %>! Here's your system overview.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+
+                <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('students')">
+                    <p class="text-xs text-gray-500">Total Students</p>
+                    <p class="text-xl font-bold text-gray-800">
+                        <%= stats.totalStudents %>
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all students →</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('all-faculty')">
+                    <p class="text-xs text-gray-500">Total Faculty</p>
+                    <p class="text-xl font-bold text-gray-800">
+                        <%= stats.totalFaculty %>
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all faculty →</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('faculty')">
+                    <p class="text-xs text-gray-500">Pending Registration Approvals</p>
+                    <p class="text-xl font-bold text-gray-800">
+                        <%= stats.pendingFaculty %>
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all pending faculty →</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('all-registrations')">
+                    <p class="text-xs text-gray-500">All Student Registrations</p>
+                    <p class="text-xl font-bold text-gray-800">
+                        <%= stats.totalRegistrations || 0 %>
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all registrations →</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('pending')">
+                    <p class="text-xs text-gray-500">Pending Event Approvals</p>
+                    <p class="text-xl font-bold text-gray-800">
+                        <%= stats.pendingEvents %>
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all pending events →</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('all-events')">
+                    <p class="text-xs text-gray-500">All Events</p>
+                    <p class="text-xl font-bold text-gray-800">
+                        <%= stats.totalEvents %>
+                    </p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all events →</p>
+                </div>
+
+            </div>
+
+            <!-- Dynamic Content Sections -->
+            <div id="dynamic-content">
+                <!-- Students Section -->
+                <div id="students-section" class="content-section" style="display: none;">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">All Students</h2>
+                                <p class="text-gray-600">Complete list of all registered students</p>
+                            </div>
+                            <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Dashboard
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Student</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">College ID</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Department</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Year</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <% if (typeof allStudents !== 'undefined' && allStudents.length > 0) { %>
+                                            <% allStudents.forEach(student => { %>
+                                                <tr class="hover:bg-gray-50 transition-colors">
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center">
+                                                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                                                <i class="fas fa-user text-blue-600"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-sm font-medium text-gray-900">
+                                                                    <%= student.profile.firstName %> <%= student.profile.lastName %>
+                                                                </div>
+                                                                <div class="text-sm text-gray-500"><%= student.email %></div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4 text-sm text-gray-900"><%= student.profile.collegeId %></td>
+                                                    <td class="px-6 py-4 text-sm text-gray-900"><%= student.profile.department %></td>
+                                                    <td class="px-6 py-4 text-sm text-gray-900"><%= student.profile.year %></td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="viewStudentDetails('<%= student._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                                <i class="fas fa-eye mr-1"></i>
+                                                                View Details
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5" class="px-6 py-12 text-center">
+                                                    <div class="text-center">
+                                                        <div class="mx-auto h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                                            <i class="fas fa-users text-gray-400 text-lg"></i>
+                                                        </div>
+                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No students found</h3>
+                                                        <p class="text-gray-500">There are no registered students yet.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faculty Section -->
+                <div id="faculty-section" class="content-section" style="display: none;">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">Pending Faculty Approvals</h2>
+                                <p class="text-gray-600">Faculty members awaiting admin approval</p>
+                            </div>
+                            <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Dashboard
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Faculty Details</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact Information</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Department</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Registration Date</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <% if (typeof pendingFaculty !== 'undefined' && pendingFaculty.length > 0) { %>
+                                            <% pendingFaculty.forEach(faculty => { %>
+                                                <tr class="hover:bg-gray-50 transition-colors">
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center">
+                                                            <div class="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center mr-4 border border-gray-200">
+                                                                <i class="fas fa-user-tie text-blue-600"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-sm font-semibold text-gray-900 mb-1">
+                                                                    <%= faculty.profile.firstName %> <%= faculty.profile.lastName %>
+                                                                </div>
+                                                                <div class="flex items-center space-x-2">
+                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                        <i class="fas fa-clock mr-1"></i>
+                                                                        Pending
+                                                                    </span>
+                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                                                        Faculty
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <i class="fas fa-envelope text-gray-400 mr-2"></i>
+                                                                <%= faculty.email %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <i class="fas fa-phone text-gray-400 mr-2"></i>
+                                                                <%= faculty.profile.phone || 'Not provided' %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= faculty.profile.department || 'Not specified' %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                Employee ID: <%= faculty.profile.employeeId || 'Not provided' %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= new Date(faculty.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <%= new Date(faculty.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="viewFacultyDetails('<%= faculty._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                                <i class="fas fa-eye mr-1"></i>
+                                                                View Details
+                                                            </button>
+                                                            <button onclick="approveFaculty('<%= faculty._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                                <i class="fas fa-check mr-1"></i>
+                                                                Approve
+                                                            </button>
+                                                            <button onclick="rejectFaculty('<%= faculty._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                                <i class="fas fa-times mr-1"></i>
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5" class="px-6 py-12 text-center">
+                                                    <div class="text-center">
+                                                        <div class="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                                                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                                                        </div>
+                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Faculty</h3>
+                                                        <p class="text-gray-500">There are no faculty members awaiting approval.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Faculty Section -->
+                <div id="all-faculty-section" class="content-section" style="display: none;">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">All Faculty Members</h2>
+                                <p class="text-gray-600">Complete list of all approved faculty members</p>
+                            </div>
+                            <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Dashboard
+                            </button>
+                        </div>
+                        
+                        <!-- All Faculty List -->
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Faculty Details</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact Information</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Department</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Registration Date</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <% if (typeof approvedFaculty !== 'undefined' && approvedFaculty.length > 0) { %>
+                                            <% approvedFaculty.forEach(faculty => { %>
+                                                <tr class="hover:bg-gray-50 transition-colors">
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center">
+                                                            <div class="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center mr-4 border border-gray-200">
+                                                                <i class="fas fa-user-tie text-green-600"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-sm font-semibold text-gray-900 mb-1">
+                                                                    <%= faculty.profile.firstName %> <%= faculty.profile.lastName %>
+                                                                </div>
+                                                                <div class="flex items-center space-x-2">
+                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                        <i class="fas fa-check-circle mr-1"></i>
+                                                                        Approved
+                                                                    </span>
+                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                                                        Faculty
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <i class="fas fa-envelope text-gray-400 mr-2"></i>
+                                                                <%= faculty.email %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <i class="fas fa-phone text-gray-400 mr-2"></i>
+                                                                <%= faculty.profile.phone || 'Not provided' %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= faculty.profile.department || 'Not specified' %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                Employee ID: <%= faculty.profile.employeeId || 'Not provided' %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= new Date(faculty.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <%= new Date(faculty.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="viewFacultyDetails('<%= faculty._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                                <i class="fas fa-eye mr-1"></i>
+                                                                View Details
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5" class="px-6 py-12 text-center">
+                                                    <div class="text-center">
+                                                        <div class="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                                            <i class="fas fa-user-tie text-gray-400 text-2xl"></i>
+                                                        </div>
+                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Approved Faculty</h3>
+                                                        <p class="text-gray-500">There are no approved faculty members yet.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Events Section -->
+                <div id="pending-section" class="content-section" style="display: none;">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">Pending Event Approvals</h2>
+                                <p class="text-gray-600">Events awaiting admin approval</p>
+                            </div>
+                            <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Dashboard
+                            </button>
+                        </div>             
+                       <!-- Pending Events List -->
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Event Details</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Organizer</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date & Time</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <% if (allEvents && allEvents.length > 0) { %>
+                                            <% allEvents.filter(event => event.status === 'pending').forEach(event => { %>
+                                                <tr class="hover:bg-gray-50 transition-colors">
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center">
+                                                            <% if (event.poster) { %>
+                                                                <img src="<%= event.poster %>" alt="<%= event.title %>" 
+                                                                     class="h-12 w-12 rounded-lg object-cover mr-4 border border-gray-200">
+                                                            <% } else { %>
+                                                                <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 border border-gray-200">
+                                                                    <i class="fas fa-calendar text-gray-400"></i>
+                                                                </div>
+                                                            <% } %>
+                                                            <div>
+                                                                <div class="text-sm font-semibold text-gray-900 mb-1">
+                                                                    <%= event.title %>
+                                                                </div>
+                                                                <div class="flex items-center space-x-2">
+                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                        <%= event.category %>
+                                                                    </span>
+                                                                    <% if (event.subCategory) { %>
+                                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                                                            <%= event.subCategory %>
+                                                                        </span>
+                                                                    <% } %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= (event.organizer && event.organizer.profile) ? (event.organizer.profile.firstName + ' ' + event.organizer.profile.lastName) : 'Unknown' %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <%= (event.organizer && event.organizer.email) ? event.organizer.email : '' %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <%= event.startTime %> - <%= event.endTime %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center space-x-2">
+                                                            <a href="/admin/events/<%= event._id %>" 
+                                                               class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                                <i class="fas fa-eye mr-1"></i>
+                                                                View
+                                                            </a>
+                                                            <a href="/admin/events/<%= event._id %>/approve" 
+                                                               class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                                <i class="fas fa-check mr-1"></i>
+                                                                Approve
+                                                            </a>
+                                                            <a href="/admin/events/<%= event._id %>/reject" 
+                                                               class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                                <i class="fas fa-times mr-1"></i>
+                                                                Reject
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="4" class="px-6 py-12 text-center">
+                                                    <div class="text-center">
+                                                        <div class="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                                                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                                                        </div>
+                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Events</h3>
+                                                        <p class="text-gray-500">There are no events awaiting approval.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Default Events Section (already exists) -->
+                <div id="default-section" class="content-section">
+
+            <!-- Events Section -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">All Events</h2>
+                            <p class="text-gray-600">Complete list of all events in the system</p>
+                        </div>
+                        <div class="flex space-x-4">
+                
+                        </div>
+                    </div>
+                </div>
+             
+                <!-- Events List -->
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Event Details
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Organizer
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Date & Time
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <% if (allEvents && allEvents.length > 0) { %>
+                                    <% allEvents.forEach(event => { %>
+                                        <tr class="hover:bg-gray-50 transition-colors event-row" data-status="<%= event.status %>">
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center">
+                                                    <% if (event.poster) { %>
+                                                        <img src="<%= event.poster %>" alt="<%= event.title %>" 
+                                                             class="h-12 w-12 rounded-lg object-cover mr-4 border border-gray-200">
+                                                    <% } else { %>
+                                                        <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 border border-gray-200">
+                                                            <i class="fas fa-calendar text-gray-400"></i>
+                                                        </div>
+                                                    <% } %>
+                                                    <div>
+                                                        <div class="text-sm font-semibold text-gray-900 mb-1">
+                                                            <%= event.title %>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                <%= event.category %>
+                                                            </span>
+                                                            <% if (event.subCategory) { %>
+                                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                                                    <%= event.subCategory %>
+                                                                </span>
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm">
+                                                    <div class="font-medium text-gray-900">
+                                                        <%= (event.organizer && event.organizer.profile) ? (event.organizer.profile.firstName + ' ' + event.organizer.profile.lastName) : 'Unknown' %>
+                                                    </div>
+                                                    <div class="text-gray-500">
+                                                        <%= (event.organizer && event.organizer.email) ? event.organizer.email : '' %>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm">
+                                                    <div class="font-medium text-gray-900">
+                                                        <%= new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                    </div>
+                                                    <div class="text-gray-500">
+                                                        <%= event.startTime %> - <%= event.endTime %>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                                    <% if (event.status === 'approved') { %>bg-green-100 text-green-800<% } else if (event.status === 'pending') { %>bg-yellow-100 text-yellow-800<% } else if (event.status === 'rejected') { %>bg-red-100 text-red-800<% } else { %>bg-gray-100 text-gray-800<% } %>">
+                                                    <%= event.status.charAt(0).toUpperCase() + event.status.slice(1) %>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center space-x-2">
+                                                    <a href="/admin/events/<%= event._id %>" 
+                                                       class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                        <i class="fas fa-eye mr-1"></i>
+                                                        View
+                                                    </a>
+                                                    <% if (event.status === 'pending') { %>
+                                                        <a href="/admin/events/<%= event._id %>/approve" 
+                                                           class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                            <i class="fas fa-check mr-1"></i>
+                                                            Approve
+                                                        </a>
+                                                        <a href="/admin/events/<%= event._id %>/reject" 
+                                                           class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                            <i class="fas fa-times mr-1"></i>
+                                                            Reject
+                                                        </a>
+                                                    <% } %>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-12 text-center">
+                                            <div class="text-center">
+                                                <div class="mx-auto h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                                    <i class="fas fa-calendar-times text-gray-400 text-lg"></i>
+                                                </div>
+                                                <h3 class="text-lg font-medium text-gray-900 mb-2">No events found</h3>
+                                                <p class="text-gray-500">There are no events in the system yet.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+                <!-- All Student Registrations Section -->
+                <div id="all-registrations-section" class="content-section" style="display: none;">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">All Student Registrations</h2>
+                                <p class="text-gray-600">Complete list of all student event registrations</p>
+                            </div>
+                            <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Dashboard
+                            </button>
+                        </div>
+                        
+                        <!-- Pending Registrations List -->
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Student Details</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Event Information</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Registration Date</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <% if (typeof pendingRegistrations !== 'undefined' && pendingRegistrations.length > 0) { %>
+                                            <% pendingRegistrations.forEach(registration => { %>
+                                                <tr class="hover:bg-gray-50 transition-colors">
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center">
+                                                            <div class="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center mr-4 border border-gray-200">
+                                                                <i class="fas fa-user text-blue-600"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-sm font-semibold text-gray-900 mb-1">
+                                                                    <%= registration.student.profile.firstName %> <%= registration.student.profile.lastName %>
+                                                                </div>
+                                                                <div class="text-sm text-gray-500">
+                                                                    <%= registration.student.email %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= registration.event.title %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <%= new Date(registration.event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm">
+                                                            <div class="font-medium text-gray-900">
+                                                                <%= new Date(registration.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                            </div>
+                                                            <div class="text-gray-500">
+                                                                <%= new Date(registration.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="viewRegistrationDetails('<%= registration._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                                <i class="fas fa-eye mr-1"></i>
+                                                                View Details
+                                                            </button>
+                                                            <button onclick="approveRegistration('<%= registration._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                                <i class="fas fa-check mr-1"></i>
+                                                                Approve
+                                                            </button>
+                                                            <button onclick="rejectRegistration('<%= registration._id %>')" 
+                                                                   class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                                <i class="fas fa-times mr-1"></i>
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="4" class="px-6 py-12 text-center">
+                                                    <div class="text-center">
+                                                        <div class="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                                            <i class="fas fa-calendar-check text-gray-400 text-2xl"></i>
+                                                        </div>
+                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Registrations</h3>
+                                                        <p class="text-gray-500">There are no student event registrations awaiting approval.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- ✅ Store JSON safely in HTML -->
+<script id="sportsDataJSON" type="application/json">
+    <%- JSON.stringify(sportsEvents || []) %>
+</script>
+
+<!-- Chart CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('sportsChart').getContext('2d');
+
+    // ✅ Read JSON safely (No EJS inside JS now)
+    const sportsData = JSON.parse(
+        document.getElementById('sportsDataJSON').textContent
+    );
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sportsData.map(s => s._id || 'Other'),
+            datasets: [{
+                label: 'Participants',
+                data: sportsData.map(s => s.count),
+                backgroundColor: 'rgba(59,130,246,0.5)',
+                borderColor: 'rgba(59,130,246,1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+<script>
+    function showSection(section) {
+        // Hide all content sections
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(sec => sec.style.display = 'none');
+        
+        // Show the selected section
+        const targetSection = document.getElementById(section + '-section');
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+    }
+
+    // Faculty approval functions
+    function approveFaculty(facultyId) {
+        if (confirm('Are you sure you want to approve this faculty member?')) {
+            // Show loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Approving...';
+            button.disabled = true;
+            
+            fetch(`/admin/faculty/${facultyId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert('Faculty approved successfully! Total faculty count will be updated.');
+                    // Reload page to refresh all counts
+                    location.reload();
+                } else {
+                    alert('Error approving faculty: ' + data.message);
+                    // Restore button state
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving faculty');
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+    }
+
+    function rejectFaculty(facultyId) {
+        const reason = prompt('Please provide a reason for rejecting this faculty registration:');
+        if (reason) {
+            // Show loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Rejecting...';
+            button.disabled = true;
+            
+            fetch(`/admin/faculty/${facultyId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert('Faculty rejected successfully! Pending faculty count will be updated.');
+                    // Reload page to refresh all counts
+                    location.reload();
+                } else {
+                    alert('Error rejecting faculty: ' + data.message);
+                    // Restore button state
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error rejecting faculty');
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+    }
+
+    function viewStudentDetails(studentId) {
+        // Redirect to student details page
+        window.location.href = `/admin/students/${studentId}`;
+    }
+
+    function approveStudent(studentId) {
+        if (confirm('Are you sure you want to approve this student?')) {
+            fetch(`/admin/students/${studentId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Student approved successfully!');
+                    location.reload();
+                } else {
+                    alert('Error approving student: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving student');
+            });
+        }
+    }
+
+    function viewFacultyDetails(facultyId) {
+        // Redirect to faculty details page
+        window.location.href = `/admin/faculty/${facultyId}`;
+    }
+
+    function viewRegistrationDetails(registrationId) {
+        // Redirect to registration details page
+        window.location.href = `/admin/registrations/${registrationId}`;
+    }
+
+    function approveRegistration(registrationId) {
+        if (confirm('Are you sure you want to approve this event registration?')) {
+            fetch(`/admin/registrations/${registrationId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration approved successfully!');
+                    location.reload();
+                } else {
+                    alert('Error approving registration: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving registration');
+            });
+        }
+    }
+
+    function rejectRegistration(registrationId) {
+        const reason = prompt('Please provide a reason for rejecting this registration:');
+        if (reason) {
+            fetch(`/admin/registrations/${registrationId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration rejected successfully!');
+                    location.reload();
+                } else {
+                    alert('Error rejecting registration: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error rejecting registration');
+            });
+        }
+    }
+</script>
+
+<%- include('../partials/footer') %>

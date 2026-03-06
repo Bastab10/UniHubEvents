@@ -1,0 +1,323 @@
+<%- include('../partials/header') %>
+
+<div class="flex h-screen bg-gray-50">
+    <%- include('../partials/sidebar') %>
+    
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-2xl font-bold text-gray-800">Faculty Management</h1>
+                <p class="text-gray-600">Approve or reject faculty registration requests</p>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-100 rounded-lg mr-4">
+                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Pending Approval</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= stats.totalPending %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-lg mr-4">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Approved Faculty</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= stats.totalApproved %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                            <i class="fas fa-chalkboard-teacher text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total Faculty</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= stats.totalPending + stats.totalApproved %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Faculty Section -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Pending Faculty Approvals</h2>
+                    <p class="text-gray-600">Faculty members awaiting your approval</p>
+                </div>
+
+                <% if (pendingFaculty.length > 0) { %>
+                    <div class="space-y-4">
+                        <% pendingFaculty.forEach(faculty => { %>
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                                            <i class="fas fa-user text-gray-500"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-gray-900">
+                                                <%= faculty.profile.firstName %> <%= faculty.profile.lastName %>
+                                            </h3>
+                                            <p class="text-sm text-gray-500"><%= faculty.email %></p>
+                                            <div class="flex items-center space-x-4 mt-1">
+                                                <span class="text-sm text-gray-600">
+                                                    <i class="fas fa-id-card mr-1"></i>
+                                                    <%= faculty.profile.collegeId %>
+                                                </span>
+                                                <span class="text-sm text-gray-600">
+                                                    <i class="fas fa-building mr-1"></i>
+                                                    <%= faculty.profile.department %>
+                                                </span>
+                                                <% if (faculty.profile.phone) { %>
+                                                    <span class="text-sm text-gray-600">
+                                                        <i class="fas fa-phone mr-1"></i>
+                                                        <%= faculty.profile.phone %>
+                                                    </span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="approveFaculty('<%= faculty._id %>')" 
+                                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center">
+                                            <i class="fas fa-check mr-2"></i>
+                                            Approve
+                                        </button>
+                                        <button onclick="rejectFaculty('<%= faculty._id %>')" 
+                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center">
+                                            <i class="fas fa-times mr-2"></i>
+                                            Reject
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-sm text-gray-500">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    Registered on <%= new Date(faculty.createdAt).toLocaleDateString() %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-12">
+                        <div class="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Approvals</h3>
+                        <p class="text-gray-500">All faculty registrations have been processed.</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Approved Faculty Section -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Approved Faculty</h2>
+                    <p class="text-gray-600">Currently active faculty members</p>
+                </div>
+
+                <% if (approvedFaculty.length > 0) { %>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faculty</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <% approvedFaculty.forEach(faculty => { %>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                                    <i class="fas fa-chalkboard-teacher text-green-600"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        <%= faculty.profile.firstName %> <%= faculty.profile.lastName %>
+                                                    </div>
+                                                    <div class="text-sm text-gray-500"><%= faculty.email %></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-900"><%= faculty.profile.collegeId %></td>
+                                        <td class="px-6 py-4 text-sm text-gray-900"><%= faculty.profile.department %></td>
+                                        <td class="px-6 py-4 text-sm text-gray-900"><%= faculty.profile.phone || 'N/A' %></td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">
+                                            <%= faculty.approvalDate ? new Date(faculty.approvalDate).toLocaleDateString() : 'N/A' %>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-12">
+                        <div class="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-chalkboard-teacher text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Approved Faculty</h3>
+                        <p class="text-gray-500">No faculty members have been approved yet.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Rejection Modal -->
+<div id="rejectionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Reject Faculty Registration</h3>
+            <p class="text-sm text-gray-500 mb-4">Please provide a reason for rejecting this faculty registration.</p>
+            
+            <textarea id="rejectionReason" rows="4" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter rejection reason..."></textarea>
+            
+            <div class="flex justify-end space-x-3 mt-4">
+                <button onclick="closeRejectionModal()" 
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                    Cancel
+                </button>
+                <button onclick="confirmRejection()" 
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                    Reject Faculty
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+    let currentFacultyId = null;
+
+    function approveFaculty(facultyId) {
+        if (confirm('Are you sure you want to approve this faculty member?')) {
+            fetch(`/admin/faculty/${facultyId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Faculty approved successfully!');
+                    location.reload();
+                } else {
+                    alert('Error approving faculty: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving faculty');
+            });
+        }
+    }
+
+    function rejectFaculty(facultyId) {
+        currentFacultyId = facultyId;
+        document.getElementById('rejectionModal').classList.remove('hidden');
+    }
+
+    function closeRejectionModal() {
+        document.getElementById('rejectionModal').classList.add('hidden');
+        document.getElementById('rejectionReason').value = '';
+        currentFacultyId = null;
+    }
+
+    function confirmRejection() {
+        const reason = document.getElementById('rejectionReason').value.trim();
+        
+        if (!reason) {
+            alert('Please provide a rejection reason');
+            return;
+        }
+
+        fetch(`/admin/faculty/${currentFacultyId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reason })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Faculty rejected successfully!');
+                location.reload();
+            } else {
+                alert('Error rejecting faculty: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error rejecting faculty');
+        });
+    }
+</script>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                    <% if (facultyMember.profile.verified) { %>
+                                                        bg-green-100 text-green-800
+                                                    <% } else { %>
+                                                        bg-red-100 text-red-800
+                                                    <% } %>
+                                                ">
+                                                    <% if (facultyMember.profile.verified) { %>
+                                                        <i class="fas fa-check-circle mr-1"></i>
+                                                        Verified
+                                                    <% } else { %>
+                                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                        Not Verified
+                                                    <% } %>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <a href="/admin/faculty/<%= facultyMember._id %>" class="bg-purple-600 text-white px-3 py-1 rounded text-xs hover:bg-purple-700 transition">
+                                                    <i class="fas fa-eye mr-1"></i>
+                                                    View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                                            <div class="flex flex-col items-center">
+                                                <i class="fas fa-chalkboard-teacher text-4xl text-gray-300 mb-4"></i>
+                                                <p class="text-lg font-medium">No faculty found</p>
+                                                <p class="text-sm">There are no registered faculty members in the system.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
