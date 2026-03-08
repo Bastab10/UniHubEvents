@@ -80,23 +80,26 @@ router.get('/dashboard', async (req, res) => {
         
         const stats = await Promise.all([
             Event.countDocuments({ organizer: facultyId }),
-            Event.countDocuments({ organizer: facultyId, status: 'pending' }),
-            Event.countDocuments({ organizer: facultyId, status: 'approved' }),
+            Event.aggregate([
+                { $match: { organizer: facultyId } },
+                { $unwind: '$registrations' },
+                { $count: 'total' }
+            ]),
             Event.find({ organizer: facultyId })
+                .populate('organizer', 'profile.firstName profile.lastName')
                 .sort({ createdAt: -1 })
-                .limit(10)
         ]);
 
-        const [totalEvents, pendingEvents, approvedEvents, recentEvents] = stats;
+        const [totalEvents, registrationCount, allEvents] = stats;
+        const totalRegistrations = registrationCount.length > 0 ? registrationCount[0].total : 0;
 
         res.render('faculty/dashboard', {
             title: 'Faculty Dashboard',
             stats: {
                 totalEvents,
-                pendingEvents,
-                approvedEvents
+                totalRegistrations
             },
-            recentEvents
+            allEvents
         });
     } catch (error) {
         console.error('Faculty dashboard error:', error);
@@ -251,10 +254,9 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
 // My Events
 router.get('/events', async (req, res) => {
     try {
-        const { status, category } = req.query;
+        const { category } = req.query;
         let query = { organizer: req.session.user._id };
 
-        if (status) query.status = status;
         if (category) query.category = category;
 
         const events = await Event.find(query)
@@ -285,12 +287,6 @@ router.get('/events/:id/edit', async (req, res) => {
             return res.redirect('/faculty/my-events');
         }
         
-        // Only allow editing pending events
-        if (event.status !== 'pending') {
-            req.session.error = 'Only pending events can be edited';
-            return res.redirect('/faculty/my-events');
-        }
-        
         res.render('faculty/edit-event', { 
             title: 'Edit Event', 
             event,
@@ -317,12 +313,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
         // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to edit this event';
-            return res.redirect('/faculty/my-events');
-        }
-        
-        // Only allow editing pending events
-        if (event.status !== 'pending') {
-            req.session.error = 'Only pending events can be edited';
             return res.redirect('/faculty/my-events');
         }
         

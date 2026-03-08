@@ -117,7 +117,8 @@ router.get('/events/:id', async (req, res) => {
         res.render('student/event-details', { 
             title: event.title, 
             event, 
-            isRegistered 
+            isRegistered,
+            currentUser: req.session.user
         });
     } catch (error) {
         console.error('Event details error:', error);
@@ -193,14 +194,26 @@ router.post('/events/:id/register', async (req, res) => {
         };
 
         if (event.eventType === 'team') {
-            const { teamName, teamMembers } = req.body;
+            const { teamName, teamLeaderName, teamLeaderCollegeId, teamMembers } = req.body;
             
             if (!teamName || teamName.trim() === '') {
                 req.session.error = 'Team name is required for team events';
                 return res.redirect(`/student/events/${req.params.id}`);
             }
 
+            if (!teamLeaderName || teamLeaderName.trim() === '') {
+                req.session.error = 'Team leader name is required for team events';
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
+
+            if (!teamLeaderCollegeId || teamLeaderCollegeId.trim() === '') {
+                req.session.error = 'Team leader college ID is required for team events';
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
+
             registrationData.teamName = teamName.trim();
+            registrationData.teamLeaderName = teamLeaderName.trim();
+            registrationData.teamLeaderCollegeId = teamLeaderCollegeId.trim();
 
             if (teamMembers && Array.isArray(teamMembers)) {
                 registrationData.teamMembers = teamMembers
@@ -228,21 +241,16 @@ router.post('/events/:id/register', async (req, res) => {
 // My Registrations
 router.get('/registrations', async (req, res) => {
     try {
-        const { status } = req.query;
-        let matchQuery = { 'registrations.student': req.session.user._id };
+        const studentId = req.session.user._id;
 
-        if (status) {
-            matchQuery['registrations.status'] = status;
-        }
-
-        const events = await Event.find(matchQuery)
+        const events = await Event.find({ 'registrations.student': studentId })
             .populate('organizer', 'profile.firstName profile.lastName')
             .sort({ date: 1 });
 
-        // Filter registrations based on status
+        // Filter registrations to show only the current student's registrations
         const filteredEvents = events.map(event => {
             const userRegistrations = event.registrations.filter(
-                reg => reg.student.toString() === req.session.user._id.toString()
+                reg => reg.student.toString() === studentId.toString()
             );
             
             return {
@@ -253,8 +261,7 @@ router.get('/registrations', async (req, res) => {
 
         res.render('student/my-registrations', { 
             title: 'My Registrations', 
-            events: filteredEvents,
-            filters: req.query
+            events: filteredEvents
         });
     } catch (error) {
         console.error('My registrations error:', error);
@@ -283,24 +290,18 @@ router.post('/registrations/:eventId/cancel', async (req, res) => {
             return res.redirect('/student/registrations');
         }
 
-        // Only allow cancellation if registration is pending or event is more than 24 hours away
-        const registration = event.registrations[registrationIndex];
+        // Only allow cancellation if event is more than 24 hours away
         const eventDateTime = new Date(`${event.date.toISOString().split('T')[0]}T${event.startTime}`);
         const now = new Date();
         const hoursUntilEvent = (eventDateTime - now) / (1000 * 60 * 60);
 
-        if (registration.status === 'approved' && hoursUntilEvent < 24) {
+        if (hoursUntilEvent < 24) {
             req.session.error = 'Cannot cancel registration less than 24 hours before the event';
             return res.redirect('/student/registrations');
         }
 
         event.registrations.splice(registrationIndex, 1);
         await event.save();
-
-        // Remove event from user's registered events
-        await User.findByIdAndUpdate(req.session.user._id, {
-            $pull: { registeredEvents: req.params.eventId }
-        });
 
         req.session.success = 'Registration cancelled successfully';
         res.redirect('/student/registrations');

@@ -3,15 +3,8 @@
 <style>
 /* My Events Styles */
 .events-container {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: #f8fafc;
     min-height: 100vh;
-}
-
-.events-header {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
 }
 
 .events-grid {
@@ -91,29 +84,6 @@
     margin-bottom: 1rem;
 }
 
-.status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: capitalize;
-}
-
-.status-approved {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.status-pending {
-    background: #fed7aa;
-    color: #92400e;
-}
-
-.status-rejected {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
 .action-buttons {
     display: flex;
     gap: 0.5rem;
@@ -139,14 +109,6 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .events-header {
-        padding: 1.5rem 0;
-    }
-    
-    .events-header h1 {
-        font-size: 1.75rem;
-    }
-    
     .event-card {
         border-radius: 0.75rem;
     }
@@ -169,38 +131,24 @@
     <%- include('../partials/sidebar') %>
     
     <main class="flex-1">
-        <!-- Header Section -->
-        <div class="events-header">
-            <div class="container mx-auto px-4">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div>
-                        <h1 class="text-3xl font-bold mb-2">My Events</h1>
-                        <p class="text-blue-100">Manage and track your created events</p>
-                    </div>
-                    <div class="mt-4 md:mt-0">
-                        <a href="/faculty/create-event" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors shadow-lg">
-                            <i class="fas fa-plus mr-2"></i>
-                            Create New Event
-                        </a>
-                    </div>
+        <div class="container mx-auto px-4 py-6">
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">My Events</h1>
+                    <p class="text-gray-600">Manage and track your created events</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <a href="/faculty/events/create" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>Create New Event
+                    </a>
                 </div>
             </div>
-        </div>
 
         <!-- Filters Section -->
         <div class="container mx-auto px-4 mb-6">
             <div class="bg-white rounded-lg shadow-md p-4">
                 <form method="GET" action="/faculty/my-events" class="flex flex-wrap gap-4 items-end">
-                    <div class="flex-1 min-w-48">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select name="status" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
-                            <option value="">All Status</option>
-                            <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
-                            <option value="approved" <%= filters.status === 'approved' ? 'selected' : '' %>>Approved</option>
-                            <option value="rejected" <%= filters.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
-                        </select>
-                    </div>
-                    
                     <div class="flex-1 min-w-48">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                         <select name="category" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -218,10 +166,6 @@
                             <i class="fas fa-filter mr-2"></i>
                             Filter
                         </button>
-                        <a href="/faculty/my-events" class="ml-2 text-gray-600 hover:text-gray-800">
-                            <i class="fas fa-times"></i>
-                            Clear
-                        </a>
                     </div>
                 </form>
             </div>
@@ -253,14 +197,11 @@
                             
                             <!-- Event Content -->
                             <div class="event-content">
-                                <!-- Title and Status -->
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="event-title flex-1 mr-2">
+                                <!-- Title -->
+                                <div class="mb-2">
+                                    <h3 class="event-title">
                                         <%= event.title %>
                                     </h3>
-                                    <span class="status-badge status-<%= event.status %>">
-                                        <%= event.status %>
-                                    </span>
                                 </div>
                                 
                                 <!-- Description -->
@@ -314,7 +255,7 @@
                     <i class="fas fa-calendar-times"></i>
                     <h3 class="text-xl font-semibold text-gray-600 mb-2">No Events Found</h3>
                     <p class="text-gray-500 mb-4">
-                        <% if (filters.status || filters.category) { %>
+                        <% if (filters.category) { %>
                             No events match your current filters. Try adjusting your criteria.
                         <% } else { %>
                             You haven't created any events yet. Start by creating your first event!
@@ -372,3 +313,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<%- include('../partials/footer') %>

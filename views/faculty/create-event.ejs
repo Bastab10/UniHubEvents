@@ -1,194 +1,186 @@
 <%- include('../partials/header') %>
 
-<div class="flex min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+<div class="flex min-h-screen bg-gray-50">
     <%- include('../partials/sidebar') %>
     
     <main class="flex-1">
-        <div class="p-4 p-md-6">
-            <div class="mb-4 mb-md-6">
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 text-black">
-                    <h1 class="text-2xl md:text-3xl font-bold text-black">
+        <div class="p-6">
+            <!-- Centered Container -->
+            <div class="max-w-4xl mx-auto">
+                <!-- Page Header -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-l-4 border-blue-500">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
                         Create New Event
                     </h1>
                     <p class="text-gray-600 mt-2">Fill in the details to create a new event</p>
 
-                <% if (error) { %>
-                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-exclamation-triangle mr-2"></i>
-                            <span><%= error %></span>
+                    <% if (error) { %>
+                        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mt-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                <span><%= error %></span>
+                            </div>
                         </div>
-                    </div>
-                <% } %>
+                    <% } %>
 
-                <% if (success) { %>
-                    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle mr-2"></i>
-                            <span><%= success %></span>
+                    <% if (success) { %>
+                        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mt-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span><%= success %></span>
+                            </div>
                         </div>
-                    </div>
-                <% } %>
+                    <% } %>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-xl shadow-xl p-6 p-md-8 border border-gray-200 text-black">
-                <form method="POST" action="/faculty/events/create" enctype="multipart/form-data" class="space-y-6 space-y-md-8">
+                <!-- Form Container -->
+                <div class="bg-white rounded-xl shadow-xl p-8 border border-gray-200">
+                    <form method="POST" action="/faculty/events/create" enctype="multipart/form-data" class="space-y-8">
 
-                    <!-- Basic Information -->
-                    <div class="grid grid-cols-1 gap-4 gap-md-6">
-
-                        <div>
-                            <label for="title" class="block text-sm font-semibold mb-2">Event Title *</label>
-                            <input type="text" id="title" name="title" required
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400"
-                                   placeholder="Enter event title">
-                        </div>
-
-                        <div>
-                            <label for="description" class="block text-sm font-semibold mb-2">Description *</label>
-                            <textarea id="description" name="description" rows="4" required
-                                      class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 resize-vertical"
-                                      placeholder="Describe your event"></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Basic Information Section -->
+                        <div class="space-y-6">
+                            <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Basic Information</h2>
                             
+                            <!-- Event Title - Full Width -->
                             <div>
-                                <label for="category" class="block text-sm font-semibold mb-2">Category *</label>
-                                <select id="category" name="category" required
-                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
-                                    <option value="">Select a category</option>
-                                    <option value="seminar">Seminar</option>
-                                    <option value="workshop">Workshop</option>
-                                    <option value="cultural">Cultural</option>
-                                    <option value="sports">Sports</option>
-                                </select>
+                                <label for="title" class="block text-sm font-semibold mb-2 text-gray-700">Event Title *</label>
+                                <input type="text" id="title" name="title" required
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                       placeholder="Enter event title">
                             </div>
 
+                            <!-- Description - Full Width -->
                             <div>
-                                <label for="subCategory" class="block text-sm font-semibold mb-2">Sub-category</label>
-                                <input type="text" id="subCategory" name="subCategory"
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400"
-                                       placeholder="e.g., Football, Music, Technical">
+                                <label for="description" class="block text-sm font-semibold mb-2 text-gray-700">Description *</label>
+                                <textarea id="description" name="description" rows="4" required
+                                          class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 resize-vertical transition-colors"
+                                          placeholder="Describe your event"></textarea>
                             </div>
 
-                        </div>
+                            <!-- Category and Sub-category - Two Columns -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="category" class="block text-sm font-semibold mb-2 text-gray-700">Category *</label>
+                                    <select id="category" name="category" required
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                        <option value="">Select a category</option>
+                                        <option value="seminar">Seminar</option>
+                                        <option value="workshop">Workshop</option>
+                                        <option value="cultural">Cultural</option>
+                                        <option value="sports">Sports</option>
+                                    </select>
+                                </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="subCategory" class="block text-sm font-semibold mb-2 text-gray-700">Sub-category</label>
+                                    <input type="text" id="subCategory" name="subCategory"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                           placeholder="e.g., Football, Music, Technical">
+                                </div>
+                            </div>
 
+                            <!-- Event Type and Team Size - Two Columns -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="eventType" class="block text-sm font-semibold mb-2 text-gray-700">Event Type *</label>
+                                    <select id="eventType" name="eventType" required
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                        <option value="">Select event type</option>
+                                        <option value="individual">Individual</option>
+                                        <option value="team">Team</option>
+                                    </select>
+                                </div>
+
+                                <div id="teamSizeDiv" class="hidden">
+                                    <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">Team Size *</label>
+                                    <input type="number" id="teamSize" name="teamSize" min="2" max="20"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                           placeholder="Number of team members">
+                                </div>
+                            </div>
+
+                            <!-- Maximum Participants - Full Width -->
                             <div>
-                                <label for="eventType" class="block text-sm font-semibold mb-2">Event Type *</label>
-                                <select id="eventType" name="eventType" required
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Select event type</option>
-                                    <option value="individual">Individual</option>
-                                    <option value="team">Team</option>
-                                </select>
+                                <label for="maxParticipants" class="block text-sm font-semibold mb-2 text-gray-700">Maximum Participants</label>
+                                <input type="number" id="maxParticipants" name="maxParticipants" min="1"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                       placeholder="Leave empty for unlimited">
+                            </div>
+                        </div>
+
+                        <!-- Event Schedule Section -->
+                        <div class="space-y-6">
+                            <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Event Schedule</h2>
+                            
+                            <!-- Date and Time - Three Columns -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label for="date" class="block text-sm font-semibold mb-2 text-gray-700">Event Date *</label>
+                                    <input type="date" id="date" name="date" required
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                </div>
+
+                                <div>
+                                    <label for="startTime" class="block text-sm font-semibold mb-2 text-gray-700">Start Time *</label>
+                                    <input type="time" id="startTime" name="startTime" required
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                </div>
+
+                                <div>
+                                    <label for="endTime" class="block text-sm font-semibold mb-2 text-gray-700">End Time *</label>
+                                    <input type="time" id="endTime" name="endTime" required
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                </div>
                             </div>
 
-                            <div id="teamSizeDiv" class="hidden">
-                                <label for="teamSize" class="block text-sm font-semibold mb-2">Team Size *</label>
-                                <input type="number" id="teamSize" name="teamSize" min="2" max="20"
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400"
-                                       placeholder="Number of team members">
+                            <!-- Venue - Full Width -->
+                            <div>
+                                <label for="venue" class="block text-sm font-semibold mb-2 text-gray-700">Venue *</label>
+                                <input type="text" id="venue" name="venue" required
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                       placeholder="Event location">
                             </div>
-
                         </div>
 
-                        <div>
-                            <label for="maxParticipants" class="block text-sm font-semibold mb-2">Maximum Participants</label>
-                            <input type="number" id="maxParticipants" name="maxParticipants" min="1"
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400"
-                                   placeholder="Leave empty for unlimited">
+                        <!-- Media Section -->
+                        <div class="space-y-6">
+                            <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Event Media</h2>
+                            
+                            <!-- Poster Upload -->
+                            <div>
+                                <label for="poster" class="block text-sm font-semibold mb-2 text-gray-700">Event Poster</label>
+                                <input type="file" id="poster" name="poster" accept="image/*"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                <p class="text-sm text-gray-500 mt-1">Upload an image for your event poster (optional)</p>
+                            </div>
                         </div>
 
-                    </div>
-
-                    <!-- Date and Time -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                        <div>
-                            <label for="date" class="block text-sm font-semibold mb-2">Event Date *</label>
-                            <input type="date" id="date" name="date" required
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
+                        <!-- Form Actions -->
+                        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                            <a href="/faculty/events" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                                Cancel
+                            </a>
+                            <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                                <i class="fas fa-plus mr-2"></i>Create Event
+                            </button>
                         </div>
-
-                        <div>
-                            <label for="startTime" class="block text-sm font-semibold mb-2">Start Time *</label>
-                            <input type="time" id="startTime" name="startTime" required
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
-                        </div>
-
-                        <div>
-                            <label for="endTime" class="block text-sm font-semibold mb-2">End Time *</label>
-                            <input type="time" id="endTime" name="endTime" required
-                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400">
-                        </div>
-
-                    </div>
-
-                    <!-- Venue -->
-                    <div>
-                        <label for="venue" class="block text-sm font-semibold mb-2">Venue *</label>
-                        <input type="text" id="venue" name="venue" required
-                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400"
-                               placeholder="Event location">
-                    </div>
-
-                    <!-- Poster -->
-                    <div>
-                        <label for="poster" class="block text-sm font-semibold mb-2">Event Poster</label>
-                        <input type="file" id="poster" name="poster" accept="image/*"
-                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-black">
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="flex justify-end space-x-4">
-
-                        <button type="button" onclick="history.back()" 
-                                class="px-6 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50">
-                            Cancel
-                        </button>
-
-                        <button type="submit" 
-                                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 shadow-lg">
-                            Create Event
-                        </button>
-
-                    </div>
-
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </main>
 </div>
 
-<%- include('../partials/footer') %>
-
 <script>
 // Show/hide team size field based on event type
-document.addEventListener('DOMContentLoaded', function() {
-    const eventTypeSelect = document.getElementById('eventType');
+document.getElementById('eventType').addEventListener('change', function() {
     const teamSizeDiv = document.getElementById('teamSizeDiv');
-    const teamSizeInput = document.getElementById('teamSize');
-    
-    function toggleTeamSize() {
-        if (eventTypeSelect.value === 'team') {
-            teamSizeDiv.classList.remove('hidden');
-            teamSizeInput.required = true;
-        } else {
-            teamSizeDiv.classList.add('hidden');
-            teamSizeInput.required = false;
-            teamSizeInput.value = '';
-        }
-    }
-    
-    eventTypeSelect.addEventListener('change', toggleTeamSize);
-    
-    // Initialize on page load
-    if (eventTypeSelect.value) {
-        toggleTeamSize();
+    if (this.value === 'team') {
+        teamSizeDiv.classList.remove('hidden');
+    } else {
+        teamSizeDiv.classList.add('hidden');
     }
 });
 </script>
+
+<%- include('../partials/footer') %>

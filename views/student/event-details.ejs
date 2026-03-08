@@ -1,202 +1,303 @@
 <%- include('../partials/header') %>
 
-<div class="flex min-h-screen">
+<div class="flex min-h-screen bg-gray-50">
     <%- include('../partials/sidebar') %>
     
     <main class="flex-1">
-        <div class="p-6">
-            <!-- Back Button -->
-            <div class="mb-4">
-                <a href="/student/events" class="text-blue-600 hover:text-blue-800 flex items-center">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Events
-                </a>
-            </div>
+        <!-- Header -->
+        <div class="bg-gradient-to-r  px-6 py-3">
+                <div class="flex items-center">
+                    <a href="/student/dashboard" class="text-black hover:text-gray-200 flex items-center mr-4">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                    <!-- <h1 class="text-xl font-bold text-white">Event Details</h1> -->
+                </div>   
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Event Details -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <% if (event.poster) { %>
-                            <img src="<%= event.poster %>" alt="<%= event.title %>" class="w-full h-64 object-cover">
-                        <% } else { %>
-                            <div class="w-full h-64 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
-                                <i class="fas fa-calendar-alt text-white text-5xl"></i>
-                            </div>
-                        <% } %>
-                        
-                        <div class="p-6">
-                            <div class="flex items-center mb-4">
-                                <h1 class="text-2xl font-bold text-gray-800 mr-3"><%= event.title %></h1>
-                                <span class="px-3 py-1 text-sm font-medium 
-                                    <% if (event.category === 'seminar') { %>bg-blue-100 text-blue-800<% } else if (event.category === 'workshop') { %>bg-green-100 text-green-800<% } else if (event.category === 'cultural') { %>bg-purple-100 text-purple-800<% } else { %>bg-yellow-100 text-yellow-800<% } %> rounded-full">
-                                    <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
-                                </span>
-                            </div>
-                            
-                            <div class="prose max-w-none text-gray-600 mb-6">
-                                <p><%= event.description %></p>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                <div class="space-y-3">
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="fas fa-calendar-alt mr-3 text-blue-500"></i>
-                                        <div>
-                                            <p class="text-sm font-medium">Date</p>
-                                            <p class="font-semibold"><%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="fas fa-clock mr-3 text-green-500"></i>
-                                        <div>
-                                            <p class="text-sm font-medium">Time</p>
-                                            <p class="font-semibold"><%= event.startTime %> - <%= event.endTime %></p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="space-y-3">
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="fas fa-map-marker-alt mr-3 text-red-500"></i>
-                                        <div>
-                                            <p class="text-sm font-medium">Venue</p>
-                                            <p class="font-semibold"><%= event.venue %></p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center text-gray-600">
-                                        <i class="fas fa-user mr-3 text-purple-500"></i>
-                                        <div>
-                                            <p class="text-sm font-medium">Organizer</p>
-                                            <p class="font-semibold"><%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %></p>
-                                            <p class="text-sm"><%= event.organizer.email %></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <% if (event.subCategory) { %>
-                                <div class="mb-4">
-                                    <span class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                                        <i class="fas fa-football-ball mr-2"></i>
-                                        <%= event.subCategory %>
-                                    </span>
-                                </div>
-                            <% } %>
-
-                            <% if (event.eventType === 'team') { %>
-                                <div class="mb-4 p-4 bg-blue-50 rounded-lg">
-                                    <h3 class="font-semibold text-blue-900 mb-2">
-                                        <i class="fas fa-users mr-2"></i>Team Event
-                                    </h3>
-                                    <p class="text-blue-700">Team Size: <%= event.teamSize %> members</p>
-                                </div>
-                            <% } %>
+        <div class="p-4">
+            <!-- Event Banner -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4 mx-auto max-w-3xl">
+                <% if (event.poster) { %>
+                    <img src="<%= event.poster %>" alt="<%= event.title %>" class="w-full h-48 object-cover">
+                <% } else { %>
+                    <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <i class="fas fa-calendar-alt text-4xl mb-2"></i>
+                            <p class="text-lg font-semibold">Event Banner</p>
                         </div>
                     </div>
-                </div>
-
-                <!-- Registration Panel -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Registration</h3>
+                <% } %>
+                
+                <!-- Event Info Card -->
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <h1 class="text-2xl font-bold text-gray-800 mr-3"><%= event.title %></h1>
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full
+                                <% if (event.category === 'seminar') { %>bg-blue-100 text-blue-800<% } 
+                                   else if (event.category === 'workshop') { %>bg-green-100 text-green-800<% } 
+                                   else if (event.category === 'cultural') { %>bg-purple-100 text-purple-800<% } 
+                                   else if (event.category === 'sports') { %>bg-orange-100 text-orange-800<% }
+                                   else { %>bg-gray-100 text-gray-800<% } %>">
+                                <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
+                            </span>
+                        </div>
                         
-                        <% if (isRegistered) { %>
-                            <div class="text-center py-6">
-                                <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
-                                <h4 class="text-lg font-semibold text-gray-800 mb-2">Already Registered</h4>
-                                <p class="text-gray-600 mb-4">You are registered for this event</p>
-                                <span class="inline-block px-4 py-2 bg-green-100 text-green-800 rounded-full">
-                                    <i class="fas fa-ticket-alt mr-2"></i>Registered
-                                </span>
-                            </div>
-                        <% } else { %>
-                            <% const availableSpots = event.maxParticipants ? event.maxParticipants - event.registrations.length : null; %>
-                            
-                            <% if (availableSpots !== null && availableSpots <= 0) { %>
-                                <div class="text-center py-6">
-                                    <i class="fas fa-times-circle text-red-500 text-4xl mb-3"></i>
-                                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Event Full</h4>
-                                    <p class="text-gray-600">This event has reached maximum capacity</p>
+                        <% if (event.subCategory) { %>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                                <i class="fas fa-football-ball mr-1"></i><%= event.subCategory %>
+                            </span>
+                        <% } %>
+                    </div>
+                    
+                    <div class="prose max-w-none text-gray-600 mb-4">
+                        <p class="text-base leading-relaxed"><%= event.description %></p>
+                    </div>
+                    
+                    <!-- Compact Event Details Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-2 gap-3 mb-4">
+                        <div class="bg-blue-50 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-alt text-blue-500 text-lg mr-2"></i>
+                                <div>
+                                    <p class="text-xs text-blue-600 font-medium">Date</p>
+                                    <p class="text-sm font-semibold text-gray-800"><%= new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
                                 </div>
-                            <% } else { %>
-                                <form method="POST" action="/student/events/<%= event._id %>/register" class="space-y-4">
-                                    <% if (event.eventType === 'team') { %>
-                                        <div>
-                                            <label for="teamName" class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
-                                            <input type="text" id="teamName" name="teamName" required
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                   placeholder="Enter your team name">
-                                        </div>
-                                        
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Team Members</label>
-                                            <p class="text-xs text-gray-500 mb-2">Add <%= event.teamSize - 1 %> team members (excluding yourself)</p>
-                                            
-                                            <% for(let i = 0; i < event.teamSize - 1; i++) { %>
-                                                <div class="space-y-2 mb-3 p-3 border border-gray-200 rounded">
-                                                    <input type="text" name="teamMembers[<%= i %>][name]" 
-                                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 mb-2"
-                                                           placeholder="Member <%= i + 1 %> Name">
-                                                    <input type="text" name="teamMembers[<%= i %>][collegeId]" 
-                                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                           placeholder="Member <%= i + 1 %> College ID">
-                                                </div>
-                                            <% } %>
-                                        </div>
-                                    <% } %>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <i class="fas fa-clock text-green-500 text-lg mr-2"></i>
+                                <div>
+                                    <p class="text-xs text-green-600 font-medium">Time</p>
+                                    <p class="text-sm font-semibold text-gray-800"><%= event.startTime %> - <%= event.endTime %></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-50 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-red-500 text-lg mr-2"></i>
+                                <div>
+                                    <p class="text-xs text-red-600 font-medium">Venue</p>
+                                    <p class="text-sm font-semibold text-gray-800"><%= event.venue %></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <i class="fas fa-user text-purple-500 text-lg mr-2"></i>
+                                <div>
+                                    <p class="text-xs text-purple-600 font-medium">Organizer</p>
+                                    <p class="text-sm font-semibold text-gray-800"><%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (event.eventType === 'team') { %>
+                        <div class="mb-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-users text-blue-600 text-lg mr-2"></i>
+                                <div>
+                                    <p class="text-xs font-medium text-blue-600">Team Event</p>
+                                    <p class="text-sm font-semibold text-gray-800">Team Size: <%= event.teamSize %> members</p>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Team Registration Section -->
+            <% const availableSpots = event.maxParticipants ? event.maxParticipants - event.registrations.length : null; %>
+            <% const isRegistered = event.registrations.some(reg => reg.student.toString() === currentUser._id.toString()); %>
+            
+            <% if (isRegistered) { %>
+                <!-- Already Registered Card -->
+                <div class="bg-white rounded-lg shadow-md p-6 text-center mx-auto max-w-2xl">
+                    <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Already Registered</h3>
+                    <p class="text-gray-600 mb-4">You are successfully registered for this event</p>
+                    <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full">
+                        <i class="fas fa-ticket-alt mr-2"></i>
+                        <span class="font-medium">Registration Confirmed</span>
+                    </div>
+                </div>
+            <% } else if (availableSpots !== null && availableSpots <= 0) { %>
+                <div class="bg-white rounded-lg shadow-md p-6 text-center mx-auto max-w-2xl">
+                    <i class="fas fa-times-circle text-red-500 text-4xl mb-3"></i>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Event Full</h3>
+                    <p class="text-gray-600">This event has reached maximum capacity</p>
+                </div>
+            <% } else { %>
+                <div class="bg-white rounded-lg shadow-md p-6 mx-auto max-w-3xl">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-user-plus text-purple-600 text-xl mr-3"></i>
+                        <h2 class="text-xl font-bold text-gray-800">Event Registration</h2>
+                    </div>
+
+                    <form method="POST" action="/student/events/<%= event._id %>/register" id="teamRegistrationForm">
+                        <% if (event.eventType === 'team') { %>
+                            <!-- Compact Team Information -->
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-4">
+                                <h3 class="text-base font-semibold text-gray-800 mb-3">Team Information</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-1 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
+                                        <input type="text" id="teamName" name="teamName" required
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               placeholder="Enter team name">
+                                    </div>
                                     
-                                    <div class="text-center">
-                                        <% if (availableSpots !== null) { %>
-                                            <p class="text-sm text-gray-600 mb-3">
-                                                <i class="fas fa-users mr-1"></i>
-                                                <%= availableSpots %> spots remaining
-                                            </p>
-                                        <% } %>
-                                        
-                                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 font-medium">
-                                            <i class="fas fa-ticket-alt mr-2"></i>
-                                            <% if (event.eventType === 'team') { %>
-                                                Register Team
-                                            <% } else { %>
-                                                Register Now
-                                            <% } %>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader Name *</label>
+                                        <input type="text" id="teamLeaderName" name="teamLeaderName" required
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               placeholder="Team leader name">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader College ID *</label>
+                                        <input type="text" id="teamLeaderCollegeId" name="teamLeaderCollegeId" required
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               placeholder="College ID">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Compact Team Members Table -->
+                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-semibold text-gray-800">Team Members</h3>
+                                        <button type="button" id="addMemberBtn" class="px-3 py-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm font-medium">
+                                            <i class="fas fa-plus mr-1"></i>Add Member
                                         </button>
                                     </div>
-                                </form>
-                            <% } %>
-                        <% } %>
-
-                        <!-- Event Stats -->
-                        <div class="mt-6 pt-6 border-t border-gray-200">
-                            <h4 class="font-medium text-gray-800 mb-3">Event Statistics</h4>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Total Capacity:</span>
-                                    <span class="font-medium">
-                                        <% if (event.maxParticipants) { %>
-                                            <%= event.maxParticipants %>
-                                        <% } else { %>
-                                            Unlimited
-                                        <% } %>
-                                    </span>
+                                    <p class="text-xs text-gray-600 mt-1">Maximum <%= event.teamSize %> members (including team leader)</p>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Registered:</span>
-                                    <span class="font-medium"><%= event.registrations.length %></span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Event Type:</span>
-                                    <span class="font-medium capitalize"><%= event.eventType %></span>
+                                
+                                <div class="overflow-x-auto">
+                                    <table class="w-full" id="teamMembersTable">
+                                        <thead class="bg-gray-50 border-b border-gray-200">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member Name</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College ID</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200" id="teamMembersBody">
+                                            <!-- Dynamic members will be added here -->
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
+                        <% } else { %>
+                            <!-- Individual Registration -->
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-4">
+                                <h3 class="text-base font-semibold text-gray-800 mb-2">Individual Registration</h3>
+                                <p class="text-sm text-gray-600">Click the button below to register for this event.</p>
+                            </div>
+                        <% } %>
+
+                        <!-- Compact Submit Button -->
+                        <div class="mt-6 text-center">
+                            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-md">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <% if (event.eventType === 'team') { %>Register Team<% } else { %>Register for Event<% } %>
+                            </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
+            <% } %>
         </div>
     </main>
 </div>
+
+<script>
+let memberCount = 0;
+const maxMembers = <%- event.eventType === 'team' ? event.teamSize - 1 : 0 %>;
+
+// Add initial member rows
+if (maxMembers > 0) {
+    for (let i = 0; i < Math.min(2, maxMembers); i++) {
+        addMemberRow();
+    }
+}
+
+document.getElementById('addMemberBtn').addEventListener('click', function() {
+    if (memberCount < maxMembers) {
+        addMemberRow();
+    } else {
+        alert('Maximum team size reached!');
+    }
+});
+
+function addMemberRow() {
+    const tbody = document.getElementById('teamMembersBody');
+    const row = document.createElement('tr');
+    row.className = 'hover:bg-gray-50';
+    row.innerHTML = '<td class="px-6 py-4">' +
+        '<input type="text" name="teamMembers[' + memberCount + '][name]" required ' +
+        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" ' +
+        'placeholder="Member name">' +
+        '</td>' +
+        '<td class="px-6 py-4">' +
+        '<input type="text" name="teamMembers[' + memberCount + '][collegeId]" required ' +
+        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" ' +
+        'placeholder="College ID">' +
+        '</td>' +
+        '<td class="px-6 py-4">' +
+        '<input type="text" name="teamMembers[' + memberCount + '][department]" ' +
+        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" ' +
+        'placeholder="Department">' +
+        '</td>' +
+        '<td class="px-6 py-4 text-center">' +
+        '<button type="button" onclick="removeMember(this)" class="text-red-600 hover:text-red-800">' +
+        '<i class="fas fa-trash"></i>' +
+        '</button>' +
+        '</td>';
+    tbody.appendChild(row);
+    memberCount++;
+    
+    // Disable add button if max reached
+    if (memberCount >= maxMembers) {
+        document.getElementById('addMemberBtn').disabled = true;
+        document.getElementById('addMemberBtn').classList.add('opacity-50', 'cursor-not-allowed');
+    }
+}
+
+function removeMember(button) {
+    const row = button.closest('tr');
+    row.remove();
+    memberCount--;
+    
+    // Re-enable add button if below max
+    if (memberCount < maxMembers) {
+        document.getElementById('addMemberBtn').disabled = false;
+        document.getElementById('addMemberBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    
+    // Re-index remaining members
+    reindexMembers();
+}
+
+function reindexMembers() {
+    const rows = document.querySelectorAll('#teamMembersBody tr');
+    memberCount = 0;
+    rows.forEach((row, index) => {
+        const inputs = row.querySelectorAll('input');
+        inputs[0].name = 'teamMembers[' + index + '][name]';
+        inputs[1].name = 'teamMembers[' + index + '][collegeId]';
+        inputs[2].name = 'teamMembers[' + index + '][department]';
+        memberCount++;
+    });
+}
+</script>
 
 <%- include('../partials/footer') %>
