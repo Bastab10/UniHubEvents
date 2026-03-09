@@ -9,47 +9,172 @@
     <link rel="stylesheet" href="/css/professional-ui.css">
     <link rel="stylesheet" href="/css/responsive.css">
     <style>
-        /* Enhanced Sticky Navbar */
+        /* Enhanced Professional Navbar */
         .navbar-enhanced {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #d8c1e7;
             backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         }
         
         .navbar-enhanced.scrolled {
-            background: rgba(102, 126, 234, 0.95);
+            background: #be8cdf;
             backdrop-filter: blur(25px);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
         
         .navbar-transition {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .logo-container {
-            transition: transform 0.3s ease;
+        .navbar-z-index {
+            z-index: 1030;
         }
         
-        .logo-container:hover {
-            transform: scale(1.05);
+        /* Professional Navigation Buttons */
+        .nav-button {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        .search-enhanced {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
         }
         
-        .search-enhanced:focus {
-            background: white;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        .nav-button:hover::before {
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem;
+        }
+        
+        .nav-button:hover {
             transform: translateY(-1px);
         }
         
+        /* Professional Search Bar */
+        .search-bar {
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar:focus-within {
+            transform: translateY(-1px);
+        }
+        
+        /* User Avatar Styles */
+        .user-avatar {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar:hover {
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            transform: scale(1.05);
+        }
+        
+        /* Professional Dropdown */
         .user-dropdown {
-            background: white;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Mobile Search Bar */
+        .mobile-search-bar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Professional Button Styles */
+        .btn-professional {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-professional::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-professional:hover::before {
+            left: 100%;
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+        
+        /* Logo Text Enhancement */
+        .logo-text h1 {
+            background: linear-gradient(135deg, #1f2937 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-text:hover h1 {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Responsive Enhancements */
+        @media (max-width: 768px) {
+            .navbar-enhanced {
+                padding: 0.5rem 0;
+            }
+            
+            .nav-button {
+                padding: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-text h1 {
+                font-size: 0.875rem;
+            }
+            
+            .logo-text p {
+                font-size: 0.75rem;
+            }
+        }
+        
+        
+        .user-dropdown {
+            background: rgba(66, 65, 65, 0.17);
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -90,19 +215,16 @@
         .nav-button::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
         
         .nav-button:hover::before {
-            width: 100%;
-            height: 100%;
+            left: 100%;
         }
         
         .quick-filter-btn {
@@ -309,9 +431,6 @@
         
         /* Medium Devices (768px - 1023px) - Tablets */
         @media (min-width: 768px) and (max-width: 1023px) {
-            .search-enhanced {
-                max-width: 280px;
-            }
             
             .quick-filter-btn {
                 display: none;
@@ -325,9 +444,6 @@
         
         /* Large Devices (1024px - 1279px) - Small Laptops */
         @media (min-width: 1024px) and (max-width: 1279px) {
-            .search-enhanced {
-                max-width: 320px;
-            }
             
             .quick-filter-btn {
                 display: none;
@@ -336,9 +452,6 @@
         
         /* Extra Large Devices (1280px - 1535px) - Laptops */
         @media (min-width: 1280px) and (max-width: 1535px) {
-            .search-enhanced {
-                max-width: 400px;
-            }
         }
         
         /* Ultra Wide Devices (1536px+) - Large Desktops */
@@ -347,9 +460,6 @@
                 max-width: 1400px;
             }
             
-            .search-enhanced {
-                max-width: 500px;
-            }
         }
         
         /* Hide mobile menu button on desktop */
@@ -368,28 +478,18 @@
                 min-width: 44px;
             }
             
-            /* Mobile search optimizations */
-            .search-enhanced {
-                font-size: 16px !important; /* Prevents zoom on iOS */
-                min-height: 40px;
-            }
-            
-            .search-enhanced::placeholder {
-                font-size: 14px;
-            }
         }
         
         /* Small mobile adjustments */
         @media (max-width: 480px) {
-            .search-enhanced {
-                font-size: 14px !important;
-                min-height: 36px;
-            }
-            
-            .search-enhanced::placeholder {
-                font-size: 12px;
+            .logo-text h1 {
+                font-size: 0.75rem !important;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
         }
+        
     </style>
 </head>
 <body class="bg-gray-50">
@@ -401,109 +501,105 @@
                 <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
                     <!-- Mobile Menu Button -->
                     <button onclick="toggleMobileMenu()" 
-                            class="mobile-menu-btn nav-button text-white hover:bg-white/10 p-2 sm:p-2.5 rounded-lg sm:rounded-xl"
+                            class="mobile-menu-btn nav-button text-black hover:bg-black/10 p-2 sm:p-2.5 rounded-lg sm:rounded-xl"
                             title="Mobile Menu">
                         <i class="fas fa-bars text-base sm:text-lg"></i>
                     </button>
                     
                     <!-- Sidebar Toggle Button (Desktop) -->
                     <button onclick="openSidebar()" 
-                            class="nav-button text-white hover:bg-white/10 p-2 sm:p-2.5 lg:p-3 rounded-lg sm:rounded-xl hidden md:flex"
+                            class="nav-button text-black hover:bg-black/10 p-2 sm:p-2.5 lg:p-3 rounded-lg sm:rounded-xl hidden md:flex"
                             title="Toggle Menu">
                         <i class="fa-solid fa-sliders text-base sm:text-lg"></i>
                     </button>
                     
                     <!-- Logo/Brand -->
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                        <div class="logo-container bg-white p-1.5 sm:p-2 lg:p-2.5 rounded-lg sm:rounded-xl shadow-lg">
-                            <i class="fa-brands fa-squarespace text-sm sm:text-base lg:text-lg"></i>
-                        </div>
                         <div class="logo-text">
-                            <h1 class="text-white text-sm sm:text-base lg:text-lg xl:text-xl font-bold tracking-tight">Campus Event</h1>
-                            <p class="text-blue-100 text-xs sm:text-xs font-medium hidden md:block">NLU Event Management System</p>
+                            <h1 class="text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-bold tracking-tight">Campus Event</h1>
+                            <p class="text-black text-xs font-medium hidden sm:block">NLU Event Management System</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Search Bar -->
-                <div class="flex items-center flex-1 mx-1 sm:mx-2 lg:mx-6 xl:mx-8">
-                    <div class="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-md xl:max-w-lg">
-                        <input type="text" 
-                               id="eventSearch" 
-                               placeholder="Search events..." 
-                               class="search-enhanced w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-2.5 pl-8 sm:pl-10 md:pl-12 pr-16 sm:pr-20 md:pr-24 text-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-white/50 text-xs sm:text-sm md:text-base">
-                        <div class="absolute left-2 sm:left-3 md:left-4 top-1/2 transform -translate-y-1/2">
-                            <i class="fas fa-search text-gray-400 text-xs sm:text-sm md:text-base"></i>
-                        </div>
-                        <!-- Quick Category Filters - Hidden on smaller screens -->
-                        <!-- <div class="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 flex space-x-1 hidden lg:hidden xl:flex">
-                            <button onclick="quickSearch('Technical')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200">T</button>
-                            <button onclick="quickSearch('Cultural')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200">C</button>
-                            <button onclick="quickSearch('Sports')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200">S</button>
-                            <button onclick="quickSearch('Seminar')" class="quick-filter-btn px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200">Se</button>
-                        </div> -->
-                        <!-- Full Quick Filters - Only on large screens -->
-                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1 hidden 2xl:flex">
-                            <button onclick="quickSearch('Technical')" class="quick-filter-btn px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200">Technical</button>
-                            <button onclick="quickSearch('Cultural')" class="quick-filter-btn px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200">Cultural</button>
-                            <button onclick="quickSearch('Sports')" class="quick-filter-btn px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200">Sports</button>
-                            <button onclick="quickSearch('Seminar')" class="quick-filter-btn px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200">Seminar</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Right Side Actions -->
-                <div class="flex items-center justify-end ml-auto">
+              <div class="hidden lg:flex flex-1 justify-center mx-4">
+
+    <div class="relative w-full max-w-lg group">
+
+        <input 
+            type="text" 
+            id="headerSearchInput" 
+            placeholder="Search events by name, category, or venue..."
+            onkeypress="handleSearchKeyPress(event)"
+            class="w-full px-5 py-3.5 pl-12 pr-28 text-sm border border-gray-200 rounded-full bg-gray-50 focus:bg-white focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200/50 transition-all duration-300"
+        >
+
+        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <i class="fas fa-search text-sm"></i>
+        </div>
+
+        <button 
+            onclick="performHeaderSearch()" 
+            class="absolute right-3 top-1/2 -translate-y-1/2 px-8 py-2 bg-[#be8cdf] text-white text-sm font-semibold rounded-full hover:bg-red-600 transition-all duration-300"
+        >
+            Search
+        </button>
+
+    </div>
+
+</div>
+
+                <!-- Right Section: User Actions -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <!-- Mobile Search Toggle -->
+                    <button onclick="toggleMobileSearch()" 
+                            class="lg:hidden nav-button text-black hover:bg-black/10 p-2 sm:p-2.5 rounded-lg sm:rounded-xl"
+                            title="Search">
+                        <i class="fas fa-search text-base sm:text-lg"></i>
+                    </button>
+                    
+                    <!-- Notifications (for logged-in users) -->
                     <% if (currentUser) { %>
-                        <!-- User Profile Dropdown -->
-                        <div class="relative">
-                            <button onclick="toggleUserDropdown()" class="nav-button flex items-center space-x-2 sm:space-x-3 text-white hover:bg-white/10 px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl">
-                               <h2><i class="fa-solid fa-circle-user text-base sm:text-lg"></i></h2>
-                                <!-- <img src="<%= currentUser.profile.avatar || '/images/default-avatar.png' %>" 
-                                     alt="Profile" 
-                                     class="user-avatar h-8 w-8 lg:h-9 lg:w-9 rounded-full object-cover"> -->
-                                <div class="user-info text-left hidden sm:block">
-                                    <p class="text-xs sm:text-sm font-semibold">
-                                        <%= currentUser.profile.firstName %> <%= currentUser.profile.lastName %>
-                                    </p>
-                                    <p class="text-xs text-blue-100 capitalize">
-                                        <%= currentUser.role %>
-                                    </p>
-                                </div>
-                                <i class="fas fa-chevron-down text-xs sm:text-sm transition-transform duration-300 hidden lg:block"></i>
-                            </button>
-                            
-                            <!-- Enhanced Dropdown Menu -->
-                            <div id="userDropdown" class="hidden user-dropdown absolute right-0 mt-2 sm:mt-3 w-48 sm:w-56 lg:w-64 py-2 dropdown-z-index dropdown-animation">
-                                <div class="px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-100">
-                                    <p class="text-xs sm:text-sm font-bold text-gray-800">
-                                        <%= currentUser.profile.firstName %> <%= currentUser.profile.lastName %>
-                                    </p>
-                                    <p class="text-xs text-gray-500 capitalize">
-                                        <%= currentUser.role %>
-                                        <% if (currentUser.profile.department) { %>
-                                            • <%= currentUser.profile.department %>
-                                        <% } %>
-                                    </p>
-                                </div>
-                                <a href="/<%= currentUser.role %>/profile" class="flex items-center px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <i class="fas fa-user-circle mr-2 sm:mr-3 text-gray-400 text-sm"></i>
-                                    My Profile
-                                </a>
-                            </div>
-                        </div>
-                    <% } else { %>
-                        <!-- Login Button -->
-                        <a href="/auth/login" class="bg-white text-blue-600 px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 rounded-lg sm:rounded-xl font-medium hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-xs sm:text-sm">
-                            <i class="fas fa-sign-in-alt mr-1 sm:mr-2 text-xs sm:text-sm"></i>
-                            <span class="hidden sm:inline">Login</span>
-                        </a>
+                        <button class="relative nav-button text-black hover:bg-black/10 p-2 sm:p-2.5 rounded-lg sm:rounded-xl hidden sm:flex"
+                                title="Notifications">
+                            <i class="fas fa-bell text-base sm:text-lg"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
                     <% } %>
+                    
                 </div>
+            </div>
+            
+            <!-- Mobile Search Bar (Hidden by default) -->
+         <div id="mobileSearchBar" class="hidden lg:hidden border-t border-gray-200 bg-white">
+    <div class="px-4 py-3">
+
+        <div class="relative">
+
+            <input type="text" 
+                   id="mobileSearchInput" 
+                   placeholder="Search events..." 
+                   onkeypress="handleMobileSearchKeyPress(event)"
+                   class="w-full px-5 py-3.5 pl-12 pr-28 text-sm border border-gray-200 rounded-full bg-gray-50 focus:bg-white focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200/50 transition-all duration-300">
+
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <i class="fas fa-search text-sm"></i>
+            </div>
+
+            <button 
+                onclick="performMobileSearch()" 
+                class="absolute right-3 top-1/2 -translate-y-1/2 px-6 py-2 bg-[#be8cdf] text-white text-sm font-semibold rounded-full hover:bg-[#a874cc] transition-all duration-300">
+                Search
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
             </div>
         </div>
     </nav>
-
     <!-- Mobile Navigation Menu -->
     <div id="mobileMenu" class="mobile-menu">
         <div class="mobile-menu-header">
@@ -680,33 +776,69 @@
             }
         }
         
-        // Search functionality
-        function quickSearch(category) {
-            const searchInput = document.getElementById('eventSearch');
-            searchInput.value = category;
-            performSearch();
+        // Mobile Search Toggle
+        function toggleMobileSearch() {
+            const mobileSearchBar = document.getElementById('mobileSearchBar');
+            const mobileSearchInput = document.getElementById('mobileSearchInput');
+            
+            if (mobileSearchBar.classList.contains('hidden')) {
+                mobileSearchBar.classList.remove('hidden');
+                mobileSearchInput.focus();
+            } else {
+                mobileSearchBar.classList.add('hidden');
+                mobileSearchInput.value = '';
+            }
         }
         
-        function performSearch() {
-            const searchTerm = document.getElementById('eventSearch').value.trim();
+        // Mobile Search Functions
+        function handleMobileSearchKeyPress(event) {
+            if (event.key === 'Enter') {
+                performMobileSearch();
+            }
+        }
+        
+        function performMobileSearch() {
+            const searchInput = document.getElementById('mobileSearchInput');
+            const searchTerm = searchInput.value.trim();
+            
             if (searchTerm) {
-                // Redirect to events page with search parameter
                 const currentRole = '<%= currentUser ? currentUser.role : "student" %>';
                 window.location.href = `/${currentRole}/events?search=${encodeURIComponent(searchTerm)}`;
             }
         }
         
-        // Handle Enter key in search
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('eventSearch');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(event) {
-                    if (event.key === 'Enter') {
-                        performSearch();
-                    }
-                });
+        // User Menu Toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('opacity-100');
+                dropdown.classList.toggle('visible');
+                dropdown.classList.toggle('opacity-0');
+                dropdown.classList.toggle('invisible');
+            }
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const userDropdown = document.getElementById('userDropdown');
+            const userButton = event.target.closest('[onclick="toggleUserMenu()"]');
+            
+            if (userDropdown && !userDropdown.contains(event.target) && !userButton) {
+                userDropdown.classList.add('opacity-0', 'invisible');
+                userDropdown.classList.remove('opacity-100', 'visible');
             }
         });
+        
+        // Close mobile search when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileSearchBar = document.getElementById('mobileSearchBar');
+            const mobileSearchButton = event.target.closest('[onclick="toggleMobileSearch()"]');
+            
+            if (mobileSearchBar && !mobileSearchBar.contains(event.target) && !mobileSearchButton) {
+                mobileSearchBar.classList.add('hidden');
+            }
+        });
+        
         
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
@@ -775,4 +907,28 @@
                 }
             }
         });
+        
+        // Search functionality
+        function handleSearchKeyPress(event) {
+            if (event.key === 'Enter') {
+                performHeaderSearch();
+            }
+        }
+        
+        function performHeaderSearch() {
+            const searchInput = document.getElementById('headerSearchInput');
+            const searchTerm = searchInput.value.trim();
+            
+            if (searchTerm) {
+                // Determine current user role and redirect to appropriate events page
+                const currentRole = '<%= currentUser ? currentUser.role : "student" %>';
+                
+                // Redirect to events page with search parameter
+                window.location.href = `/${currentRole}/events?search=${encodeURIComponent(searchTerm)}`;
+            } else {
+                // If search is empty, redirect to events page without search
+                const currentRole = '<%= currentUser ? currentUser.role : "student" %>';
+                window.location.href = `/${currentRole}/events`;
+            }
+        }
     </script>

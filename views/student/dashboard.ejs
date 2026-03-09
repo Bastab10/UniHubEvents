@@ -14,7 +14,7 @@
 }
 
 .welcome-section {
-    background: linear-gradient(135deg, #2563eb, #9333ea);
+    background: linear-gradient(135deg, white 0%, white);
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -66,20 +66,6 @@
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-.events-section {
-    background: white;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-}
-
-@media (max-width: 640px) {
-    .events-section {
-        padding: 1rem;
-        border-radius: 0.75rem;
-    }
 }
 
 .events-grid {
@@ -217,7 +203,7 @@
 }
 
 .view-details-btn {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    background: linear-gradient(135deg, #648ce1, #3b82f6);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
@@ -297,35 +283,56 @@ body {
     <main class="flex-1">
         <div class="p-4 sm:p-6">
             <!-- Welcome Section -->
-            <div class="welcome-section mb-6 sm:mb-8 text-white">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                        <h1 class="responsive-text-3xl font-bold mb-2">Welcome back, <%= currentUser.profile.firstName %>!</h1>
-                        <p class="text-blue-100 text-base sm:text-lg">Here's your personalized dashboard overview</p>
-                    </div>
-                    <div class="hidden md:block">
-                        <i class="fas fa-graduation-cap text-6xl text-blue-200 opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+            <h2 class="responsive-text-3xl font-bold mb-2">Welcome back, <%= currentUser.profile.firstName %>!</h2>
+            <p class="text-black-100 text-base sm:text-lg mb-6 sm:mb-8">Here's your personalized dashboard overview</p>
 
             <!-- Events Section -->
-            <div class="events-section mb-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
-                    <h2 class="responsive-text-2xl font-bold text-gray-800 flex items-center">
-                        <i class="fas fa-calendar-alt mr-3 text-blue-600"></i>
-                        Available Events
-                    </h2>
-                    <div class="flex items-center space-x-2 sm:space-x-4">
-                        <span class="text-xs sm:text-sm text-gray-500">Total Events</span>
-                        <span class="text-lg sm:text-xl font-bold text-blue-600"><%= allEvents.length %></span>
-                    </div>
+            <!-- Category Filter Buttons -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button onclick="filterEvents('all')" class="category-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-blue-600 text-white">
+                    All Events
+                </button>
+                <button onclick="filterEvents('seminar')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Seminars
+                </button>
+                <button onclick="filterEvents('workshop')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Workshops
+                </button>
+                <button onclick="filterEvents('hackathon')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Hackathons
+                </button>
+                <button onclick="filterEvents('quiz')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Quizzes
+                </button>
+                <button onclick="filterEvents('talkshow')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Talk Shows
+                </button>
+                <button onclick="filterEvents('bootcamp')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Bootcamps
+                </button>
+                <button onclick="filterEvents('cultural')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Cultural
+                </button>
+                <button onclick="filterEvents('sports')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Sports
+                </button>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+                <h2 class="responsive-text-2xl font-bold text-gray-800 flex items-center">
+                    <!-- <i class="fas fa-calendar-alt mr-3 text-blue-600"></i> -->
+                    Available <span id="category-title">ALL</span> Events
+                </h2>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <span class="text-xs sm:text-sm text-gray-500">Total Events</span>
+                    <span id="event-count" class="text-lg sm:text-xl font-bold text-blue-600"><%= allEvents.length %></span>
                 </div>
-                
-                <% if (allEvents && allEvents.length > 0) { %>
-                    <div class="events-grid">
+            </div>
+            
+            <% if (allEvents && allEvents.length > 0) { %>
+                <div class="events-grid">
                         <% allEvents.forEach((event, index) => { %>
-                            <div class="event-card group">
+                            <div class="event-card group" data-category="<%= event.category || 'other' %>">
                                 <!-- Event Image -->
                                 <div class="event-image">
                                     <% if (event.poster && event.poster.trim() !== '') { %>
@@ -417,9 +424,71 @@ body {
                         <p class="text-gray-500">There are currently no events available. Check back later for new events!</p>
                     </div>
                 <% } %>
-            </div>
         </div>
     </main>
 </div>
+
+<script>
+// Category filtering functionality
+function filterEvents(category) {
+    const eventCards = document.querySelectorAll('.event-card');
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const categoryTitle = document.getElementById('category-title');
+    const eventCount = document.getElementById('event-count');
+    
+    // Update active button styling
+    categoryButtons.forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    
+    // Highlight active button
+    const activeButton = document.querySelector(`[onclick="filterEvents('${category}')"]`);
+    if (activeButton) {
+        activeButton.classList.remove('bg-gray-200', 'text-gray-700');
+        activeButton.classList.add('bg-blue-600', 'text-white');
+    }
+    
+    // Update category title
+    if (category === 'all') {
+        categoryTitle.textContent = 'ALL';
+    } else {
+        categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+    }
+    
+    // Filter events
+    let visibleCount = 0;
+    eventCards.forEach(card => {
+        const eventCategory = card.getAttribute('data-category');
+        
+        if (category === 'all' || eventCategory === category) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Update event count
+    eventCount.textContent = visibleCount;
+    
+    // Show/hide no events message
+    const eventsGrid = document.querySelector('.events-grid');
+    const noEventsMessage = document.querySelector('.no-events');
+    
+    if (visibleCount === 0 && eventsGrid) {
+        if (noEventsMessage) {
+            noEventsMessage.style.display = 'block';
+            noEventsMessage.innerHTML = `
+                <i class="fas fa-calendar-times text-gray-300 text-6xl mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No ${category === 'all' ? '' : category.charAt(0).toUpperCase() + category.slice(1) + ' '}Events Available</h3>
+                <p class="text-gray-500">There are currently no ${category === 'all' ? '' : category + ' '}events available. Check back later for new events!</p>
+            `;
+        }
+    } else if (noEventsMessage) {
+        noEventsMessage.style.display = 'none';
+    }
+}
+</script>
 
 <%- include('../partials/footer') %>

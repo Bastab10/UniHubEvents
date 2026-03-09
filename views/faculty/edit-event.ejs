@@ -190,11 +190,15 @@
                                             required 
                                             onchange="toggleSubCategory()">
                                         <option value="">Select Category</option>
+                                        <option value="seminar" <%= (formData.category || event.category) === 'seminar' ? 'selected' : '' %>>Seminars</option>
+                                        <option value="workshop" <%= (formData.category || event.category) === 'workshop' ? 'selected' : '' %>>Workshops</option>
+                                        <option value="hackathon" <%= (formData.category || event.category) === 'hackathon' ? 'selected' : '' %>>Hackathons</option>
+                                        <option value="quiz" <%= (formData.category || event.category) === 'quiz' ? 'selected' : '' %>>Quizzes</option>
+                                        <option value="talkshow" <%= (formData.category || event.category) === 'talkshow' ? 'selected' : '' %>>Talk Shows</option>
+                                        <option value="bootcamp" <%= (formData.category || event.category) === 'bootcamp' ? 'selected' : '' %>>Bootcamps</option>
                                         <option value="technical" <%= (formData.category || event.category) === 'technical' ? 'selected' : '' %>>Technical</option>
                                         <option value="cultural" <%= (formData.category || event.category) === 'cultural' ? 'selected' : '' %>>Cultural</option>
                                         <option value="sports" <%= (formData.category || event.category) === 'sports' ? 'selected' : '' %>>Sports</option>
-                                        <option value="seminar" <%= (formData.category || event.category) === 'seminar' ? 'selected' : '' %>>Seminar</option>
-                                        <option value="workshop" <%= (formData.category || event.category) === 'workshop' ? 'selected' : '' %>>Workshop</option>
                                     </select>
                                 </div>
 

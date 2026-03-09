@@ -45,7 +45,7 @@
                             <div>
                                 <label for="title" class="block text-sm font-semibold mb-2 text-gray-700">Event Title *</label>
                                 <input type="text" id="title" name="title" required
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
                                        placeholder="Enter event title">
                             </div>
 
@@ -53,7 +53,7 @@
                             <div>
                                 <label for="description" class="block text-sm font-semibold mb-2 text-gray-700">Description *</label>
                                 <textarea id="description" name="description" rows="4" required
-                                          class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 resize-vertical transition-colors"
+                                          class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 resize-vertical transition-colors text-black"
                                           placeholder="Describe your event"></textarea>
                             </div>
 
@@ -62,10 +62,14 @@
                                 <div>
                                     <label for="category" class="block text-sm font-semibold mb-2 text-gray-700">Category *</label>
                                     <select id="category" name="category" required
-                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
                                         <option value="">Select a category</option>
-                                        <option value="seminar">Seminar</option>
-                                        <option value="workshop">Workshop</option>
+                                        <option value="seminar">Seminars</option>
+                                        <option value="workshop">Workshops</option>
+                                        <option value="hackathon">Hackathons</option>
+                                        <option value="quiz">Quizzes</option>
+                                        <option value="talkshow">Talk Shows</option>
+                                        <option value="bootcamp">Bootcamps</option>
                                         <option value="cultural">Cultural</option>
                                         <option value="sports">Sports</option>
                                     </select>
@@ -74,7 +78,7 @@
                                 <div>
                                     <label for="subCategory" class="block text-sm font-semibold mb-2 text-gray-700">Sub-category</label>
                                     <input type="text" id="subCategory" name="subCategory"
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
                                            placeholder="e.g., Football, Music, Technical">
                                 </div>
                             </div>
@@ -84,7 +88,7 @@
                                 <div>
                                     <label for="eventType" class="block text-sm font-semibold mb-2 text-gray-700">Event Type *</label>
                                     <select id="eventType" name="eventType" required
-                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
                                         <option value="">Select event type</option>
                                         <option value="individual">Individual</option>
                                         <option value="team">Team</option>
@@ -94,7 +98,7 @@
                                 <div id="teamSizeDiv" class="hidden">
                                     <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">Team Size *</label>
                                     <input type="number" id="teamSize" name="teamSize" min="2" max="20"
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
                                            placeholder="Number of team members">
                                 </div>
                             </div>
@@ -103,7 +107,7 @@
                             <div>
                                 <label for="maxParticipants" class="block text-sm font-semibold mb-2 text-gray-700">Maximum Participants</label>
                                 <input type="number" id="maxParticipants" name="maxParticipants" min="1"
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
                                        placeholder="Leave empty for unlimited">
                             </div>
                         </div>
@@ -117,19 +121,19 @@
                                 <div>
                                     <label for="date" class="block text-sm font-semibold mb-2 text-gray-700">Event Date *</label>
                                     <input type="date" id="date" name="date" required
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
                                 </div>
 
                                 <div>
                                     <label for="startTime" class="block text-sm font-semibold mb-2 text-gray-700">Start Time *</label>
                                     <input type="time" id="startTime" name="startTime" required
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
                                 </div>
 
                                 <div>
                                     <label for="endTime" class="block text-sm font-semibold mb-2 text-gray-700">End Time *</label>
                                     <input type="time" id="endTime" name="endTime" required
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
                                 </div>
                             </div>
 
@@ -137,7 +141,7 @@
                             <div>
                                 <label for="venue" class="block text-sm font-semibold mb-2 text-gray-700">Venue *</label>
                                 <input type="text" id="venue" name="venue" required
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
                                        placeholder="Event location">
                             </div>
                         </div>
@@ -150,7 +154,7 @@
                             <div>
                                 <label for="poster" class="block text-sm font-semibold mb-2 text-gray-700">Event Poster</label>
                                 <input type="file" id="poster" name="poster" accept="image/*"
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors">
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
                                 <p class="text-sm text-gray-500 mt-1">Upload an image for your event poster (optional)</p>
                             </div>
                         </div>
