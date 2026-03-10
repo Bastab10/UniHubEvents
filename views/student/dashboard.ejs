@@ -28,11 +28,65 @@
     
     .welcome-section h1 {
         font-size: 1.5rem !important;
+        color: #1f2937 !important; /* Force dark color on mobile */
     }
     
     .welcome-section p {
         font-size: 1rem !important;
+        color: #4b5563 !important; /* Force dark color on mobile */
     }
+}
+
+/* Mobile text color fixes */
+@media (max-width: 640px) {
+    .dashboard-container h2 {
+        color: #1f2937 !important; /* Force dark gray */
+    }
+    
+    .dashboard-container p {
+        color: #4b5563 !important; /* Force medium gray */
+    }
+    
+    /* Filter button mobile fixes */
+    .category-btn.active {
+        background-color: #dabbf2 !important; /* Force blue background */
+        color: #ffffff !important; /* Force white text */
+    }
+    
+    .category-btn.bg-blue-600 {
+        background-color: #d1aee2 !important; /* Force blue background */
+        color: #ffffff !important; /* Force white text */
+    }
+}
+
+/* Category button fade effects (no blur) */
+.category-btn {
+    transition: all 0.3s ease !important;
+    position: relative;
+}
+
+.category-btn:not(.active) {
+    opacity: 0.7;
+    transform: scale(0.95);
+    color: #000000 !important; /* Force black text */
+}
+
+.category-btn:not(.active):hover {
+    opacity: 0.9;
+    transform: scale(0.98);
+}
+
+.category-btn.active {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    z-index: 10;
+}
+
+/* Smooth transitions for all states */
+.category-btn {
+    transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease !important;
 }
 
 .stats-grid {
@@ -283,13 +337,13 @@ body {
     <main class="flex-1">
         <div class="p-4 sm:p-6">
             <!-- Welcome Section -->
-            <h2 class="responsive-text-3xl font-bold mb-2">Welcome back, <%= currentUser.profile.firstName %>!</h2>
-            <p class="text-black-100 text-base sm:text-lg mb-6 sm:mb-8">Here's your personalized dashboard overview</p>
+            <h2 class="responsive-text-3xl font-bold mb-2 text-gray-800">Welcome back, <%= currentUser.profile.firstName %>!</h2>
+            <p class="text-gray-700 sm:text-gray-600 text-base sm:text-lg mb-6 sm:mb-8">Here's your personalized dashboard overview</p>
 
             <!-- Events Section -->
             <!-- Category Filter Buttons -->
             <div class="flex flex-wrap gap-2 mb-6">
-                <button onclick="filterEvents('all')" class="category-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-blue-600 text-white">
+                <button onclick="filterEvents('all')" class="category-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-[#be8cdf] text-white">
                     All Events
                 </button>
                 <button onclick="filterEvents('seminar')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300">
@@ -340,13 +394,20 @@ body {
                                              alt="<%= event.title %>" 
                                              class="w-full h-full object-cover"
                                              style="object-fit: cover;"
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100" style="display:none;">
-                                            <i class="fas fa-calendar-alt text-4xl text-blue-600"></i>
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.parentElement.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';"
+                                             onload="console.log('Image loaded successfully:', '<%= event.poster %>');">
+                                        <div class="w-full h-full flex items-center justify-center" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                            <div class="text-center">
+                                                <i class="fas fa-calendar-alt text-4xl text-white mb-2"></i>
+                                                <p class="text-white text-sm">Image not available</p>
+                                            </div>
                                         </div>
                                     <% } else { %>
                                         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                                            <i class="fas fa-calendar-alt text-4xl text-blue-600"></i>
+                                            <div class="text-center">
+                                                <i class="fas fa-calendar-alt text-4xl text-blue-600 mb-2"></i>
+                                                <p class="text-blue-600 text-sm">No poster uploaded</p>
+                                            </div>
                                         </div>
                                     <% } %>
                                 </div>
@@ -436,17 +497,52 @@ function filterEvents(category) {
     const categoryTitle = document.getElementById('category-title');
     const eventCount = document.getElementById('event-count');
     
-    // Update active button styling
+    // Update active button styling - ensure only one active button
     categoryButtons.forEach(btn => {
-        btn.classList.remove('bg-blue-600', 'text-white');
+        // Remove all active classes and styles
+        btn.classList.remove('bg-[#be8cdf]', 'text-white', 'active');
         btn.classList.add('bg-gray-200', 'text-gray-700');
+        
+        // Apply inactive button styles
+        btn.style.opacity = '0.7';
+        btn.style.transform = 'scale(0.95)';
+        btn.style.color = '#000000';
+        btn.style.boxShadow = 'none';
+        btn.style.backgroundColor = '#f3f4f6';
     });
     
-    // Highlight active button
-    const activeButton = document.querySelector(`[onclick="filterEvents('${category}')"]`);
+    // Find and activate the clicked button
+    let activeButton = null;
+    
+    // More reliable selector method
+    categoryButtons.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(`filterEvents('${category}')`)) {
+            activeButton = btn;
+            return false; // Exit the loop
+        }
+    });
+    
+    // Apply active button styles
     if (activeButton) {
+        // Remove inactive classes
         activeButton.classList.remove('bg-gray-200', 'text-gray-700');
-        activeButton.classList.add('bg-blue-600', 'text-white');
+        
+        // Add active classes
+        activeButton.classList.add('bg-[#be8cdf]', 'text-white', 'active');
+        
+        // Apply active button styles
+        activeButton.style.opacity = '1';
+        activeButton.style.transform = 'scale(1)';
+        activeButton.style.color = '#ffffff';
+        activeButton.style.boxShadow = '0 4px 12px rgba(190, 140, 223, 0.3)';
+        activeButton.style.backgroundColor = '#be8cdf';
+        
+        // Force mobile styles
+        if (window.innerWidth <= 640) {
+            activeButton.style.backgroundColor = '#be8cdf';
+            activeButton.style.color = '#ffffff';
+        }
     }
     
     // Update category title

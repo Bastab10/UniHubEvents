@@ -153,9 +153,19 @@
                             <!-- Poster Upload -->
                             <div>
                                 <label for="poster" class="block text-sm font-semibold mb-2 text-gray-700">Event Poster</label>
-                                <input type="file" id="poster" name="poster" accept="image/*"
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
+                                <input type="file" id="poster" name="poster" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
+                                       onchange="previewImage(this)">
                                 <p class="text-sm text-gray-500 mt-1">Upload an image for your event poster (optional)</p>
+                                <p class="text-xs text-gray-400 mt-1">Supported formats: JPEG, JPG, PNG, GIF, WEBP (Max size: 5MB)</p>
+                                
+                                <!-- Image Preview -->
+                                <div id="imagePreview" class="mt-3 hidden">
+                                    <img id="previewImg" src="" alt="Preview" class="max-w-full h-40 object-cover rounded-lg border border-gray-300">
+                                    <button type="button" onclick="removeImage()" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                                        <i class="fas fa-times mr-1"></i>Remove Image
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -185,6 +195,74 @@ document.getElementById('eventType').addEventListener('change', function() {
         teamSizeDiv.classList.add('hidden');
     }
 });
+
+// Image preview functionality for mobile
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only JPEG, JPG, PNG, GIF, and WEBP files are allowed');
+            input.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Remove image functionality
+function removeImage() {
+    const input = document.getElementById('poster');
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    input.value = '';
+    previewImg.src = '';
+    preview.classList.add('hidden');
+}
+
+// Mobile-specific enhancements
+if (window.innerWidth <= 768) {
+    // Add mobile-specific file input handling
+    const fileInput = document.getElementById('poster');
+    
+    fileInput.addEventListener('touchstart', function() {
+        this.classList.add('ring-2', 'ring-blue-500');
+    });
+    
+    fileInput.addEventListener('touchend', function() {
+        setTimeout(() => {
+            this.classList.remove('ring-2', 'ring-blue-500');
+        }, 200);
+    });
+    
+    // Prevent zoom on input focus (mobile)
+    fileInput.addEventListener('focus', function() {
+        document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0');
+    });
+    
+    fileInput.addEventListener('blur', function() {
+        document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width,initial-scale=1.0');
+    });
+}
 </script>
 
 <%- include('../partials/footer') %>

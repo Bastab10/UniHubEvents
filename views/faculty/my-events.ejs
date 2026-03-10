@@ -124,6 +124,68 @@
     .event-image {
         height: 10rem;
     }
+    
+    /* Mobile text color fixes */
+    .event-title {
+        color: #1f2937 !important; /* Force dark gray for titles */
+    }
+    
+    .event-description {
+        color: #4b5563 !important; /* Force medium gray for descriptions */
+    }
+    
+    .event-meta span {
+        color: #4b5563 !important; /* Force medium gray for meta info */
+    }
+    
+    .event-meta i {
+        color: #6b7280 !important; /* Force gray for icons */
+    }
+    
+    /* Button text fixes */
+    .btn {
+        color: #ffffff !important; /* Force white text on buttons */
+    }
+    
+    .btn-primary {
+        background-color: #2563eb !important; /* Force blue background */
+        color: #ffffff !important; /* Force white text */
+    }
+    
+    .btn-outline-secondary {
+        border-color: #6b7280 !important; /* Force gray border */
+        color: #374151 !important; /* Force dark gray text */
+    }
+    
+    .btn-outline-danger {
+        border-color: #dc2626 !important; /* Force red border */
+        color: #dc2626 !important; /* Force red text */
+    }
+    
+    /* Header text fixes */
+    h1, h2, h3 {
+        color: #1f2937 !important; /* Force dark gray for headers */
+    }
+    
+    p {
+        color: #4b5563 !important; /* Force medium gray for paragraphs */
+    }
+    
+    /* Label text fixes */
+    label {
+        color: #374151 !important; /* Force dark gray for labels */
+    }
+    
+    /* Select text fixes */
+    select {
+        color: #1f2937 !important; /* Force dark gray for select text */
+        background-color: #ffffff !important; /* Force white background */
+    }
+    
+    select option {
+        color: #1f2937 !important; /* Force dark gray for options */
+        background-color: #ffffff !important; /* Force white background for options */
+    }
 }
 </style>
 
@@ -159,7 +221,6 @@
                             <option value="quiz" <%= filters.category === 'quiz' ? 'selected' : '' %>>Quizzes</option>
                             <option value="talkshow" <%= filters.category === 'talkshow' ? 'selected' : '' %>>Talk Shows</option>
                             <option value="bootcamp" <%= filters.category === 'bootcamp' ? 'selected' : '' %>>Bootcamps</option>
-                            <option value="technical" <%= filters.category === 'technical' ? 'selected' : '' %>>Technical</option>
                             <option value="cultural" <%= filters.category === 'cultural' ? 'selected' : '' %>>Cultural</option>
                             <option value="sports" <%= filters.category === 'sports' ? 'selected' : '' %>>Sports</option>
                         </select>
@@ -188,13 +249,20 @@
                                          alt="<%= event.title %>" 
                                          class="w-full h-full object-cover"
                                          style="object-fit: cover;"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100" style="display:none;">
-                                        <i class="fas fa-calendar-alt text-4xl text-blue-600"></i>
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.parentElement.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';"
+                                         onload="console.log('Image loaded successfully:', '<%= event.poster %>');">
+                                    <div class="w-full h-full flex items-center justify-center" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                        <div class="text-center">
+                                            <i class="fas fa-calendar-alt text-4xl text-white mb-2"></i>
+                                            <p class="text-white text-sm">Image not available</p>
+                                        </div>
                                     </div>
                                 <% } else { %>
                                     <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                                        <i class="fas fa-calendar-alt text-4xl text-blue-600"></i>
+                                        <div class="text-center">
+                                            <i class="fas fa-calendar-alt text-4xl text-blue-600 mb-2"></i>
+                                            <p class="text-blue-600 text-sm">No poster uploaded</p>
+                                        </div>
                                     </div>
                                 <% } %>
                             </div>

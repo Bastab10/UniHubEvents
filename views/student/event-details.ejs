@@ -34,6 +34,30 @@
                 </div>
             <% } %>
             
+            <style>
+                /* Mobile input field text visibility fixes */
+                @media (max-width: 640px) {
+                    input[type="text"] {
+                        color: #000000 !important; /* Force black text */
+                        background-color: #ffffff !important; /* Force white background */
+                    }
+                    
+                    input[type="text"]::placeholder {
+                        color: #6b7280 !important; /* Gray placeholder */
+                        opacity: 1 !important; /* Force full opacity */
+                    }
+                    
+                    /* Focus states */
+                    input[type="text"]:focus {
+                        color: #000000 !important; /* Black text on focus */
+                    }
+                    
+                    input[type="text"]:focus::placeholder {
+                        color: #9ca3af !important; /* Lighter gray on focus */
+                    }
+                }
+            </style>
+            
             <!-- Event Banner -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4 mx-auto max-w-3xl">
                 <% if (event.poster) { %>
@@ -179,21 +203,21 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
                                         <input type="text" id="teamName" name="teamName" required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                                                placeholder="Enter team name">
                                     </div>
                                     
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader Name *</label>
                                         <input type="text" id="teamLeaderName" name="teamLeaderName" required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                                                placeholder="Team leader name">
                                     </div>
                                     
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader College ID *</label>
                                         <input type="text" id="teamLeaderCollegeId" name="teamLeaderCollegeId" required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                                                placeholder="College ID">
                                     </div>
                                 </div>
@@ -274,17 +298,17 @@ function addMemberRow() {
     row.className = 'hover:bg-gray-50';
     row.innerHTML = '<td class="px-6 py-4">' +
         '<input type="text" name="teamMembers[' + memberCount + '][name]" required ' +
-        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" ' +
+        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900" ' +
         'placeholder="Member name">' +
         '</td>' +
         '<td class="px-6 py-4">' +
         '<input type="text" name="teamMembers[' + memberCount + '][collegeId]" required ' +
-        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" ' +
+        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900" ' +
         'placeholder="College ID">' +
         '</td>' +
         '<td class="px-6 py-4">' +
         '<input type="text" name="teamMembers[' + memberCount + '][department]" ' +
-        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" ' +
+        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900" ' +
         'placeholder="Department">' +
         '</td>' +
         '<td class="px-6 py-4 text-center">' +
@@ -294,6 +318,15 @@ function addMemberRow() {
         '</td>';
     tbody.appendChild(row);
     memberCount++;
+    
+    // Apply mobile styles to new inputs
+    if (window.innerWidth <= 640) {
+        const newInputs = row.querySelectorAll('input[type="text"]');
+        newInputs.forEach(input => {
+            input.style.color = '#000000';
+            input.style.backgroundColor = '#ffffff';
+        });
+    }
     
     // Disable add button if max reached
     if (memberCount >= maxMembers) {

@@ -12,22 +12,37 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
+        // Sanitize filename for mobile compatibility
+        const originalName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+        cb(null, Date.now() + '-' + originalName);
     }
 });
 
 const upload = multer({ 
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    limits: { 
+        fileSize: 5 * 1024 * 1024, // 5MB limit
+        files: 1 // Limit to 1 file at a time
+    },
     fileFilter: function (req, file, cb) {
-        const allowedTypes = /jpeg|jpg|png|gif/;
+        // Enhanced file type validation for mobile
+        const allowedTypes = /jpeg|jpg|png|gif|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
+        
+        console.log('File upload debug:', {
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            extname: path.extname(file.originalname).toLowerCase(),
+            extnameValid: extname,
+            mimetypeValid: mimetype
+        });
         
         if (mimetype && extname) {
             return cb(null, true);
         } else {
-            cb(new Error('Only image files are allowed'));
+            console.log('File rejected - Invalid type:', file.mimetype, file.originalname);
+            cb(new Error('Only image files (JPEG, JPG, PNG, GIF, WEBP) are allowed'));
         }
     }
 });
@@ -121,6 +136,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
         console.log('File uploaded:', req.file);
         console.log('User session:', req.session.user);
         console.log('Content-Type:', req.headers['content-type']);
+        console.log('Content-Length:', req.headers['content-length']);
         
         const {
             title,
@@ -135,6 +151,33 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             endTime,
             venue
         } = req.body;
+
+        // Enhanced file upload validation for mobile
+        let posterPath = null;
+        if (req.file) {
+            console.log('File details:', {
+                originalname: req.file.originalname,
+                filename: req.file.filename,
+                path: req.file.path,
+                size: req.file.size,
+                mimetype: req.file.mimetype
+            });
+            
+            // Verify file exists and is accessible
+            const fs = require('fs');
+            if (fs.existsSync(req.file.path)) {
+                posterPath = '/uploads/' + req.file.filename;
+                console.log('Poster path set to:', posterPath);
+            } else {
+                console.log('File not found at path:', req.file.path);
+            }
+        } else {
+            console.log('No file uploaded - checking if file was expected');
+            // Check if request was multipart and contained file data
+            if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+                console.log('Request was multipart but no file received');
+            }
+        }
 
         // Validation
         console.log('Starting validation...');
@@ -226,7 +269,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             startTime,
             endTime,
             venue,
-            poster: req.file ? '/uploads/' + req.file.filename : null,
+            poster: posterPath, // Use the validated poster path
             organizer: req.session.user._id,
             status: 'approved',
             approvedBy: req.session.user._id,
