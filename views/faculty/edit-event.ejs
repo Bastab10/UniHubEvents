@@ -161,7 +161,7 @@
                             <div>
                                 <label for="title" class="block text-sm font-semibold mb-2 text-gray-700">Event Title *</label>
                                 <input type="text" 
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                        id="title" 
                                        name="title" 
                                        value="<%= formData.title || event.title %>"
@@ -172,7 +172,7 @@
                             <!-- Description - Full Width -->
                             <div>
                                 <label for="description" class="block text-sm font-semibold mb-2 text-gray-700">Description *</label>
-                                <textarea class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 resize-vertical transition-colors" 
+                                <textarea class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 resize-vertical transition-colors text-black" 
                                           id="description" 
                                           name="description" 
                                           rows="4" 
@@ -184,7 +184,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="category" class="block text-sm font-semibold mb-2 text-gray-700">Category *</label>
-                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                             id="category" 
                                             name="category" 
                                             required 
@@ -204,7 +204,7 @@
 
                                 <div>
                                     <label for="eventType" class="block text-sm font-semibold mb-2 text-gray-700">Event Type *</label>
-                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                             id="eventType" 
                                             name="eventType" 
                                             onchange="toggleTeamSize()">
@@ -219,7 +219,7 @@
                                 <div id="teamSizeField" style="display: none;">
                                     <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">Team Size *</label>
                                     <input type="number" 
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                            id="teamSize" 
                                            name="teamSize" 
                                            value="<%= formData.teamSize || event.teamSize %>"
@@ -230,7 +230,7 @@
                                 <div>
                                     <label for="maxParticipants" class="block text-sm font-semibold mb-2 text-gray-700">Max Participants</label>
                                     <input type="number" 
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                            id="maxParticipants" 
                                            name="maxParticipants" 
                                            value="<%= formData.maxParticipants || event.maxParticipants %>"
@@ -273,7 +273,7 @@
                                 <div>
                                     <label for="date" class="block text-sm font-semibold mb-2 text-gray-700">Date *</label>
                                     <input type="date" 
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                            id="date" 
                                            name="date" 
                                            value="<% if (formData.date) { %><%= new Date(formData.date).toISOString().split('T')[0] %><% } else { %><%= new Date(event.date).toISOString().split('T')[0] %><% } %>"
@@ -283,7 +283,7 @@
                                 <div>
                                     <label for="startTime" class="block text-sm font-semibold mb-2 text-gray-700">Start Time *</label>
                                     <input type="time" 
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                            id="startTime" 
                                            name="startTime" 
                                            value="<%= formData.startTime || event.startTime %>"
@@ -293,7 +293,7 @@
                                 <div>
                                     <label for="endTime" class="block text-sm font-semibold mb-2 text-gray-700">End Time *</label>
                                     <input type="time" 
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                            id="endTime" 
                                            name="endTime" 
                                            value="<%= formData.endTime || event.endTime %>"
@@ -305,7 +305,7 @@
                             <div>
                                 <label for="venue" class="block text-sm font-semibold mb-2 text-gray-700">Venue *</label>
                                 <input type="text" 
-                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
                                        id="venue" 
                                        name="venue" 
                                        value="<%= formData.venue || event.venue %>"

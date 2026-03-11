@@ -46,7 +46,7 @@
                     <h2 class="text-lg font-semibold text-gray-800">Student Registrations</h2>
                 </div>
                 
-                <% if (registrations && registrations.length > 0) { %>
+                <% if (typeof registrations !== 'undefined' && registrations && registrations.length > 0) { %>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -109,14 +109,26 @@
                                                         class="text-red-600 hover:text-red-900">
                                                     <i class="fas fa-times-circle"></i> Reject
                                                 </button>
+                                                <button onclick="deleteRegistration('<%= registration._id %>')" 
+                                                        class="text-orange-600 hover:text-orange-900 ml-3">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
                                             <% } else if (registration.status === 'approved') { %>
                                                 <span class="text-green-600">
                                                     <i class="fas fa-check-circle"></i> Approved
                                                 </span>
+                                                <button onclick="deleteRegistration('<%= registration._id %>')" 
+                                                        class="text-red-600 hover:text-red-900 ml-3">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
                                             <% } else if (registration.status === 'rejected') { %>
                                                 <span class="text-red-600">
                                                     <i class="fas fa-times-circle"></i> Rejected
                                                 </span>
+                                                <button onclick="deleteRegistration('<%= registration._id %>')" 
+                                                        class="text-red-600 hover:text-red-900 ml-3">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
                                             <% } %>
                                         </td>
                                     </tr>
@@ -139,9 +151,11 @@
 <%- include('../partials/footer') %>
 
 <script>
+const eventId = '<%= event._id %>';
+
 function approveRegistration(registrationId) {
     if (confirm('Are you sure you want to approve this registration?')) {
-        fetch(`/faculty/events/${event._id}/registrations/${registrationId}/approve`, {
+        fetch(`/faculty/events/${eventId}/registrations/${registrationId}/approve`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -165,7 +179,7 @@ function approveRegistration(registrationId) {
 function rejectRegistration(registrationId) {
     const reason = prompt('Please enter reason for rejection:');
     if (reason) {
-        fetch(`/faculty/events/${event._id}/registrations/${registrationId}/reject`, {
+        fetch(`/faculty/events/${eventId}/registrations/${registrationId}/reject`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -183,6 +197,29 @@ function rejectRegistration(registrationId) {
         .catch(error => {
             console.error('Error:', error);
             alert('Error rejecting registration');
+        });
+    }
+}
+
+function deleteRegistration(registrationId) {
+    if (confirm('Are you sure you want to delete this registration? This action cannot be undone.')) {
+        fetch(`/faculty/events/${eventId}/registrations/${registrationId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error deleting registration: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting registration');
         });
     }
 }

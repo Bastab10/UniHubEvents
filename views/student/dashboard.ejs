@@ -585,6 +585,106 @@ function filterEvents(category) {
         noEventsMessage.style.display = 'none';
     }
 }
+
+// Search functionality for events
+function searchEventsOnDashboard(searchTerm) {
+    const eventCards = document.querySelectorAll('.event-card');
+    const eventCount = document.getElementById('event-count');
+    const categoryTitle = document.getElementById('category-title');
+    const noEventsMessage = document.querySelector('.no-events');
+    
+    // Reset category filters
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    categoryButtons.forEach(btn => {
+        btn.classList.remove('bg-[#be8cdf]', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+    });
+    
+    // Set "All Events" button as active
+    const allEventsBtn = Array.from(categoryButtons).find(btn => {
+        const onclickAttr = btn.getAttribute('onclick');
+        return onclickAttr && onclickAttr.includes("filterEvents('all')");
+    });
+    if (allEventsBtn) {
+        allEventsBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+        allEventsBtn.classList.add('bg-[#be8cdf]', 'text-white');
+    }
+    
+    categoryTitle.textContent = 'SEARCH RESULTS';
+    
+    if (!searchTerm) {
+        // Show all events if search is empty
+        eventCards.forEach(card => {
+            card.style.display = 'block';
+        });
+        eventCount.textContent = eventCards.length;
+        
+        if (noEventsMessage) {
+            noEventsMessage.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Convert search term to lowercase for case-insensitive search
+    const searchLower = searchTerm.toLowerCase();
+    let visibleCount = 0;
+    
+    eventCards.forEach(card => {
+        // Get event details from the card
+        const title = card.querySelector('.event-title')?.textContent.toLowerCase() || '';
+        const description = card.querySelector('.event-description')?.textContent.toLowerCase() || '';
+        const venue = card.querySelector('.event-venue')?.textContent.toLowerCase() || '';
+        const category = card.getAttribute('data-category')?.toLowerCase() || '';
+        
+        // Check if search term matches any field
+        if (title.includes(searchLower) || 
+            description.includes(searchLower) || 
+            venue.includes(searchLower) || 
+            category.includes(searchLower)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Update event count
+    eventCount.textContent = visibleCount;
+    
+    // Show/hide no events message
+    if (visibleCount === 0) {
+        if (noEventsMessage) {
+            noEventsMessage.style.display = 'block';
+            noEventsMessage.innerHTML = `
+                <i class="fas fa-search text-gray-300 text-6xl mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No events found matching your search.</h3>
+                <p class="text-gray-500">Try searching with different keywords or check back later for new events!</p>
+            `;
+        }
+    } else if (noEventsMessage) {
+        noEventsMessage.style.display = 'none';
+    }
+}
+
+// Check for search parameter in URL and perform search on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get('search');
+    
+    if (searchParam) {
+        // Set search input value
+        const headerSearchInput = document.getElementById('headerSearchInput');
+        if (headerSearchInput) {
+            headerSearchInput.value = searchParam;
+        }
+        
+        // Perform search
+        searchEventsOnDashboard(searchParam);
+    }
+});
+
+// Make searchEventsOnDashboard function globally accessible
+window.searchEventsOnDashboard = searchEventsOnDashboard;
 </script>
 
 <%- include('../partials/footer') %>

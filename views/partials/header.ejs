@@ -694,11 +694,7 @@
                         <i class="fas fa-tachometer-alt text-base sm:text-lg"></i>
                         <span class="text-sm sm:text-base">Dashboard</span>
                     </a>
-                    <a href="/student/events">
-                        <i class="fas fa-calendar text-base sm:text-lg"></i>
-                        <span class="text-sm sm:text-base">Browse Events</span>
-                    </a>
-                    <a href="/student/my-events">
+                    <a href="/student/registrations">
                         <i class="fas fa-ticket-alt text-base sm:text-lg"></i>
                         <span class="text-sm sm:text-base">My Registrations</span>
                     </a>
@@ -730,64 +726,6 @@
     <!-- Mobile Menu Overlay -->
     <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
 
-    <!-- Flash Messages -->
-    <% if (success) { %>
-        <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-4 shadow-md transition-opacity duration-500">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-check-circle text-green-500"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium"><%= success %></p>
-                </div>
-            </div>
-        </div>
-        
-        <script>
-            // Auto-hide success message after 4 seconds
-            setTimeout(function() {
-                const successMessage = document.getElementById('successMessage');
-                if (successMessage) {
-                    successMessage.style.opacity = '0';
-                    setTimeout(function() {
-                        successMessage.remove();
-                    }, 500); // Wait for fade out animation
-                }
-            }, 4000);
-        </script>
-    <% } %>
-
-    <% if (error) { %>
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 shadow-md">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-circle text-red-500"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium"><%= error %></p>
-                </div>
-            </div>
-        </div>
-    <% } %>
-
-    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 shadow-md">
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-red-500"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium">Please fix the following errors:</p>
-                    <ul class="mt-2 list-disc list-inside text-sm space-y-1">
-                        <% errors.forEach(error => { %>
-                            <li><%= error.msg %></li>
-                        <% }) %>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    <% } %>
-
     <script>
         // Sticky Navbar Scroll Effect
         window.addEventListener('scroll', function() {
@@ -798,7 +736,7 @@
                 navbar.classList.remove('scrolled');
             }
         });
-        
+
         function toggleUserDropdown() {
             const dropdown = document.getElementById('userDropdown');
             const chevron = event.currentTarget.querySelector('.fa-chevron-down');
@@ -825,7 +763,7 @@
                 mobileSearchInput.value = '';
             }
         }
-        
+
         // Mobile Search Functions
         function handleMobileSearchKeyPress(event) {
             if (event.key === 'Enter') {
@@ -838,11 +776,29 @@
             const searchTerm = searchInput.value.trim();
             
             if (searchTerm) {
-                const currentRole = '<%= currentUser ? currentUser.role : "student" %>';
-                window.location.href = `/${currentRole}/events?search=${encodeURIComponent(searchTerm)}`;
+                // Check if we're on student dashboard
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('/student/dashboard')) {
+                    // Perform search on current page and close mobile search
+                    searchEventsOnDashboard(searchTerm);
+                    toggleMobileSearch();
+                } else {
+                    // Redirect to student dashboard with search parameter
+                    window.location.href = `/student/dashboard?search=${encodeURIComponent(searchTerm)}`;
+                }
+            } else {
+                // If search is empty, redirect to student dashboard
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('/student/dashboard')) {
+                    // Clear search on current page and close mobile search
+                    searchEventsOnDashboard('');
+                    toggleMobileSearch();
+                } else {
+                    window.location.href = '/student/dashboard';
+                }
             }
         }
-        
+
         // User Menu Toggle
         function toggleUserMenu() {
             const dropdown = document.getElementById('userDropdown');
@@ -853,7 +809,7 @@
                 dropdown.classList.toggle('invisible');
             }
         }
-        
+
         // Close dropdowns when clicking outside
         document.addEventListener('click', function(event) {
             const userDropdown = document.getElementById('userDropdown');
@@ -864,7 +820,7 @@
                 userDropdown.classList.remove('opacity-100', 'visible');
             }
         });
-        
+
         // Close mobile search when clicking outside
         document.addEventListener('click', function(event) {
             const mobileSearchBar = document.getElementById('mobileSearchBar');
@@ -874,8 +830,7 @@
                 mobileSearchBar.classList.add('hidden');
             }
         });
-        
-        
+
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('userDropdown');
@@ -887,7 +842,7 @@
                 if (chevron) chevron.style.transform = 'rotate(0deg)';
             }
         });
-        
+
         // Close dropdown on escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
@@ -897,7 +852,7 @@
                 if (chevron) chevron.style.transform = 'rotate(0deg)';
             }
         });
-        
+
         // Mobile Menu Functions
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
@@ -913,7 +868,7 @@
                 document.body.style.overflow = '';
             }
         }
-        
+
         function closeMobileMenu() {
             const mobileMenu = document.getElementById('mobileMenu');
             const overlay = document.getElementById('mobileMenuOverlay');
@@ -922,7 +877,7 @@
             overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
-        
+
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {
             const mobileMenu = document.getElementById('mobileMenu');
@@ -933,7 +888,7 @@
                 closeMobileMenu();
             }
         });
-        
+
         // Close mobile menu on escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
@@ -943,7 +898,7 @@
                 }
             }
         });
-        
+
         // Search functionality
         function handleSearchKeyPress(event) {
             if (event.key === 'Enter') {
@@ -956,15 +911,24 @@
             const searchTerm = searchInput.value.trim();
             
             if (searchTerm) {
-                // Determine current user role and redirect to appropriate events page
-                const currentRole = '<%= currentUser ? currentUser.role : "student" %>';
-                
-                // Redirect to events page with search parameter
-                window.location.href = `/${currentRole}/events?search=${encodeURIComponent(searchTerm)}`;
+                // Check if we're on student dashboard
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('/student/dashboard')) {
+                    // Perform search on current page
+                    searchEventsOnDashboard(searchTerm);
+                } else {
+                    // Redirect to student dashboard with search parameter
+                    window.location.href = `/student/dashboard?search=${encodeURIComponent(searchTerm)}`;
+                }
             } else {
-                // If search is empty, redirect to events page without search
-                const currentRole = '<%= currentUser ? currentUser.role : "student" %>';
-                window.location.href = `/${currentRole}/events`;
+                // If search is empty, redirect to student dashboard
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('/student/dashboard')) {
+                    // Clear search on current page
+                    searchEventsOnDashboard('');
+                } else {
+                    window.location.href = '/student/dashboard';
+                }
             }
         }
     </script>

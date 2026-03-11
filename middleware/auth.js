@@ -19,7 +19,7 @@ exports.checkRole = (...roles) => {
         
         if (!roles.includes(req.session.user.role)) {
             req.session.error = 'Access denied. You do not have permission to access this page.';
-            return res.redirect('/');
+            return res.redirect('/auth/login');
         }
         
         next();

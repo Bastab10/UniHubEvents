@@ -15,7 +15,7 @@ router.get('/dashboard', async (req, res) => {
         // Get all approved events for display
         const allEvents = await Event.find({ status: 'approved' })
             .populate('organizer', 'profile.firstName profile.lastName')
-            .sort({ date: 1 });
+            .sort({ createdAt: -1 }); // Sort by creation date, newest first
         
         // Get user's registered events for status tracking
         const registeredEvents = await Event.find({
@@ -57,38 +57,6 @@ router.get('/dashboard', async (req, res) => {
         console.error('Student dashboard error:', error);
         req.session.error = 'Error loading dashboard';
         res.render('student/dashboard', { title: 'Student Dashboard' });
-    }
-});
-
-// Browse Events
-router.get('/events', async (req, res) => {
-    try {
-        const { category, search } = req.query;
-        let query = { status: 'approved', date: { $gte: new Date() } };
-
-        if (category) query.category = category;
-        if (search) {
-            query.$or = [
-                { title: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } },
-                { venue: { $regex: search, $options: 'i' } }
-            ];
-        }
-
-        const events = await Event.find(query)
-            .populate('organizer', 'profile.firstName profile.lastName')
-            .sort({ date: 1 });
-
-        res.render('student/browse-events', { 
-            title: 'Browse Events', 
-            events, 
-            filters: req.query,
-            studentId: req.session.user._id
-        });
-    } catch (error) {
-        console.error('Browse events error:', error);
-        req.session.error = 'Error loading events';
-        res.redirect('/student/dashboard');
     }
 });
 
@@ -158,30 +126,17 @@ router.post('/events/:id/register', async (req, res) => {
             return res.redirect(`/student/events/${req.params.id}`);
         }
 
-        // Check for time clash
-        const timeClash = await Event.findOne({
+        // Check for exact date and start time conflict
+        const exactConflict = await Event.findOne({
             _id: { $ne: req.params.id },
             'registrations.student': req.session.user._id,
             'registrations.status': 'approved',
             date: event.date,
-            $or: [
-                { 
-                    $and: [
-                        { startTime: { $lte: event.startTime } },
-                        { endTime: { $gte: event.startTime } }
-                    ]
-                },
-                { 
-                    $and: [
-                        { startTime: { $lte: event.endTime } },
-                        { endTime: { $gte: event.endTime } }
-                    ]
-                }
-            ]
+            startTime: event.startTime
         });
 
-        if (timeClash) {
-            req.session.error = `Time clash detected. You are already registered for "${timeClash.title}" at the same time.`;
+        if (exactConflict) {
+            req.session.error = 'You have already registered for another event at the same date and time. Please cancel your existing registration before registering for this event.';
             return res.redirect(`/student/events/${req.params.id}`);
         }
 
@@ -290,25 +245,15 @@ router.post('/registrations/:eventId/cancel', async (req, res) => {
             return res.redirect('/student/registrations');
         }
 
-        // Only allow cancellation if event is more than 24 hours away
-        const eventDateTime = new Date(`${event.date.toISOString().split('T')[0]}T${event.startTime}`);
-        const now = new Date();
-        const hoursUntilEvent = (eventDateTime - now) / (1000 * 60 * 60);
-
-        if (hoursUntilEvent < 24) {
-            req.session.error = 'Cannot cancel registration less than 24 hours before the event';
-            return res.redirect('/student/registrations');
-        }
-
         event.registrations.splice(registrationIndex, 1);
         await event.save();
 
-        req.session.success = 'Registration cancelled successfully';
-        res.redirect('/student/registrations');
+        req.session.success = 'Registration cancelled successfully.';
+        res.redirect(`/student/events/${req.params.eventId}`);
     } catch (error) {
         console.error('Cancel registration error:', error);
         req.session.error = 'Error cancelling registration';
-        res.redirect('/student/registrations');
+        res.redirect(`/student/events/${req.params.eventId}`);
     }
 });
 

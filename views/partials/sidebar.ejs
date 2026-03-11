@@ -10,7 +10,7 @@
     width: 85%;
     max-width: 320px;
     height: 100vh;
-    background: #be8cdf;
+    background: #be8cdf !important;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1030;
@@ -23,6 +23,7 @@
         height: calc(100vh - 56px);
         width: 280px;
         left: -280px;
+        background: #be8cdf !important;
     }
 }
 
@@ -30,11 +31,54 @@
     .sidebar {
         top: 64px;
         height: calc(100vh - 64px);
+        background: #be8cdf !important;
     }
 }
 
+/* Mobile-specific overrides */
+@media (max-width: 639px) {
+    .sidebar {
+        background: #be8cdf !important;
+    }
+}
+
+/* Force background color for all states */
 .sidebar.open {
     left: 0;
+    background: #be8cdf !important;
+}
+
+/* Additional overrides to prevent any conflicts */
+.sidebar * {
+    box-sizing: border-box;
+}
+
+/* Ensure sidebar maintains color in all scenarios */
+.sidebar,
+.sidebar.open,
+.sidebar:hover,
+.sidebar:focus,
+.sidebar:active {
+    background: #be8cdf !important;
+}
+
+/* Override any external CSS that might affect sidebar */
+@media (max-width: 767px) {
+    .sidebar,
+    .sidebar.open,
+    .sidebar:hover,
+    .sidebar:focus {
+        background: #be8cdf !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar,
+    .sidebar.open,
+    .sidebar:hover,
+    .sidebar:focus {
+        background: #be8cdf !important;
+    }
 }
 
 .sidebar-header {
@@ -199,14 +243,39 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
     /* Hide sidebar toggle on tablet and show only mobile menu */
-    .sidebar {
+    /* .sidebar {
         display: none;
-    }
+    } */
 }
 
 @media (max-width: 639px) {
     .sidebar {
-        display: block;
+        display: block !important;
+        background: #be8cdf !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        display: block !important;
+        background: #be8cdf !important;
+    }
+}
+
+/* Extra mobile overrides */
+@media (max-width: 425px) {
+    .sidebar {
+        display: block !important;
+        background: #be8cdf !important;
+        visibility: visible !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .sidebar {
+        display: block !important;
+        background: #be8cdf !important;
+        visibility: visible !important;
     }
 }
 
@@ -307,13 +376,13 @@
                 <i class="fas fa-tachometer-alt"></i>
                 Dashboard
             </a>
-            <a href="/student/events">
-                <i class="fas fa-calendar"></i>
-                Browse Events
-            </a>
             <a href="/student/registrations">
                 <i class="fas fa-ticket-alt"></i>
                 My Registrations
+            </a>
+            <a href="/student/profile">
+                <i class="fas fa-user"></i>
+                My Profile
             </a>
 
             <div class="sidebar-divider"></div>

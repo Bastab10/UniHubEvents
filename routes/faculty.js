@@ -102,7 +102,7 @@ router.get('/dashboard', async (req, res) => {
             ]),
             Event.find({ organizer: facultyId })
                 .populate('organizer', 'profile.firstName profile.lastName')
-                .sort({ createdAt: -1 })
+                .sort({ createdAt: -1 }) // Sort by creation date, newest first
         ]);
 
         const [totalEvents, registrationCount, allEvents] = stats;
@@ -516,7 +516,11 @@ router.get('/events/:id', async (req, res) => {
     try {
         const eventId = req.params.id;
         const event = await Event.findById(eventId)
-            .populate('organizer', 'profile.firstName profile.lastName profile.email');
+            .populate('organizer', 'profile.firstName profile.lastName profile.email')
+            .populate({
+                path: 'registrations.student',
+                select: 'profile.firstName profile.lastName profile.collegeId email'
+            });
         
         if (!event) {
             req.session.error = 'Event not found';
@@ -583,8 +587,12 @@ router.get('/profile', async (req, res) => {
 router.get('/events/:id/students', async (req, res) => {
     try {
         const eventId = req.params.id;
+        
         const event = await Event.findById(eventId)
-            .populate('registrations.student', 'profile.firstName profile.lastName profile.collegeId email')
+            .populate({
+                path: 'registrations.student',
+                select: 'profile.firstName profile.lastName profile.collegeId email'
+            })
             .populate('organizer', 'profile.firstName profile.lastName');
         
         if (!event) {
@@ -592,7 +600,7 @@ router.get('/events/:id/students', async (req, res) => {
             return res.redirect('/faculty/events');
         }
         
-        // Check if faculty is the organizer
+        // Check if faculty is organizer
         if (event.organizer._id.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to view students for this event';
             return res.redirect('/faculty/events');
@@ -672,6 +680,51 @@ router.post('/events/:eventId/registrations/:registrationId/reject', async (req,
     } catch (error) {
         console.error('Reject registration error:', error);
         res.status(500).json({ success: false, message: 'Error rejecting registration' });
+    }
+});
+
+// Delete Registration
+router.delete('/events/:eventId/registrations/:registrationId/delete', async (req, res) => {
+    try {
+        const { eventId, registrationId } = req.params;
+        
+        const event = await Event.findById(eventId);
+        if (!event || event.organizer.toString() !== req.session.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Unauthorized' });
+        }
+        
+        // Find and remove registration
+        await Event.findOneAndUpdate(
+            { _id: eventId, 'registrations._id': registrationId },
+            { $pull: { registrations: { _id: registrationId } } }
+        );
+        
+        res.json({ success: true, message: 'Registration deleted successfully' });
+    } catch (error) {
+        console.error('Delete registration error:', error);
+        res.status(500).json({ success: false, message: 'Error deleting registration' });
+    }
+});
+
+// View Student Details
+router.get('/student/:studentId', async (req, res) => {
+    try {
+        const student = await User.findById(req.params.studentId)
+            .select('profile.firstName profile.lastName profile.collegeId email profile.phone profile.department');
+        
+        if (!student) {
+            req.session.error = 'Student not found';
+            return res.redirect('/faculty/events');
+        }
+        
+        res.render('faculty/student-details', {
+            title: 'Student Details',
+            student
+        });
+    } catch (error) {
+        console.error('View student error:', error);
+        req.session.error = 'Error loading student details';
+        res.redirect('/faculty/events');
     }
 });
 

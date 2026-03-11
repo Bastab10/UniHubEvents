@@ -30,6 +30,25 @@
     
     <main class="flex-1 overflow-y-auto">
         <div class="p-4 sm:p-6">
+            <!-- Flash Messages -->
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div id="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 mx-auto max-w-4xl">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span><%= success %></span>
+                    </div>
+                </div>
+            <% } %>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mx-auto max-w-4xl">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <span><%= error %></span>
+                    </div>
+                </div>
+            <% } %>
+
             <div class="mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">My Registrations</h1>
                 <p class="text-gray-700 sm:text-gray-600">View all events you have registered for</p>
@@ -85,23 +104,13 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <% const eventDateTime = new Date(`${event.date.toISOString().split('T')[0]}T${event.startTime}`); %>
-                                            <% const now = new Date(); %>
-                                            <% const hoursUntilEvent = (eventDateTime - now) / (1000 * 60 * 60); %>
-                                            
-                                            <% if (hoursUntilEvent > 24) { %>
-                                                <form method="POST" action="/student/registrations/<%= event._id %>/cancel" 
-                                                      onsubmit="return confirm('Are you sure you want to cancel this registration?')">
-                                                    <button type="submit" class="bg-red-100 text-red-800 px-3 py-1 rounded text-sm hover:bg-red-200 transition-colors">
-                                                        <i class="fas fa-times mr-1"></i>Cancel
-                                                    </button>
-                                                </form>
-                                            <% } else { %>
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                                    <i class="fas fa-lock mr-1"></i>Event Soon
-                                                </span>
-                                            <% } %>
-                                        </td>
+                                        <form method="POST" action="/student/registrations/<%= event._id %>/cancel" 
+                                              onsubmit="return confirm('Are you sure you want to cancel this registration?')">
+                                            <button type="submit" class="bg-red-100 text-red-800 px-3 py-1 rounded text-sm hover:bg-red-200 transition-colors">
+                                                <i class="fas fa-times mr-1"></i>Cancel
+                                            </button>
+                                        </form>
+                                    </td>
                                     </tr>
                                 <% }) %>
                             </tbody>
@@ -123,5 +132,42 @@
         </div>
     </main>
 </div>
+
+<script>
+    // Control flash message display duration
+    window.addEventListener('load', function() {
+        console.log('Flash message script loaded'); // Debug log
+        
+        // Auto-hide success message after 3 seconds
+        const successMessage = document.getElementById('successMessage');
+        console.log('Success message element:', successMessage); // Debug log
+        
+        if (successMessage) {
+            console.log('Hiding success message after 3 seconds'); // Debug log
+            setTimeout(function() {
+                successMessage.style.transition = 'opacity 0.5s ease';
+                successMessage.style.opacity = '0';
+                setTimeout(function() {
+                    successMessage.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+        
+        // Auto-hide error message after 5 seconds
+        const errorMessage = document.getElementById('errorMessage');
+        console.log('Error message element:', errorMessage); // Debug log
+        
+        if (errorMessage) {
+            console.log('Hiding error message after 5 seconds'); // Debug log
+            setTimeout(function() {
+                errorMessage.style.transition = 'opacity 0.5s ease';
+                errorMessage.style.opacity = '0';
+                setTimeout(function() {
+                    errorMessage.style.display = 'none';
+                }, 500);
+            }, 5000);
+        }
+    });
+</script>
 
 <%- include('../partials/footer') %>
