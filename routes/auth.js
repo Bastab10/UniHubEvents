@@ -184,7 +184,7 @@ router.post('/register', [
             // Validate College ID format for students: YYCourseCodeRollNo
             const pattern = /^[0-9]{2}(BCA|BA|BSc)[0-9]{3}$/;
             if (!pattern.test(value.toUpperCase())) {
-                throw new Error('Invalid College ID format. Use format: YYCourseCodeRollNo (e.g., 23BCA001)');
+                throw new Error('Invalid College ID format. Use format: YYCourseCodeRollNo');
             }
         }
         return true;

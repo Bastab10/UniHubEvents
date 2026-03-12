@@ -14,7 +14,10 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         // Sanitize filename for mobile compatibility
         const originalName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-        cb(null, Date.now() + '-' + originalName);
+        const timestamp = Date.now();
+        const filename = timestamp + '-' + originalName;
+        console.log('Generated filename:', filename);
+        cb(null, filename);
     }
 });
 
@@ -35,14 +38,18 @@ const upload = multer({
             mimetype: file.mimetype,
             extname: path.extname(file.originalname).toLowerCase(),
             extnameValid: extname,
-            mimetypeValid: mimetype
+            mimetypeValid: mimetype,
+            size: file.size
         });
         
-        if (mimetype && extname) {
+        if (mimetype && extname && file.size <= 5 * 1024 * 1024) {
             return cb(null, true);
         } else {
-            console.log('File rejected - Invalid type:', file.mimetype, file.originalname);
-            cb(new Error('Only image files (JPEG, JPG, PNG, GIF, WEBP) are allowed'));
+            const errorMsg = mimetype && extname ? 
+                'File size exceeds 5MB limit' : 
+                'Only image files (JPEG, JPG, PNG, GIF, WEBP) are allowed';
+            console.log('File rejected:', errorMsg);
+            cb(new Error(errorMsg));
         }
     }
 });
@@ -157,27 +164,30 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
         if (req.file) {
             console.log('File details:', {
                 originalname: req.file.originalname,
-                filename: req.file.filename,
-                path: req.file.path,
+                mimetype: req.file.mimetype,
                 size: req.file.size,
-                mimetype: req.file.mimetype
+                path: req.file.path,
+                filename: req.file.filename
             });
             
             // Verify file exists and is accessible
             const fs = require('fs');
             if (fs.existsSync(req.file.path)) {
                 posterPath = '/uploads/' + req.file.filename;
-                console.log('Poster path set to:', posterPath);
+                console.log('File saved successfully at:', posterPath);
+                console.log('File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
             } else {
-                console.log('File not found at path:', req.file.path);
+                console.log(' File not found at path:', req.file.path);
+                req.session.error = 'File was uploaded but could not be saved. Please try again.';
+                return res.render('faculty/create-event', { 
+                    title: 'Create Event',
+                    formData: req.body,
+                    error: 'File was uploaded but could not be saved. Please try again.'
+                });
             }
         } else {
-            console.log('No file uploaded - checking if file was expected');
-            // Check if request was multipart and contained file data
-            if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
-                console.log('Request was multipart but no file received');
+                console.log('No file uploaded');
             }
-        }
 
         // Validation
         console.log('Starting validation...');

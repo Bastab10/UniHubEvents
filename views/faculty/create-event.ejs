@@ -161,11 +161,46 @@
                                 
                                 <!-- Image Preview -->
                                 <div id="imagePreview" class="mt-3 hidden">
-                                    <img id="previewImg" src="" alt="Preview" class="max-w-full h-40 object-cover rounded-lg border border-gray-300">
-                                    <button type="button" onclick="removeImage()" class="mt-2 text-sm text-red-600 hover:text-red-800">
-                                        <i class="fas fa-times mr-1"></i>Remove Image
-                                    </button>
+                                    <img id="previewImg" src="" alt="Image preview" class="w-full h-48 object-cover rounded-lg shadow-md">
+                                    <p class="text-sm text-gray-500 mt-1">Image preview will appear here</p>
                                 </div>
+                                
+                                <script>
+                                function previewImage(input) {
+                                    if (input.files && input.files[0]) {
+                                        const file = input.files[0];
+                                        const reader = new FileReader();
+                                        
+                                        reader.onload = function(e) {
+                                            const preview = document.getElementById('imagePreview');
+                                            const previewImg = document.getElementById('previewImg');
+                                            
+                                            if (preview && previewImg) {
+                                                preview.classList.remove('hidden');
+                                                previewImg.src = e.target.result;
+                                                previewImg.onerror = function() {
+                                                    console.log('Preview image failed to load');
+                                                    this.style.display = 'none';
+                                                    preview.classList.add('hidden');
+                                                };
+                                                previewImg.onload = function() {
+                                                    console.log('Preview image loaded successfully');
+                                                };
+                                            }
+                                        };
+                                        
+                                        reader.readAsDataURL(file);
+                                    } else {
+                                        const preview = document.getElementById('imagePreview');
+                                        if (preview) {
+                                            preview.classList.add('hidden');
+                                        }
+                                    }
+                                }
+                                </script>
+                                <button type="button" onclick="removeImage()" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                                    <i class="fas fa-times mr-1"></i>Remove Image
+                                </button>
                             </div>
                         </div>
 
