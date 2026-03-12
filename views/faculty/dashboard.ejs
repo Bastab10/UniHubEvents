@@ -81,7 +81,7 @@ main {
                     <!-- Event Image -->
                     <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-600 relative overflow-hidden">
                         <% if (event.poster) { %>
-                            <img src="<%= event.poster %>?v=<%= Date.now() %>" alt="<%= event.title %>" class="w-full h-48 bg-gradient-to-br from-blue-400 to-purple-600 relative overflow-hidden">
+                            <img src="<%= event.poster %>" alt="<%= event.title %>" class="w-full h-full object-cover">
                         <% } else { %>
                             <div class="w-full h-full flex items-center justify-center">
                                 <i class="fas fa-calendar-alt text-white text-4xl"></i>

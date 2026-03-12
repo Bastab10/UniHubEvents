@@ -25,7 +25,8 @@ const upload = multer({
     storage: storage,
     limits: { 
         fileSize: 5 * 1024 * 1024, // 5MB limit
-        files: 1 // Limit to 1 file at a time
+        files: 1, // Limit to 1 file at a time
+        fieldSize: 1024 * 1024 // 1MB field size limit for mobile
     },
     fileFilter: function (req, file, cb) {
         // Enhanced file type validation for mobile
@@ -38,16 +39,13 @@ const upload = multer({
             mimetype: file.mimetype,
             extname: path.extname(file.originalname).toLowerCase(),
             extnameValid: extname,
-            mimetypeValid: mimetype,
-            size: file.size
+            mimetypeValid: mimetype
         });
         
-        if (mimetype && extname && file.size <= 5 * 1024 * 1024) {
+        if (mimetype && extname) {
             return cb(null, true);
         } else {
-            const errorMsg = mimetype && extname ? 
-                'File size exceeds 5MB limit' : 
-                'Only image files (JPEG, JPG, PNG, GIF, WEBP) are allowed';
+            const errorMsg = 'Only image files (JPEG, JPG, PNG, GIF, WEBP) are allowed';
             console.log('File rejected:', errorMsg);
             cb(new Error(errorMsg));
         }
@@ -145,6 +143,16 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
         console.log('Content-Type:', req.headers['content-type']);
         console.log('Content-Length:', req.headers['content-length']);
         
+        // Handle mobile form submission issues
+        if (!req.body || Object.keys(req.body).length === 0) {
+            console.log('Empty form data received');
+            req.session.error = 'Form data is empty. Please try again.';
+            return res.render('faculty/create-event', { 
+                title: 'Create Event',
+                error: 'Form data is empty. Please try again.'
+            });
+        }
+        
         const {
             title,
             description,
@@ -170,14 +178,24 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
                 filename: req.file.filename
             });
             
+            // File size validation (5MB limit)
+            if (req.file.size > 5 * 1024 * 1024) {
+                req.session.error = 'File size exceeds 5MB limit';
+                return res.render('faculty/create-event', { 
+                    title: 'Create Event',
+                    formData: req.body,
+                    error: 'File size exceeds 5MB limit'
+                });
+            }
+            
             // Verify file exists and is accessible
             const fs = require('fs');
             if (fs.existsSync(req.file.path)) {
                 posterPath = '/uploads/' + req.file.filename;
-                console.log('File saved successfully at:', posterPath);
-                console.log('File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
+                console.log('✅ File saved successfully at:', posterPath);
+                console.log('✅ File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
             } else {
-                console.log(' File not found at path:', req.file.path);
+                console.log('❌ File not found at path:', req.file.path);
                 req.session.error = 'File was uploaded but could not be saved. Please try again.';
                 return res.render('faculty/create-event', { 
                     title: 'Create Event',
@@ -186,7 +204,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
                 });
             }
         } else {
-                console.log('No file uploaded');
+                console.log('ℹ️ No file uploaded');
             }
 
         // Validation
@@ -299,8 +317,14 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
         console.error('Error details:', error);
         console.error('Error message:', error.message);
         console.error('Error stack:', error.stack);
+        
+        // For mobile compatibility, render the form with error instead of redirecting
         req.session.error = 'Error creating event: ' + error.message;
-        res.redirect('/faculty/dashboard');
+        return res.render('faculty/create-event', { 
+            title: 'Create Event',
+            formData: req.body,
+            error: 'Error creating event: ' + error.message
+        });
     }
 });
 
