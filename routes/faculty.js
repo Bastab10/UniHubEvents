@@ -5,8 +5,6 @@ const path = require('path');
 const Event = require('../models/Event');
 const User = require('../models/User');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
-const { getValidImagePath } = require('../middleware/imagePath');
-const env = require('../config/environment');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -193,13 +191,9 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             // Verify file exists and is accessible
             const fs = require('fs');
             if (fs.existsSync(req.file.path)) {
-                // Use environment-aware image path
-                posterPath = env.getRelativePath(req.file.filename);
+                posterPath = '/uploads/' + req.file.filename;
                 console.log('✅ File saved successfully at:', posterPath);
                 console.log('✅ File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
-                console.log('✅ Full file path:', req.file.path);
-                console.log('✅ Environment-aware path for database:', posterPath);
-                console.log('✅ Environment:', env.isProduction ? 'Production' : 'Development');
             } else {
                 console.log('❌ File not found at path:', req.file.path);
                 req.session.error = 'File was uploaded but could not be saved. Please try again.';

@@ -130,7 +130,6 @@ router.post('/login', [
 
         console.log('Login successful for:', user.username, 'as', user.role); // Debug log
         req.session.user = user;
-        req.session.success = 'Login successful!';
 
         switch(user.role) {
             case 'admin':

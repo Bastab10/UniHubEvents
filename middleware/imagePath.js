@@ -5,7 +5,7 @@ const path = require('path');
 exports.validateImagePath = (req, res, next) => {
     // Check if request is for an image
     if (req.path.includes('/uploads/')) {
-        const imagePath = path.join(__dirname, 'uploads', path.basename(req.path));
+        const imagePath = path.join(__dirname, '..', 'uploads', path.basename(req.path));
         
         // Verify file exists
         if (fs.existsSync(imagePath)) {
@@ -20,16 +20,4 @@ exports.validateImagePath = (req, res, next) => {
     } else {
         return next();
     }
-};
-
-// Helper function to ensure consistent image paths
-exports.getValidImagePath = (posterPath) => {
-    if (!posterPath) return null;
-    
-    // Ensure path starts with /uploads/
-    if (!posterPath.startsWith('/uploads/')) {
-        return '/uploads/' + path.basename(posterPath);
-    }
-    
-    return posterPath;
 };
