@@ -393,16 +393,7 @@ body {
                                         <img src="/uploads/<%= event.poster %>" 
                                              alt="<%= event.title %>" 
                                              class="w-full h-full object-cover"
-                                             style="object-fit: cover;"
-                                             loading="lazy"
-                                             onerror="console.log('Image failed to load:', '/uploads/<%= event.poster %>'); this.style.display='none'; this.nextElementSibling.style.display='flex'; this.parentElement.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';"
-                                             onload="console.log('Image loaded successfully:', '/uploads/<%= event.poster %>'); this.onload=null;">
-                                        <div class="w-full h-full flex items-center justify-center" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                            <div class="text-center">
-                                                <i class="fas fa-calendar-alt text-4xl text-white mb-2"></i>
-                                                <p class="text-white text-sm">Image not available</p>
-                                            </div>
-                                        </div>
+                                             style="object-fit: cover;">
                                     <% } else { %>
                                         <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
                                             <div class="text-center">

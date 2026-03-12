@@ -420,13 +420,7 @@
                                                         <div class="flex items-center">
                                                             <% if (event.poster) { %>
                                                                 <img src="/uploads/<%= event.poster %>" alt="<%= event.title %>" 
-                                                                     class="h-12 w-12 rounded-lg object-cover mr-4 border border-gray-200"
-                                                                     loading="lazy"
-                                                                     onerror="console.log('Image failed to load:', '/uploads/<%= event.poster %>'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                                                     onload="console.log('Image loaded successfully:', '/uploads/<%= event.poster %>');">
-                                                                <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 border border-gray-200" style="display:none;">
-                                                                    <i class="fas fa-calendar text-gray-400"></i>
-                                                                </div>
+                                                                     class="h-12 w-12 rounded-lg object-cover mr-4 border border-gray-200">
                                                             <% } else { %>
                                                                 <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 border border-gray-200">
                                                                     <i class="fas fa-calendar text-gray-400"></i>

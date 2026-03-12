@@ -35,23 +35,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
-    maxAge: '1h', // Reduced cache time for mobile compatibility
-    etag: false, // Disable ETag for mobile compatibility
-    lastModified: true,
-    setHeaders: (res, path, stat) => {
-        // Set headers for mobile compatibility
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-        res.set('Cache-Control', 'public, max-age=3600'); // 1 hour cache
-        res.set('Expires', new Date(Date.now() + 3600000).toUTCString());
-        
-        // Ensure proper content type for images
-        if (path.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-            res.set('Content-Type', 'image/' + path.split('.').pop().toLowerCase());
-        }
-    }
-}));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Session Configuration
 app.use(session({
