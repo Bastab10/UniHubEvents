@@ -4,7 +4,100 @@ const Event = require('../models/Event');
 const User = require('../models/User');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 
-// All student routes require authentication and student role
+// Special middleware for event details - no flash message
+const isAuthenticatedForEventDetails = (req, res, next) => {
+    if (req.session.user) {
+        return next();
+    }
+    // Redirect without setting flash message
+    res.redirect('/auth/login');
+};
+
+// Special checkRole middleware for event details - no flash message
+const checkRoleForEventDetails = (...roles) => {
+    return (req, res, next) => {
+        if (!req.session.user) {
+            // Redirect without setting flash message
+            return res.redirect('/auth/login');
+        }
+        
+        if (!roles.includes(req.session.user.role)) {
+            req.session.error = 'Access denied. You do not have permission to access this page.';
+            return res.redirect('/auth/login');
+        }
+        
+        next();
+    };
+};
+
+// Special isApproved middleware for event details - no flash message
+const isApprovedForEventDetails = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.session.user._id);
+        if (!user.isApproved && user.role !== 'admin') {
+            req.session.error = 'Your account is pending approval. Please contact the administrator.';
+            return res.redirect('/auth/login');
+        }
+        next();
+    } catch (error) {
+        console.error(error);
+        req.session.error = 'Server error occurred';
+        res.redirect('/auth/login');
+    }
+};
+
+// Special isActive middleware for event details - no flash message
+const isActiveForEventDetails = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.session.user._id);
+        if (!user.isActive) {
+            req.session.error = 'Your account has been deactivated. Please contact the administrator.';
+            return res.redirect('/auth/login');
+        }
+        next();
+    } catch (error) {
+        console.error(error);
+        req.session.error = 'Server error occurred';
+        res.redirect('/auth/login');
+    }
+};
+
+// Event Details - Apply special middleware without flash message
+router.get('/events/:id', isAuthenticatedForEventDetails, checkRoleForEventDetails('student'), isApprovedForEventDetails, isActiveForEventDetails, async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id)
+            .populate('organizer', 'profile.firstName profile.lastName email')
+            .populate('registrations.student', 'profile.firstName profile.lastName profile.collegeId');
+
+        if (!event) {
+            req.session.error = 'Event not found';
+            return res.redirect('/student/events');
+        }
+
+        if (event.status !== 'approved') {
+            req.session.error = 'Event not available for registration';
+            return res.redirect('/student/events');
+        }
+
+        // Check if student is already registered
+        const isRegistered = event.registrations.some(
+            reg => reg.student._id.toString() === req.session.user._id.toString()
+        );
+
+        res.render('student/event-details', { 
+            title: event.title, 
+            event, 
+            isRegistered,
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Event details error:', error);
+        req.session.error = 'Error loading event details';
+        res.redirect('/student/events');
+    }
+});
+
+// All other student routes require authentication and student role
 router.use(isAuthenticated, checkRole('student'), isApproved, isActive);
 
 // Dashboard
@@ -57,41 +150,6 @@ router.get('/dashboard', async (req, res) => {
         console.error('Student dashboard error:', error);
         req.session.error = 'Error loading dashboard';
         res.render('student/dashboard', { title: 'Student Dashboard' });
-    }
-});
-
-// Event Details
-router.get('/events/:id', async (req, res) => {
-    try {
-        const event = await Event.findById(req.params.id)
-            .populate('organizer', 'profile.firstName profile.lastName email')
-            .populate('registrations.student', 'profile.firstName profile.lastName profile.collegeId');
-
-        if (!event) {
-            req.session.error = 'Event not found';
-            return res.redirect('/student/events');
-        }
-
-        if (event.status !== 'approved') {
-            req.session.error = 'Event not available for registration';
-            return res.redirect('/student/events');
-        }
-
-        // Check if student is already registered
-        const isRegistered = event.registrations.some(
-            reg => reg.student._id.toString() === req.session.user._id.toString()
-        );
-
-        res.render('student/event-details', { 
-            title: event.title, 
-            event, 
-            isRegistered,
-            currentUser: req.session.user
-        });
-    } catch (error) {
-        console.error('Event details error:', error);
-        req.session.error = 'Error loading event details';
-        res.redirect('/student/events');
     }
 });
 
@@ -184,7 +242,7 @@ router.post('/events/:id/register', async (req, res) => {
         event.registrations.push(registrationData);
         await event.save();
 
-        req.session.success = 'Registration successful! You are now registered for this event.';
+        req.session.success = 'Registration successful!';
         res.redirect(`/student/events/${req.params.id}`);
     } catch (error) {
         console.error('Event registration error:', error);

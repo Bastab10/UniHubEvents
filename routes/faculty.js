@@ -9,7 +9,14 @@ const { isAuthenticated, checkRole, isApproved, isActive } = require('../middlew
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');
+        // Ensure uploads directory exists
+        const fs = require('fs');
+        const uploadsDir = path.join(__dirname, '..', 'uploads');
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+            console.log('Created uploads directory:', uploadsDir);
+        }
+        cb(null, uploadsDir);
     },
     filename: function (req, file, cb) {
         // Sanitize filename for mobile compatibility
@@ -180,6 +187,12 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             
             // File size validation (5MB limit)
             if (req.file.size > 5 * 1024 * 1024) {
+                // Clean up uploaded file if size exceeds limit
+                const fs = require('fs');
+                if (fs.existsSync(req.file.path)) {
+                    fs.unlinkSync(req.file.path);
+                    console.log('Cleaned up oversized file:', req.file.path);
+                }
                 req.session.error = 'File size exceeds 5MB limit';
                 return res.render('faculty/create-event', { 
                     title: 'Create Event',
@@ -191,11 +204,13 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             // Verify file exists and is accessible
             const fs = require('fs');
             if (fs.existsSync(req.file.path)) {
-                posterPath = '/uploads/' + req.file.filename;
-                console.log('✅ File saved successfully at:', posterPath);
-                console.log('✅ File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
+                posterPath = req.file.filename; // Store only filename, not full path
+                console.log(' File saved successfully at:', posterPath);
+                console.log(' File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
+                console.log(' Full file path:', req.file.path);
+                console.log(' Database path:', '/uploads/' + posterPath);
             } else {
-                console.log('❌ File not found at path:', req.file.path);
+                console.log(' File not found at path:', req.file.path);
                 req.session.error = 'File was uploaded but could not be saved. Please try again.';
                 return res.render('faculty/create-event', { 
                     title: 'Create Event',
@@ -306,12 +321,28 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
 
         console.log('Event object created:', newEvent);
         console.log('Saving event to database...');
-
-        await newEvent.save();
-        console.log('Event saved successfully!');
-        console.log('Redirecting to dashboard...');
-        req.session.success = 'Event created successfully and is now live!';
-        res.redirect('/faculty/dashboard');
+        
+        try {
+            await newEvent.save();
+            console.log('Event saved successfully!');
+            console.log('Poster path stored:', posterPath);
+            console.log('Redirecting to dashboard...');
+            res.redirect('/faculty/dashboard');
+        } catch (saveError) {
+            console.error('Error saving event:', saveError);
+            
+            // Clean up uploaded file if event save fails
+            if (req.file && posterPath) {
+                const fs = require('fs');
+                const filePath = req.file.path;
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                    console.log('Cleaned up file after save error:', filePath);
+                }
+            }
+            
+            throw saveError;
+        }
     } catch (error) {
         console.error('=== CREATE EVENT ERROR ===');
         console.error('Error details:', error);
@@ -502,11 +533,22 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
         
         // Update poster if new one is uploaded
         if (req.file) {
-            event.poster = '/uploads/' + req.file.filename;
+            // Clean up old poster if it exists
+            if (event.poster && event.poster.trim() !== '') {
+                const oldPosterPath = path.join(__dirname, '..', 'uploads', event.poster);
+                const fs = require('fs');
+                if (fs.existsSync(oldPosterPath)) {
+                    fs.unlinkSync(oldPosterPath);
+                    console.log('Cleaned up old poster:', oldPosterPath);
+                }
+            }
+            event.poster = req.file.filename; // Store only filename, not full path
+            console.log('Updated poster path:', event.poster);
+            console.log('Full image URL:', '/uploads/' + event.poster);
         }
 
         await event.save();
-        req.session.success = 'Event updated successfully!';
+        console.log('Event updated successfully');
         res.redirect('/faculty/my-events');
         
     } catch (error) {
@@ -536,7 +578,18 @@ router.delete('/events/:id/delete', async (req, res) => {
             return res.json({ success: false, message: 'Only pending events can be deleted' });
         }
         
+        // Clean up poster file if it exists
+        if (event.poster && event.poster.trim() !== '') {
+            const posterPath = path.join(__dirname, '..', 'uploads', event.poster);
+            const fs = require('fs');
+            if (fs.existsSync(posterPath)) {
+                fs.unlinkSync(posterPath);
+                console.log('Cleaned up poster file:', posterPath);
+            }
+        }
+        
         await Event.findByIdAndDelete(eventId);
+        console.log('Event deleted successfully:', eventId);
         res.json({ success: true, message: 'Event deleted successfully' });
         
     } catch (error) {

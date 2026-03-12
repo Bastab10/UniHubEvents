@@ -61,11 +61,11 @@
             <!-- Event Banner -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4 mx-auto max-w-3xl">
                 <% if (event.poster && event.poster.trim() !== '') { %>
-                    <img src="<%= event.poster %>" 
+                    <img src="/uploads/<%= event.poster %>" 
                          alt="<%= event.title %>" 
                          class="w-full h-48 object-cover"
-                         onerror="console.log('Image failed to load:', '<%= event.poster %>'); this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'; this.parentElement.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';"
-                         onload="console.log('Image loaded successfully:', '<%= event.poster %>'); this.onload=null;">
+                         onerror="console.log('Image failed to load:', '/uploads/<%= event.poster %>'); this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'; this.parentElement.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';"
+                         onload="console.log('Image loaded successfully:', '/uploads/<%= event.poster %>'); this.onload=null;">
                     <div class="w-full h-48 bg-gradient-to-br text-black flex items-center justify-center" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                         <div class="text-center">
                             <i class="fas fa-calendar-alt text-4xl mb-2"></i>

@@ -5,7 +5,6 @@ exports.isAuthenticated = (req, res, next) => {
     if (req.session.user) {
         return next();
     }
-    req.session.error = 'Please login to access this page';
     res.redirect('/auth/login');
 };
 
@@ -13,7 +12,6 @@ exports.isAuthenticated = (req, res, next) => {
 exports.checkRole = (...roles) => {
     return (req, res, next) => {
         if (!req.session.user) {
-            req.session.error = 'Please login to access this page';
             return res.redirect('/auth/login');
         }
         

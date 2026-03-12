@@ -9,22 +9,29 @@
     "seed": "node scripts/seed.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "ejs": "^3.1.9",
-    "mongoose": "^7.5.0",
     "bcryptjs": "^2.4.3",
-    "express-session": "^1.17.3",
+    "connect-flash": "^0.1.1",
     "connect-mongo": "^5.0.0",
-    "multer": "^1.4.5-lts.1",
-    "moment": "^2.29.4",
-    "express-validator": "^7.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "cors": "^2.8.5"
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
+    "moment": "^2.29.4",
+    "mongoose": "^7.5.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["college", "events", "sports", "management", "system"],
+  "keywords": [
+    "college",
+    "events",
+    "sports",
+    "management",
+    "system"
+  ],
   "author": "College Management Team",
   "license": "MIT"
 }

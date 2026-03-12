@@ -390,12 +390,13 @@ body {
                                 <!-- Event Image -->
                                 <div class="event-image">
                                     <% if (event.poster && event.poster.trim() !== '') { %>
-                                        <img src="<%= event.poster %>" 
+                                        <img src="/uploads/<%= event.poster %>" 
                                              alt="<%= event.title %>" 
                                              class="w-full h-full object-cover"
                                              style="object-fit: cover;"
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.parentElement.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';"
-                                             onload="console.log('Image loaded successfully:', '<%= event.poster %>');">
+                                             loading="lazy"
+                                             onerror="console.log('Image failed to load:', '/uploads/<%= event.poster %>'); this.style.display='none'; this.nextElementSibling.style.display='flex'; this.parentElement.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';"
+                                             onload="console.log('Image loaded successfully:', '/uploads/<%= event.poster %>'); this.onload=null;">
                                         <div class="w-full h-full flex items-center justify-center" style="display:none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                                             <div class="text-center">
                                                 <i class="fas fa-calendar-alt text-4xl text-white mb-2"></i>

@@ -35,7 +35,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+    maxAge: '1h', // Reduced cache time for mobile compatibility
+    etag: false, // Disable ETag for mobile compatibility
+    lastModified: true,
+    setHeaders: (res, path, stat) => {
+        // Set headers for mobile compatibility
+        res.set('Access-Control-Allow-Origin', '*');
+        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+        res.set('Cache-Control', 'public, max-age=3600'); // 1 hour cache
+        res.set('Expires', new Date(Date.now() + 3600000).toUTCString());
+        
+        // Ensure proper content type for images
+        if (path.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+            res.set('Content-Type', 'image/' + path.split('.').pop().toLowerCase());
+        }
+    }
+}));
 
 // Session Configuration
 app.use(session({
@@ -59,6 +75,30 @@ app.set('views', path.join(__dirname, 'views'));
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
     res.locals.success = req.session.success || null;
+    
+    // Clear any "Please login to access this page" messages from session
+    if (req.session.error && req.session.error.includes('Please login to access this page')) {
+        req.session.error = null;
+    }
+    
+    // Clear registration messages after they've been displayed once
+    // This prevents messages from appearing on wrong pages
+    const currentPath = req.path;
+    if (currentPath.includes('/events/') && req.session.success) {
+        // If we're on an event details page, only allow the appropriate message
+        if (req.session.success === 'Registration successful!' || 
+            req.session.success === 'Registration cancelled successfully.') {
+            // Allow these messages to show once
+            const tempSuccess = req.session.success;
+            req.session.success = null; // Clear after setting for display
+            res.locals.success = tempSuccess;
+        } else {
+            // Clear other success messages on event pages
+            req.session.success = null;
+            res.locals.success = null;
+        }
+    }
+    
     res.locals.error = req.session.error || null;
     next();
 });
@@ -69,6 +109,29 @@ const adminRoutes = require('./routes/admin');
 const facultyRoutes = require('./routes/faculty');
 const studentRoutes = require('./routes/student');
 const eventRoutes = require('./routes/events');
+
+// Debug route to test uploads
+app.get('/debug/uploads', (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    const uploadsDir = path.join(__dirname, 'uploads');
+    
+    if (fs.existsSync(uploadsDir)) {
+        const files = fs.readdirSync(uploadsDir);
+        res.json({
+            uploadsDir: uploadsDir,
+            exists: true,
+            files: files.slice(0, 10), // Show first 10 files
+            totalFiles: files.length
+        });
+    } else {
+        res.json({
+            uploadsDir: uploadsDir,
+            exists: false,
+            files: []
+        });
+    }
+});
 
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
