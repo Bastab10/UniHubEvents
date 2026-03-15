@@ -48,7 +48,16 @@ router.get('/login', (req, res) => {
     if (req.session.user) {
         return res.redirect('/');
     }
-    res.render('auth/login', { title: 'Login' });
+    
+    // Clear only error messages when login page loads, preserve success messages from registration
+    const error = req.session.error;
+    delete req.session.error;
+    
+    res.render('auth/login', { 
+        title: 'Login',
+        error: error || null,
+        success: req.session.success || null
+    });
 });
 
 // Login Process
@@ -116,16 +125,21 @@ router.post('/login', [
 
         if (!user.isApproved && user.role !== 'admin') {
             console.log('User not approved'); // Debug log
-            if (user.role === 'faculty') {
-                req.session.error = 'Your faculty account is pending admin approval. Please wait for an administrator to approve your account.';
-            } else {
+            if (user.role === 'student') {
                 req.session.error = 'Your account is pending approval. Please contact the administrator.';
+                return res.render('auth/login', { 
+                    title: 'Login',
+                    username,
+                    selectedRole: role
+                });
+            } else {
+                // For faculty, don't show error message - let success message from registration handle it
+                return res.render('auth/login', { 
+                    title: 'Login',
+                    username,
+                    selectedRole: role
+                });
             }
-            return res.render('auth/login', { 
-                title: 'Login',
-                username,
-                selectedRole: role
-            });
         }
 
         console.log('Login successful for:', user.username, 'as', user.role); // Debug log
@@ -161,6 +175,11 @@ router.get('/register', (req, res) => {
     if (req.session.user) {
         return res.redirect('/');
     }
+    
+    // Clear any existing session messages to prevent showing them on register page
+    delete req.session.error;
+    delete req.session.success;
+    
     res.render('auth/register', { title: 'Register' });
 });
 
@@ -234,6 +253,11 @@ router.post('/register', [
         const hashedPassword = await bcrypt.hash(password, salt);
         console.log('Password hashed successfully'); // Debug log
 
+        // Split full name into first and last name for database compatibility
+        const nameParts = fullName.trim().split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
         // Create new user with proper approval status
         const newUser = new User({
             username,
@@ -242,6 +266,8 @@ router.post('/register', [
             role,
             isApproved: role === 'student' || role === 'admin', // Students auto-approved, coordinators need approval
             profile: {
+                firstName,
+                lastName,
                 fullName,
                 collegeId,
                 department,
