@@ -180,10 +180,17 @@ router.post('/register', [
     }),
     body('collegeId').custom((value, { req }) => {
         if (req.body.role === 'student') {
-            // Validate College ID format for students: YYCourseCodeRollNo
-            const pattern = /^[0-9]{2}(BCA|BA|BSc)[0-9]{3}$/;
+            // Validate College ID format for students: YEAR + COURSE + 3 digit number
+            const pattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
             if (!pattern.test(value.toUpperCase())) {
-                throw new Error('Invalid College ID format. Use format: YYCourseCodeRollNo');
+                throw new Error('Invalid College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)');
+            }
+        }
+        if (req.body.role === 'faculty') {
+            // Validate College ID format for coordinator: FAC + 3 digits OR DEPT + 3 digits
+            const facultyPattern = /^(FAC\d{3}|DEPT\d{3})$/;
+            if (!facultyPattern.test(value.toUpperCase())) {
+                throw new Error('Invalid Coordinator ID format. Use format: FAC001 or DEPT123');
             }
         }
         return true;
@@ -227,21 +234,14 @@ router.post('/register', [
         const hashedPassword = await bcrypt.hash(password, salt);
         console.log('Password hashed successfully'); // Debug log
 
-        // Split full name into first and last name
-        const nameParts = fullName.trim().split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
-
         // Create new user with proper approval status
         const newUser = new User({
             username,
             email,
             password: hashedPassword,
             role,
-            isApproved: role === 'student' || role === 'admin', // Students auto-approved, faculty need approval
+            isApproved: role === 'student' || role === 'admin', // Students auto-approved, coordinators need approval
             profile: {
-                firstName,
-                lastName,
                 fullName,
                 collegeId,
                 department,

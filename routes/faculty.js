@@ -670,6 +670,29 @@ router.get('/profile', async (req, res) => {
     }
 });
 
+// Update Faculty Profile
+router.post('/profile', async (req, res) => {
+    try {
+        const { fullName, phone } = req.body;
+        
+        await User.findByIdAndUpdate(req.session.user._id, {
+            'profile.fullName': fullName,
+            'profile.phone': phone
+        });
+
+        // Update session user data
+        req.session.user.profile.fullName = fullName;
+        req.session.user.profile.phone = phone;
+
+        req.session.success = 'Profile updated successfully';
+        res.redirect('/faculty/profile');
+    } catch (error) {
+        console.error('Update faculty profile error:', error);
+        req.session.error = 'Error updating profile';
+        res.redirect('/faculty/profile');
+    }
+});
+
 // View Registered Students for Event
 router.get('/events/:id/students', async (req, res) => {
     try {
@@ -678,9 +701,9 @@ router.get('/events/:id/students', async (req, res) => {
         const event = await Event.findById(eventId)
             .populate({
                 path: 'registrations.student',
-                select: 'profile.firstName profile.lastName profile.collegeId email'
+                select: 'profile.fullName profile.collegeId email'
             })
-            .populate('organizer', 'profile.firstName profile.lastName');
+            .populate('organizer', 'profile.fullName');
         
         if (!event) {
             req.session.error = 'Event not found';

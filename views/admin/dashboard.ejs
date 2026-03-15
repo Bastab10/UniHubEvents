@@ -36,7 +36,7 @@
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
                     <p class="text-gray-700 sm:text-gray-600 mt-2">
-                        Welcome back, <%= currentUser.profile.firstName %>! Here's your system overview.
+                        Welcome back, <%= currentUser.profile.fullName %>! Here's your system overview.
                     </p>
                 </div>
             </div>
@@ -53,18 +53,18 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('all-faculty')">
-                    <p class="text-xs text-gray-500">Total Faculty</p>
+                    <p class="text-xs text-gray-500">Total Coordinators</p>
                     <p class="text-xl font-bold text-gray-800">
                         <%= stats.totalFaculty %>
                     </p>
-                    <p class="text-xs text-blue-600 mt-1">Click to view all faculty →</p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all coordinators →</p>
                 </div>
                 <div class="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:shadow-lg transition-shadow" onclick="showSection('faculty')">
                     <p class="text-xs text-gray-500">Pending Registration Approvals</p>
                     <p class="text-xl font-bold text-gray-800">
                         <%= stats.pendingFaculty %>
                     </p>
-                    <p class="text-xs text-blue-600 mt-1">Click to view all pending faculty →</p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view all pending coordinators →</p>
                 </div>
 
             </div>
@@ -108,7 +108,7 @@
                                                             </div>
                                                             <div>
                                                                 <div class="text-sm font-medium text-gray-900">
-                                                                    <%= student.profile.firstName %> <%= student.profile.lastName %>
+                                                                    <%= student.profile.fullName %>
                                                                 </div>
                                                                 <div class="text-sm text-gray-500"><%= student.email %></div>
                                                             </div>
@@ -148,13 +148,13 @@
                     </div>
                 </div>
 
-                <!-- Faculty Section -->
+                <!-- Coordinator Section -->
                 <div id="faculty-section" class="content-section" style="display: none;">
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <div class="mb-6 flex justify-between items-center">
                             <div>
-                                <h2 class="text-2xl font-bold text-gray-800">Pending Faculty Approvals</h2>
-                                <p class="text-gray-600">Faculty members awaiting admin approval</p>
+                                <h2 class="text-2xl font-bold text-gray-800">Pending Coordinator Approvals</h2>
+                                <p class="text-gray-600">Coordinators awaiting admin approval</p>
                             </div>
                             <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
                                 <i class="fas fa-arrow-left mr-2"></i>
@@ -167,7 +167,7 @@
                                 <table class="w-full">
                                     <thead class="bg-gray-50 border-b border-gray-200">
                                         <tr>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Faculty Details</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Coordinator Details</th>
                                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact Information</th>
                                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Department</th>
                                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Registration Date</th>
@@ -185,7 +185,7 @@
                                                             </div>
                                                             <div>
                                                                 <div class="text-sm font-semibold text-gray-900 mb-1">
-                                                                    <%= faculty.profile.firstName %> <%= faculty.profile.lastName %>
+                                                                    <%= faculty.profile.fullName %>
                                                                 </div>
                                                                 <div class="flex items-center space-x-2">
                                                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -193,7 +193,7 @@
                                                                         Pending
                                                                     </span>
                                                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                                                        Faculty
+                                                                        Coordinator
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -233,17 +233,17 @@
                                                     </td>
                                                     <td class="px-6 py-4">
                                                         <div class="flex items-center space-x-2">
-                                                            <button onclick="viewFacultyDetails('<%= faculty._id %>')" 
+                                                            <button onclick="viewCoordinatorDetails('<%= faculty._id %>')" 
                                                                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                                 <i class="fas fa-eye mr-1"></i>
                                                                 View Details
                                                             </button>
-                                                            <button onclick="approveFaculty('<%= faculty._id %>')" 
+                                                            <button onclick="approveCoordinator('<%= faculty._id %>')" 
                                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                                                 <i class="fas fa-check mr-1"></i>
                                                                 Approve
                                                             </button>
-                                                            <button onclick="rejectFaculty('<%= faculty._id %>')" 
+                                                            <button onclick="rejectCoordinator('<%= faculty._id %>')" 
                                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                                                 <i class="fas fa-times mr-1"></i>
                                                                 Reject
@@ -259,7 +259,7 @@
                                                         <div class="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
                                                             <i class="fas fa-check-circle text-green-600 text-2xl"></i>
                                                         </div>
-                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Faculty</h3>
+                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Coordinator</h3>
                                                         <p class="text-gray-500">There are no faculty members awaiting approval.</p>
                                                     </div>
                                                 </td>
@@ -272,12 +272,12 @@
                     </div>
                 </div>
 
-                <!-- All Faculty Section -->
+                <!-- All Coordinator Section -->
                 <div id="all-faculty-section" class="content-section" style="display: none;">
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <div class="mb-6 flex justify-between items-center">
                             <div>
-                                <h2 class="text-2xl font-bold text-gray-800">All Faculty Members</h2>
+                                <h2 class="text-2xl font-bold text-gray-800">All Coordinator Members</h2>
                                 <p class="text-gray-600">Complete list of all approved faculty members</p>
                             </div>
                             <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
@@ -286,13 +286,13 @@
                             </button>
                         </div>
                         
-                        <!-- All Faculty List -->
+                        <!-- All Coordinator List -->
                         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
                             <div class="overflow-x-auto">
                                 <table class="w-full">
                                     <thead class="bg-gray-50 border-b border-gray-200">
                                         <tr>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Faculty Details</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Coordinator Details</th>
                                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact Information</th>
                                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Department</th>
                                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Registration Date</th>
@@ -310,7 +310,7 @@
                                                             </div>
                                                             <div>
                                                                 <div class="text-sm font-semibold text-gray-900 mb-1">
-                                                                    <%= faculty.profile.firstName %> <%= faculty.profile.lastName %>
+                                                                    <%= faculty.profile.fullName %>
                                                                 </div>
                                                                 <div class="flex items-center space-x-2">
                                                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -318,7 +318,7 @@
                                                                         Approved
                                                                     </span>
                                                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                                                        Faculty
+                                                                        Coordinator
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -358,7 +358,7 @@
                                                     </td>
                                                     <td class="px-6 py-4">
                                                         <div class="flex items-center space-x-2">
-                                                            <button onclick="viewFacultyDetails('<%= faculty._id %>')" 
+                                                            <button onclick="viewCoordinatorDetails('<%= faculty._id %>')" 
                                                                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                                 <i class="fas fa-eye mr-1"></i>
                                                                 View Details
@@ -374,7 +374,7 @@
                                                         <div class="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                                                             <i class="fas fa-user-tie text-gray-400 text-2xl"></i>
                                                         </div>
-                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Approved Faculty</h3>
+                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Approved Coordinator</h3>
                                                         <p class="text-gray-500">There are no approved faculty members yet.</p>
                                                     </div>
                                                 </td>
@@ -446,7 +446,7 @@
                                                     <td class="px-6 py-4">
                                                         <div class="text-sm">
                                                             <div class="font-medium text-gray-900">
-                                                                <%= (event.organizer && event.organizer.profile) ? (event.organizer.profile.firstName + ' ' + event.organizer.profile.lastName) : 'Unknown' %>
+                                                                <%= (event.organizer && event.organizer.profile) ? event.organizer.profile.fullName : 'Unknown' %>
                                                             </div>
                                                             <div class="text-gray-500">
                                                                 <%= (event.organizer && event.organizer.email) ? event.organizer.email : '' %>
@@ -680,7 +680,7 @@
                                                             </div>
                                                             <div>
                                                                 <div class="text-sm font-semibold text-gray-900 mb-1">
-                                                                    <%= registration.student.profile.firstName %> <%= registration.student.profile.lastName %>
+                                                                    <%= registration.student.profile.fullName %>
                                                                 </div>
                                                                 <div class="text-sm text-gray-500">
                                                                     <%= registration.student.email %>
@@ -803,8 +803,8 @@
         }
     }
 
-    // Faculty approval functions
-    function approveFaculty(facultyId) {
+    // Coordinator approval functions
+    function approveCoordinator(facultyId) {
         if (confirm('Are you sure you want to approve this faculty member?')) {
             // Show loading state
             const button = event.target;
@@ -822,7 +822,7 @@
             .then(data => {
                 if (data.success) {
                     // Show success message
-                    alert('Faculty approved successfully! Total faculty count will be updated.');
+                    alert('Coordinator approved successfully! Total faculty count will be updated.');
                     // Reload page to refresh all counts
                     location.reload();
                 } else {
@@ -842,7 +842,7 @@
         }
     }
 
-    function rejectFaculty(facultyId) {
+    function rejectCoordinator(facultyId) {
         const reason = prompt('Please provide a reason for rejecting this faculty registration:');
         if (reason) {
             // Show loading state
@@ -862,7 +862,7 @@
             .then(data => {
                 if (data.success) {
                     // Show success message
-                    alert('Faculty rejected successfully! Pending faculty count will be updated.');
+                    alert('Coordinator rejected successfully! Pending faculty count will be updated.');
                     // Reload page to refresh all counts
                     location.reload();
                 } else {
@@ -911,7 +911,7 @@
         }
     }
 
-    function viewFacultyDetails(facultyId) {
+    function viewCoordinatorDetails(facultyId) {
         // Redirect to faculty details page
         window.location.href = `/admin/faculty/${facultyId}`;
     }

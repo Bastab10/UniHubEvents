@@ -65,7 +65,7 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <% if (registration.student) { %>
-                                                <%= registration.student.profile.firstName %> <%= registration.student.profile.lastName %>
+                                                <%= registration.student.profile.fullName %>
                                             <% } else { %>
                                                 <span class="text-gray-400">Student not found</span>
                                             <% } %>

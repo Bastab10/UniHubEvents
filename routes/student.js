@@ -224,6 +224,13 @@ router.post('/events/:id/register', async (req, res) => {
                 return res.redirect(`/student/events/${req.params.id}`);
             }
 
+            // Validate team leader College ID format
+            const studentPattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
+            if (!studentPattern.test(teamLeaderCollegeId.trim().toUpperCase())) {
+                req.session.error = 'Invalid Team Leader College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)';
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
+
             registrationData.teamName = teamName.trim();
             registrationData.teamLeaderName = teamLeaderName.trim();
             registrationData.teamLeaderCollegeId = teamLeaderCollegeId.trim();
@@ -231,10 +238,19 @@ router.post('/events/:id/register', async (req, res) => {
             if (teamMembers && Array.isArray(teamMembers)) {
                 registrationData.teamMembers = teamMembers
                     .filter(member => member && member.name && member.collegeId)
-                    .map(member => ({
-                        name: member.name.trim(),
-                        collegeId: member.collegeId.trim()
-                    }));
+                    .map(member => {
+                        const memberCollegeId = member.collegeId.trim();
+                        // Validate team member College ID format
+                        const studentPattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
+                        if (!studentPattern.test(memberCollegeId.toUpperCase())) {
+                            req.session.error = `Invalid College ID format for team member "${member.name}". Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)`;
+                            return res.redirect(`/student/events/${req.params.id}`);
+                        }
+                        return {
+                            name: member.name.trim(),
+                            collegeId: memberCollegeId
+                        };
+                    });
             }
         }
 
@@ -356,17 +372,15 @@ router.get('/profile', (req, res) => {
 // Update Profile
 router.post('/profile', async (req, res) => {
     try {
-        const { firstName, lastName, phone } = req.body;
+        const { fullName, phone } = req.body;
         
         await User.findByIdAndUpdate(req.session.user._id, {
-            'profile.firstName': firstName,
-            'profile.lastName': lastName,
+            'profile.fullName': fullName,
             'profile.phone': phone
         });
 
         // Update session user data
-        req.session.user.profile.firstName = firstName;
-        req.session.user.profile.lastName = lastName;
+        req.session.user.profile.fullName = fullName;
         req.session.user.profile.phone = phone;
 
         req.session.success = 'Profile updated successfully';

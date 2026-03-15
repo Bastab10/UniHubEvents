@@ -84,7 +84,6 @@
                         <input id="password" name="password" type="password" required
                                class="form-control form-control-sm"
                                placeholder="Create a password (min 6 characters)">
-                        <div class="form-text">Minimum 6 characters</div>
                     </div>
 
                     <div class="col-12">
@@ -92,8 +91,7 @@
                         <input id="collegeId" name="collegeId" type="text" required
                                value="<%= typeof formData !== 'undefined' ? formData.collegeId : '' %>"
                                class="form-control form-control-sm"
-                               placeholder="e.g., 23BCA001, 24BA056, 25BSc234">
-                        <div class="form-text">Format: YYCourseCodeRollNo (e.g., 23BCA101)</div>
+                               placeholder="YYCourseCodeRollNo">
                         <div id="collegeIdError" class="text-danger small" style="display: none;"></div>
                     </div>
 
@@ -117,7 +115,7 @@
                         <select id="role" name="role" required class="form-select form-select-sm">
                             <option value="">Select Role</option>
                             <option value="student" <%= typeof formData !== 'undefined' && formData.role === 'student' ? 'selected' : '' %>>Student</option>
-                            <option value="faculty" <%= typeof formData !== 'undefined' && formData.role === 'faculty' ? 'selected' : '' %>>Faculty</option>
+                            <option value="faculty" <%= typeof formData !== 'undefined' && formData.role === 'faculty' ? 'selected' : '' %>>Coordinator</option>
                         </select>
                     </div>
 
@@ -156,33 +154,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // College ID validation function
-        function validateCollegeId(collegeId) {
-            // Format: YYCourseCodeRollNo
-            // Examples: 23BCA001, 24BA056, 25BSc234
-            const pattern = /^[0-9]{2}(BCA|BA|BSc)[0-9]{3}$/;
+        // Student College ID validation function
+        function validateStudentCollegeId(collegeId) {
+            // Format: YEAR + COURSE + 3 digits
+            // Examples: 23BA123, 24BCA456, 25BSC789, 26BPES001
+            const pattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
             return pattern.test(collegeId.toUpperCase());
         }
 
-        // Real-time College ID validation
-        document.getElementById('collegeId').addEventListener('input', function() {
-            const collegeId = this.value;
-            const errorDiv = document.getElementById('collegeIdError');
-            const submitButton = document.querySelector('button[type="submit"]');
-            
-            if (collegeId && !validateCollegeId(collegeId)) {
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = 'Invalid College ID format. Use format: YYCourseCodeRollNo (e.g., 23BCA001)';
-                this.classList.add('is-invalid');
-                submitButton.disabled = true;
-            } else {
-                errorDiv.style.display = 'none';
-                this.classList.remove('is-invalid');
-                submitButton.disabled = false;
-            }
-        });
+        // Coordinator College ID validation function
+        function validateCoordinatorCollegeId(collegeId) {
+            // Format: FAC + 3 digits OR DEPT + 3 digits
+            // Examples: FAC001, FAC123, DEPT001, DEPT123
+            const pattern = /^(FAC\d{3}|DEPT\d{3})$/;
+            return pattern.test(collegeId.toUpperCase());
+        }
 
-        // Dynamic form fields based on role selection
+        // Role change handler, dynamic form fields based on role selection
         document.getElementById('role').addEventListener('change', function() {
             const role = this.value;
             const designationField = document.getElementById('designationField');
@@ -193,17 +181,33 @@
             const collegeIdHelp = collegeIdInput.parentElement.querySelector('.form-text');
             
             if (role === 'faculty') {
-                // Show designation field for faculty
+                // Show designation field for coordinator
                 designationField.style.display = 'block';
                 designationInput.setAttribute('required', 'required');
                 
-                // Update College ID guidance for faculty
+                // Update College ID guidance for coordinator
                 collegeIdLabel.textContent = 'College ID *';
-                collegeIdPlaceholder.placeholder = 'Faculty ID (e.g., FAC001, DEPT123)';
-                collegeIdHelp.textContent = 'Faculty can use any ID format';
+                collegeIdPlaceholder.placeholder = 'Coordinator ID (e.g., FAC001, DEPT123)';
+                collegeIdHelp.textContent = 'Format: FAC001 or DEPT123';
                 
-                // Remove College ID validation for faculty
-                collegeIdInput.removeEventListener('input', validateCollegeId);
+                // Enable Coordinator College ID validation
+                collegeIdInput.removeEventListener('input', validateStudentCollegeId);
+                collegeIdInput.addEventListener('input', function() {
+                    const collegeId = this.value;
+                    const errorDiv = document.getElementById('collegeIdError');
+                    const submitButton = document.querySelector('button[type="submit"]');
+                    
+                    if (collegeId && !validateCoordinatorCollegeId(collegeId)) {
+                        errorDiv.style.display = 'block';
+                        errorDiv.textContent = 'Invalid Coordinator ID format. Use: FAC001 or DEPT123';
+                        this.classList.add('is-invalid');
+                        submitButton.disabled = true;
+                    } else {
+                        errorDiv.style.display = 'none';
+                        this.classList.remove('is-invalid');
+                        submitButton.disabled = false;
+                    }
+                });
                 collegeIdInput.classList.remove('is-invalid');
                 document.getElementById('collegeIdError').style.display = 'none';
                 document.querySelector('button[type="submit"]').disabled = false;
@@ -216,18 +220,19 @@
                 
                 // Update College ID guidance for students
                 collegeIdLabel.textContent = 'College ID *';
-                collegeIdPlaceholder.placeholder = 'e.g., 23BCA001, 24BA056, 25BSc234';
-                collegeIdHelp.textContent = 'Format: YYCourseCodeRollNo (e.g., 23BCA101)';
+                collegeIdPlaceholder.placeholder = 'e.g., 23BA123, 24BCA456';
+                collegeIdHelp.textContent = 'Format: YEAR + COURSE + 3 digits';
                 
-                // Re-enable College ID validation for students
+                // Re-enable Student College ID validation
+                collegeIdInput.removeEventListener('input', validateCoordinatorCollegeId);
                 collegeIdInput.addEventListener('input', function() {
                     const collegeId = this.value;
                     const errorDiv = document.getElementById('collegeIdError');
                     const submitButton = document.querySelector('button[type="submit"]');
                     
-                    if (collegeId && !validateCollegeId(collegeId)) {
+                    if (collegeId && !validateStudentCollegeId(collegeId)) {
                         errorDiv.style.display = 'block';
-                        errorDiv.textContent = 'Invalid College ID format. Use format: YYCourseCodeRollNo (e.g., 23BCA001)';
+                        errorDiv.textContent = 'Invalid College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123)';
                         this.classList.add('is-invalid');
                         submitButton.disabled = true;
                     } else {
@@ -236,7 +241,9 @@
                         submitButton.disabled = false;
                     }
                 });
-                
+                collegeIdInput.classList.remove('is-invalid');
+                document.getElementById('collegeIdError').style.display = 'none';
+                document.querySelector('button[type="submit"]').disabled = false;
             } else {
                 // Hide designation field for other roles
                 designationField.style.display = 'none';
@@ -244,23 +251,31 @@
                 designationInput.value = '';
             }
         });
-
         // Form submission validation
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             const role = document.getElementById('role').value;
             const collegeId = document.getElementById('collegeId').value;
             
-            // Validate College ID format for students
-            if (role === 'student' && !validateCollegeId(collegeId)) {
+            // Validate College ID format based on role
+            if (role === 'student' && !validateStudentCollegeId(collegeId)) {
                 e.preventDefault();
                 document.getElementById('collegeIdError').style.display = 'block';
-                document.getElementById('collegeIdError').textContent = 'Please enter a valid College ID in the format YYCourseCodeRollNo (e.g., 23BCA001)';
+                document.getElementById('collegeIdError').textContent = 'Invalid College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123)';
                 document.getElementById('collegeId').classList.add('is-invalid');
                 document.getElementById('collegeId').focus();
                 return false;
             }
             
-            // Validate designation for faculty
+            if (role === 'faculty' && !validateCoordinatorCollegeId(collegeId)) {
+                e.preventDefault();
+                document.getElementById('collegeIdError').style.display = 'block';
+                document.getElementById('collegeIdError').textContent = 'Invalid Coordinator ID format. Use: FAC001 or DEPT123';
+                document.getElementById('collegeId').classList.add('is-invalid');
+                document.getElementById('collegeId').focus();
+                return false;
+            }
+            
+            // Validate designation for coordinator
             if (role === 'faculty' && !document.getElementById('designation').value.trim()) {
                 e.preventDefault();
                 alert('Please enter your designation');

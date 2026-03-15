@@ -28,11 +28,11 @@
                         <!-- Student Profile -->
                         <div class="flex items-center mb-8">
                             <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-6">
-                                <%= student.profile.firstName ? student.profile.firstName.charAt(0).toUpperCase() : 'S' %>
+                                <%= student.profile.fullName ? student.profile.fullName.charAt(0).toUpperCase() : 'S' %>
                             </div>
                             <div>
                                 <h2 class="text-2xl font-bold text-gray-800">
-                                    <%= student.profile.firstName %> <%= student.profile.lastName %>
+                                    <%= student.profile.fullName %>
                                 </h2>
                                 <p class="text-gray-600"><%= student.email %></p>
                             </div>
@@ -46,13 +46,8 @@
                                 
                                 <div class="space-y-4">
                                     <div class="flex items-center">
-                                        <span class="text-sm font-medium text-gray-500 w-32">First Name:</span>
-                                        <span class="text-sm text-gray-900"><%= student.profile.firstName || 'N/A' %></span>
-                                    </div>
-                                    
-                                    <div class="flex items-center">
-                                        <span class="text-sm font-medium text-gray-500 w-32">Last Name:</span>
-                                        <span class="text-sm text-gray-900"><%= student.profile.lastName || 'N/A' %></span>
+                                        <span class="text-sm font-medium text-gray-500 w-32">Full Name:</span>
+                                        <span class="text-sm text-gray-900"><%= student.profile.fullName || 'N/A' %></span>
                                     </div>
                                     
                                     <div class="flex items-center">
