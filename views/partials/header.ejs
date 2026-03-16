@@ -311,12 +311,12 @@
         /* Mobile Navigation Menu */
         .mobile-menu {
             position: fixed;
-            top: 0;
+            top: 64px; /* height of the header */
             left: -100%;
             width: 85%;
             max-width: 320px;
-            height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: calc(100vh - 64px);
+            background: #be8cdf;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1050;

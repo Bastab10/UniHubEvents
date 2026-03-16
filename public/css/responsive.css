@@ -326,7 +326,7 @@ button, a, input, select, textarea, .btn {
     top: 1rem;
     left: 1rem;
     z-index: 1040;
-    background: rgba(102, 126, 234, 0.9);
+    background: #be8cdf(102, 126, 234, 0.9);
     color: white;
     border: none;
     border-radius: 0.5rem;
