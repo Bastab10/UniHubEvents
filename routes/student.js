@@ -175,12 +175,14 @@ router.post('/events/:id/register', async (req, res) => {
 
         if (isAlreadyRegistered) {
             req.session.error = 'You are already registered for this event';
+            req.session.eventError = req.params.id; // Track which event this error is for
             return res.redirect(`/student/events/${req.params.id}`);
         }
 
         // Check if event is full
         if (event.maxParticipants && event.registrations.length >= event.maxParticipants) {
             req.session.error = 'Event is full';
+            req.session.eventError = req.params.id; // Track which event this error is for
             return res.redirect(`/student/events/${req.params.id}`);
         }
 
@@ -194,7 +196,8 @@ router.post('/events/:id/register', async (req, res) => {
         });
 
         if (exactConflict) {
-            req.session.error = 'You have already registered for another event at the same date and time. Please cancel your existing registration before registering for this event.';
+            req.session.error = 'You are already registered for another event at the same time. Please cancel the existing registration to proceed.';
+            req.session.eventError = req.params.id; // Track which event this error is for
             return res.redirect(`/student/events/${req.params.id}`);
         }
 
@@ -258,7 +261,8 @@ router.post('/events/:id/register', async (req, res) => {
         event.registrations.push(registrationData);
         await event.save();
 
-        req.session.success = 'Registration successful!';
+        req.session.success = 'Registration successful';
+        req.session.eventSuccess = req.params.id; // Track which event this success message is for
         res.redirect(`/student/events/${req.params.id}`);
     } catch (error) {
         console.error('Event registration error:', error);
@@ -322,7 +326,8 @@ router.post('/registrations/:eventId/cancel', async (req, res) => {
         event.registrations.splice(registrationIndex, 1);
         await event.save();
 
-        req.session.success = 'Registration cancelled successfully.';
+        req.session.success = 'Registration cancelled successfully';
+        req.session.eventSuccess = req.params.eventId; // Track which event this success message is for
         res.redirect(`/student/events/${req.params.eventId}`);
     } catch (error) {
         console.error('Cancel registration error:', error);

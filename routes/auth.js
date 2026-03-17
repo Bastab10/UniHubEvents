@@ -49,14 +49,13 @@ router.get('/login', (req, res) => {
         return res.redirect('/');
     }
     
-    // Clear only error messages when login page loads, preserve success messages from registration
+    // Clear only error messages when login page loads
     const error = req.session.error;
     delete req.session.error;
     
     res.render('auth/login', { 
         title: 'Login',
-        error: error || null,
-        success: req.session.success || null
+        error: error || null
     });
 });
 

@@ -6,21 +6,21 @@
     <title><%= title %> - NLU Event Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/professional-ui.css">
     <link rel="stylesheet" href="/css/responsive.css">
     <style>
         /* Enhanced Professional Navbar */
         .navbar-enhanced {
-            background: #d8c1e7;
+            background: #ffffff;
             backdrop-filter: blur(20px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid #e5e7eb;
         }
         
         .navbar-enhanced.scrolled {
-            background: #be8cdf;
+            background: #ffffff;
             backdrop-filter: blur(25px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            border-bottom: 1px solid #d1d5db;
         }
         
         .navbar-transition {
@@ -36,6 +36,66 @@
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+        }
+        
+        /* Enhanced Navigation Links */
+        .nav-link {
+            position: relative;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #0ea5a4;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+            background: #0ea5a4;
+        }
+        
+        .nav-indicator {
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #0ea5a4;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover .nav-indicator,
+        .nav-link.active .nav-indicator {
+            width: 100%;
+        }
+        
+        /* Logout Button Styling */
+        .logout-btn-nav {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .logout-btn-nav:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(14, 165, 164, 0.3);
         }
         
         .nav-button::before {
@@ -122,28 +182,6 @@
             .logo-text p {
                 font-size: 0.7rem !important;
             }
-        }
-        
-        /* Professional Button Styles */
-        .btn-professional {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-professional::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .btn-professional:hover::before {
-            left: 100%;
         }
         
         /* Notification Badge */
@@ -355,7 +393,6 @@
             display: flex;
             align-items: center;
             padding: 1rem 1.5rem;
-            color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
             transition: all 0.3s ease;
             font-weight: 500;
@@ -366,7 +403,41 @@
             background: rgba(255, 255, 255, 0.15);
             color: white;
             border-left-color: white;
-            padding-left: 2rem;
+        }
+        
+        .mobile-nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            border-left-color: #0ea5a4 !important;
+        }
+        
+        .mobile-nav-link:hover {
+            color: white !important;
+            background: rgba(14, 165, 164, 0.2) !important;
+            border-left-color: white !important;
+        }
+        
+        .mobile-nav-section {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+        
+        /* Mobile Logout Button */
+        .mobile-logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.9) !important;
+            border-left: 3px solid #0ea5a4 !important;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .mobile-logout-btn:hover {
+            color: white !important;
+            background: rgba(14, 165, 164, 0.2) !important;
+            border-left-color: white !important;
         }
         
         .mobile-menu-nav i {
@@ -549,6 +620,24 @@
                     </div>
                 </div>
                 
+                <!-- Center Section: Navigation Links -->
+                <div class="hidden lg:flex items-center justify-center flex-1">
+                    <nav class="flex items-center space-x-12">
+                        <a href="/" class="nav-link text-gray-700 hover:text-[#0ea5a4] font-medium transition-all duration-200 relative py-2 px-1">
+                            Home
+                            <span class="nav-indicator"></span>
+                        </a>
+                        <a href="/about" class="nav-link text-gray-700 hover:text-[#0ea5a4] font-medium transition-all duration-200 relative py-2 px-1">
+                            About
+                            <span class="nav-indicator"></span>
+                        </a>
+                        <a href="/contact" class="nav-link text-gray-700 hover:text-[#0ea5a4] font-medium transition-all duration-200 relative py-2 px-1">
+                            Contact
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </nav>
+                </div>
+                
                 <!-- Right Section: User Actions -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <!-- Notifications (for logged-in users) -->
@@ -558,6 +647,12 @@
                             <i class="fas fa-bell text-base sm:text-lg"></i>
                             <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                         </button>
+                        
+                        <!-- Logout Button -->
+                        <a href="/auth/logout" class="logout-btn-nav hidden sm:flex items-center px-4 py-2 rounded-lg border border-[#0ea5a4] text-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white transition-all duration-200 font-medium">
+                            <i class="fas fa-sign-out-alt text-sm"></i>
+                            <span class="ml-2">Logout</span>
+                        </a>
                     <% } %>
                     
                 </div>
@@ -579,6 +674,22 @@
         </div>
         
         <nav class="mobile-menu-nav">
+            <!-- Navigation Links -->
+            <div class="mobile-nav-section">
+                <a href="/" class="mobile-nav-link">
+                    <i class="fas fa-home text-base sm:text-lg"></i>
+                    <span class="text-sm sm:text-base">Home</span>
+                </a>
+                <a href="/about" class="mobile-nav-link">
+                    <i class="fas fa-info-circle text-base sm:text-lg"></i>
+                    <span class="text-sm sm:text-base">About</span>
+                </a>
+                <a href="/contact" class="mobile-nav-link">
+                    <i class="fas fa-envelope text-base sm:text-lg"></i>
+                    <span class="text-sm sm:text-base">Contact</span>
+                </a>
+            </div>
+            
             <% if (currentUser) { %>
                 <% if (currentUser.role === 'admin') { %>
                     <a href="/admin/dashboard">
@@ -635,7 +746,7 @@
                 
                 <div style="margin: 1.5rem 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
                 
-                <a href="/auth/logout" style="color: #ff6b6b;">
+                <a href="/auth/logout" class="mobile-logout-btn">
                     <i class="fas fa-sign-out-alt text-base sm:text-lg"></i>
                     <span class="text-sm sm:text-base">Logout</span>
                 </a>
@@ -701,28 +812,6 @@
             }
         });
 
-        // Close mobile search when clicking outside
-        document.addEventListener('click', function(event) {
-            const mobileSearchBar = document.getElementById('mobileSearchBar');
-            const mobileSearchButton = event.target.closest('[onclick="toggleMobileSearch()"]');
-            
-            if (mobileSearchBar && !mobileSearchBar.contains(event.target) && !mobileSearchButton) {
-                mobileSearchBar.classList.add('hidden');
-            }
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('userDropdown');
-            const button = event.target.closest('button');
-            const chevron = document.querySelector('.fa-chevron-down');
-            
-            if (!button || !button.onclick || button.onclick.toString().indexOf('toggleUserDropdown') === -1) {
-                dropdown.classList.add('hidden');
-                if (chevron) chevron.style.transform = 'rotate(0deg)';
-            }
-        });
-
         // Close dropdown on escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
@@ -757,6 +846,62 @@
             overlay.classList.remove('active');
             document.body.style.overflow = '';
         }
+
+        // Highlight active navigation link
+        function highlightActiveNavLink() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                const indicator = link.querySelector('.nav-indicator');
+                
+                // Remove active classes from all links
+                link.classList.remove('active', 'text-[#0ea5a4]');
+                link.classList.add('text-gray-700');
+                
+                if (indicator) {
+                    indicator.style.width = '0';
+                }
+                
+                // Add active class to current link
+                if (linkPath === '/' && currentPath === '/') {
+                    link.classList.add('active', 'text-[#0ea5a4]');
+                    link.classList.remove('text-gray-700');
+                    if (indicator) indicator.style.width = '100%';
+                } else if (linkPath !== '/' && currentPath.startsWith(linkPath)) {
+                    link.classList.add('active', 'text-[#0ea5a4]');
+                    link.classList.remove('text-gray-700');
+                    if (indicator) indicator.style.width = '100%';
+                }
+            });
+        }
+
+        // Highlight active mobile navigation link
+        function highlightActiveMobileNavLink() {
+            const currentPath = window.location.pathname;
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            
+            mobileNavLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (linkPath === '/' && currentPath === '/') {
+                    link.style.color = '#0ea5a4';
+                    link.style.borderLeftColor = '#0ea5a4';
+                } else if (linkPath !== '/' && currentPath.startsWith(linkPath)) {
+                    link.style.color = '#0ea5a4';
+                    link.style.borderLeftColor = '#0ea5a4';
+                } else {
+                    link.style.color = 'rgba(255, 255, 255, 0.9)';
+                    link.style.borderLeftColor = 'transparent';
+                }
+            });
+        }
+
+        // Initialize active link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightActiveNavLink();
+            highlightActiveMobileNavLink();
+        });
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {

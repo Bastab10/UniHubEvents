@@ -1,650 +1,38 @@
 <%- include('../partials/header') %>
 
-<style>
-/* Responsive Dashboard Styles */
-.dashboard-container {
-    min-height: 100vh;
-    background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
-}
-
-@media (max-width: 768px) {
-    .dashboard-container {
-        background: #f9fafb;
-    }
-}
-
-/* Hero Section Styles */
-.hero-section {
-    width: 100vw;
-    min-height: 60vh;
-    padding: 100px 20px;
-    background: linear-gradient(135deg, #cfe3e6, #d8dee8);
-    position: relative;
-    overflow: hidden;
-    margin: 0;
-    left: 0;
-    right: 0;
-}
-
-/* Search Container Styles */
-.search-container {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border-radius: 30px;
-    padding: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.search-input-wrapper {
-    flex: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-icon {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6b7280;
-    font-size: 16px;
-    z-index: 2;
-}
-
-.search-input {
-    width: 100%;
-    padding: 14px 20px 14px 50px;
-    border: none;
-    border-radius: 25px;
-    background: transparent;
-    font-size: 16px;
-    color: #374151;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-.search-input::placeholder {
-    color: #9ca3af;
-}
-
-.search-input:focus {
-    background: rgba(255, 255, 255, 0.95);
-}
-
-.search-button {
-    background: #0ea5a4;
-    color: white;
-    border: 1px solid #0ea5a4;
-    border-radius: 25px;
-    padding: 14px 24px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-left: 8px;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-}
-
-.search-button:hover {
-    background: #d8c1e7;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(190, 140, 223, 0.3);
-    border-color: #d8c1e7;
-}
-
-.search-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(190, 140, 223, 0.3);
-}
-
-/* Responsive Search Styles */
-@media (max-width: 640px) {
-    .search-container {
-        flex-direction: column;
-        gap: 12px;
-        max-width: 100%;
-        padding: 12px;
-    }
-    
-    .search-input-wrapper {
-        width: 100%;
-    }
-    
-    .search-button {
-        width: 100%;
-        margin-left: 0;
-        margin-top: 8px;
-    }
-    
-    .search-icon {
-        left: 16px;
-    }
-    
-    .search-input {
-        padding: 12px 16px 12px 45px;
-        font-size: 15px;
-    }
-    
-    .search-button {
-        padding: 12px 20px;
-        font-size: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .search-container {
-        padding: 10px;
-    }
-    
-    .search-input {
-        padding: 10px 14px 10px 40px;
-        font-size: 14px;
-    }
-    
-    .search-button {
-        padding: 10px 16px;
-        font-size: 14px;
-    }
-    
-    .search-icon {
-        left: 14px;
-        font-size: 14px;
-    }
-}
-
-/* Hero Section Animations */
-@keyframes fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slide-up {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes float-slow {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    33% {
-        transform: translateY(-10px) rotate(3deg);
-    }
-    66% {
-        transform: translateY(5px) rotate(-3deg);
-    }
-}
-
-@keyframes float-medium {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    25% {
-        transform: translateY(-15px) rotate(2deg);
-    }
-    50% {
-        transform: translateY(10px) rotate(-2deg);
-    }
-    75% {
-        transform: translateY(-5px) rotate(1deg);
-    }
-}
-
-@keyframes float-fast {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    20% {
-        transform: translateY(-20px) rotate(5deg);
-    }
-    40% {
-        transform: translateY(15px) rotate(-5deg);
-    }
-    60% {
-        transform: translateY(-10px) rotate(3deg);
-    }
-    80% {
-        transform: translateY(8px) rotate(-3deg);
-    }
-}
-
-@keyframes float-slow-reverse {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    33% {
-        transform: translateY(10px) rotate(-3deg);
-    }
-    66% {
-        transform: translateY(-5px) rotate(3deg);
-    }
-}
-
-@keyframes float-medium-reverse {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    25% {
-        transform: translateY(15px) rotate(-2deg);
-    }
-    50% {
-        transform: translateY(-10px) rotate(2deg);
-    }
-    75% {
-        transform: translateY(5px) rotate(-1deg);
-    }
-}
-
-@keyframes float-fast-reverse {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    20% {
-        transform: translateY(20px) rotate(-5deg);
-    }
-    40% {
-        transform: translateY(-15px) rotate(5deg);
-    }
-    60% {
-        transform: translateY(10px) rotate(-3deg);
-    }
-    80% {
-        transform: translateY(-8px) rotate(3deg);
-    }
-}
-
-.animate-fade-in {
-    animation: fade-in 0.8s ease-out forwards;
-}
-
-.animate-fade-in-delay {
-    animation: fade-in 0.8s ease-out 0.2s forwards;
-}
-
-.animate-fade-in-delay-2 {
-    animation: fade-in 0.8s ease-out 0.4s forwards;
-}
-
-.animate-slide-up {
-    animation: slide-up 0.6s ease-out 0.6s forwards;
-}
-
-.animate-float-slow {
-    animation: float-slow 6s ease-in-out infinite;
-}
-
-.animate-float-medium {
-    animation: float-medium 4s ease-in-out infinite;
-}
-
-.animate-float-fast {
-    animation: float-fast 3s ease-in-out infinite;
-}
-
-.animate-float-slow-reverse {
-    animation: float-slow-reverse 7s ease-in-out infinite;
-}
-
-.animate-float-medium-reverse {
-    animation: float-medium-reverse 5s ease-in-out infinite;
-}
-
-.animate-float-fast-reverse {
-    animation: float-fast-reverse 4s ease-in-out infinite;
-}
-
-.welcome-section {
-    background: linear-gradient(135deg, white 0%, white);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 640px) {
-    .welcome-section {
-        padding: 1rem;
-        border-radius: 0.75rem;
-    }
-    
-    .welcome-section h1 {
-        font-size: 1.5rem !important;
-        color: #1f2937 !important; /* Force dark color on mobile */
-    }
-    
-    .welcome-section p {
-        font-size: 1rem !important;
-        color: #4b5563 !important; /* Force dark color on mobile */
-    }
-}
-
-/* Mobile text color fixes */
-@media (max-width: 640px) {
-    .dashboard-container h2 {
-        color: #1f2937 !important; /* Force dark gray */
-    }
-    
-    .dashboard-container p {
-        color: #4b5563 !important; /* Force medium gray */
-    }
-    
-    /* Filter button mobile fixes */
-    .category-btn.active {
-        background-color: #0ea5a4 !important; /* Force teal background */
-        color: #ffffff !important; /* Force white text */
-    }
-    
-    .category-btn.bg-blue-600 {
-        background-color: #0ea5a4 !important; /* Force teal background */
-        color: #ffffff !important; /* Force white text */
-    }
-}
-
-/* Category button fade effects (no blur) */
-.category-btn {
-    transition: all 0.3s ease !important;
-    position: relative;
-}
-
-.category-btn:not(.active) {
-    opacity: 0.7;
-    transform: scale(0.95);
-    color: #000000 !important; /* Force black text */
-}
-
-.category-btn:not(.active):hover {
-    opacity: 0.9;
-    transform: scale(0.98);
-}
-
-.category-btn.active {
-    opacity: 1;
-    filter: blur(0);
-    transform: scale(1);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    z-index: 10;
-}
-
-/* Smooth transitions for all states */
-.category-btn {
-    transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease !important;
-}
-
-.stats-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(1, 1fr);
-}
-
-@media (min-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-    }
-}
-
-.stat-card {
-    background: white;
-    border-radius: 0.75rem;
-    padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border-left: 4px solid;
-}
-
-@media (max-width: 640px) {
-    .stat-card {
-        padding: 0.75rem;
-    }
-}
-
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-.events-grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(1, 1fr);
-}
-
-@media (min-width: 768px) {
-    .events-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-}
-
-@media (min-width: 1024px) {
-    .events-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-    }
-}
-
-@media (max-width: 640px) {
-    .events-grid {
-        gap: 1rem;
-    }
-}
-
-.event-card {
-    background: white;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border: 1px solid #e5e7eb;
-}
-
-.event-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 640px) {
-    .event-card {
-        border-radius: 0.5rem;
-    }
-}
-
-.event-image {
-    height: 12rem;
-    background: #e5e7eb;
-    position: relative;
-    overflow: hidden;
-}
-
-@media (max-width: 640px) {
-    .event-image {
-        height: 10rem;
-    }
-}
-
-.event-content {
-    padding: 1rem;
-}
-
-@media (max-width: 640px) {
-    .event-content {
-        padding: 0.75rem;
-    }
-}
-
-.event-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #1f2937;
-    line-height: 1.4;
-}
-
-@media (max-width: 640px) {
-    .event-title {
-        font-size: 1rem;
-    }
-}
-
-.event-description {
-    font-size: 0.875rem;
-    color: #6b7280;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    /* Fallback for browsers that don't support line-clamp */
-    display: -moz-box;
-    -moz-line-clamp: 2;
-    -moz-box-orient: vertical;
-    display: box;
-    line-clamp: 2;
-    box-orient: vertical;
-}
-
-@media (max-width: 640px) {
-    .event-description {
-        font-size: 0.8rem;
-    }
-}
-
-.event-details {
-    display: grid;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-
-@media (max-width: 640px) {
-    .event-details {
-        font-size: 0.8rem;
-        gap: 0.375rem;
-    }
-}
-
-.category-badge {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    border-radius: 9999px;
-    font-weight: 500;
-    text-transform: capitalize;
-}
-
-@media (max-width: 640px) {
-    .category-badge {
-        padding: 0.1875rem 0.375rem;
-        font-size: 0.6875rem;
-    }
-}
-
-.view-details-btn {
-    background: linear-gradient(135deg, #0ea5a4, #0d9488);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #0ea5a4;
-    text-decoration: none;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.view-details-btn:hover {
-    background: linear-gradient(135deg, #0d9488, #0f766e);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(14, 165, 164, 0.3);
-    border-color: #0d9488;
-}
-
-@media (max-width: 640px) {
-    .view-details-btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.8rem;
-    }
-}
-
-.no-events {
-    text-align: center;
-    padding: 3rem 1rem;
-}
-
-@media (max-width: 640px) {
-    .no-events {
-        padding: 2rem 1rem;
-    }
-}
-
-/* Prevent horizontal scrolling */
-* {
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-body {
-    overflow-x: hidden;
-}
-
-/* Responsive text */
-.responsive-text-2xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
-}
-
-@media (min-width: 768px) {
-    .responsive-text-2xl {
-        font-size: 1.875rem;
-        line-height: 2.25rem;
-    }
-}
-
-.responsive-text-3xl {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-}
-
-@media (min-width: 768px) {
-    .responsive-text-3xl {
-        font-size: 3rem;
-        line-height: 1;
-    }
-}
-</style>
+<!-- Dashboard Styles -->
+<link rel="stylesheet" href="/css/dashboard.css">
 
 <!-- Hero Section - Full Width -->
     <div class="hero-section">
         <!-- Floating Event Images - Left Side -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute top-20 left-10 w-32 h-32 bg-blue-100/20 rounded-full blur-2xl animate-float-slow"></div>
-            <div class="absolute top-40 left-5 w-24 h-24 bg-indigo-100/15 rounded-2xl animate-float-medium"></div>
-            <div class="absolute bottom-30 left-20 w-20 h-20 bg-purple-100/10 rounded-full animate-float-fast"></div>
+            <!-- Top Left - Large -->
+            <div class="absolute top-20 left-8 floating-card-left-1 animate-float-slow">
+                <img src="/uploads/img1.jpg" alt="Event 1" class="w-full h-full object-cover rounded-2xl shadow-2xl">
+            </div>
+            <!-- Middle Left - Medium -->
+            <div class="absolute top-1/3 left-4 floating-card-left-2 animate-float-medium">
+                <img src="/uploads/img2.jpg" alt="Event 2" class="w-full h-full object-cover rounded-2xl shadow-xl">
+            </div>
+            <!-- Bottom Left - Small -->
+            <div class="absolute bottom-20 left-12 floating-card-left-3 animate-float-fast">
+                <img src="/uploads/img3.jpg" alt="Event 3" class="w-full h-full object-cover rounded-3xl shadow-lg">
+            </div>
             
             <!-- Floating Event Images - Right Side -->
-            <div class="absolute top-15 right-10 w-28 h-28 bg-indigo-100/20 rounded-3xl animate-float-slow-reverse"></div>
-            <div class="absolute top-35 right-5 w-20 h-16 bg-blue-100/15 rounded-2xl animate-float-medium-reverse"></div>
-            <div class="absolute bottom-25 right-15 w-16 h-16 bg-purple-100/10 rounded-full animate-float-fast-reverse"></div>
+            <!-- Top Right - Large -->
+            <div class="absolute top-20 right-8 floating-card-right-1 animate-float-slow-reverse">
+                <img src="/uploads/img4.jpg" alt="Event 4" class="w-full h-full object-cover rounded-3xl shadow-2xl">
+            </div>
+            <!-- Middle Right - Medium -->
+            <div class="absolute top-1/3 right-4 floating-card-right-2 animate-float-medium-reverse">
+                <img src="/uploads/img5.jpg" alt="Event 5" class="w-full h-full object-cover rounded-3xl shadow-xl">
+            </div>
+            <!-- Bottom Right - Small -->
+            <div class="absolute bottom-20 right-12 floating-card-right-3 animate-float-fast-reverse">
+                <img src="/uploads/img8.jpg" alt="Event 6" class="w-full h-full object-cover rounded-3xl shadow-lg">
+            </div>
         </div>
         
         <div class="relative z-10 px-6 py-24 sm:py-32 lg:py-40">
@@ -683,7 +71,7 @@ body {
                 <div class="animate-fade-in-delay-2">
                     <button 
                         onclick="scrollToEvents()"
-                        class="bg-white hover:bg-[#0ea5a4] text-[#0ea5a4] hover:text-white px-8 py-4 rounded-full text-lg font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0ea5a4]/50 border-2 border-[#0ea5a4]"
+                        class="bg-white hover:bg-[#0ea5a4] text-[#0ea5a4] hover:text-white px-4 py-2 rounded-full text-base font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0ea5a4]/50 border-2 border-[#0ea5a4]"
                     >
                         <i class="fas fa-arrow-down mr-2"></i>
                         Get Started
@@ -980,33 +368,33 @@ function searchEventsOnDashboard(searchTerm) {
     const eventCount = document.getElementById('event-count');
     const categoryTitle = document.getElementById('category-title');
     const noEventsMessage = document.querySelector('.no-events');
+    const allEventsBtn = document.querySelector('.category-btn[onclick="filterEvents(\'all\')"]');
     
     // Reset category filters
     const categoryButtons = document.querySelectorAll('.category-btn');
     categoryButtons.forEach(btn => {
-        btn.classList.remove('bg-[#0ea5a4]', 'text-white');
-        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+        btn.classList.remove('active', 'bg-[#0ea5a4]', 'text-white');
     });
     
-    // Set "All Events" button as active
-    const allEventsBtn = Array.from(categoryButtons).find(btn => {
-        const onclickAttr = btn.getAttribute('onclick');
-        return onclickAttr && onclickAttr.includes("filterEvents('all')");
-    });
+    // Reset all events button to active state
     if (allEventsBtn) {
-        allEventsBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-        allEventsBtn.classList.add('bg-[#0ea5a4]', 'text-white');
+        allEventsBtn.classList.add('active', 'bg-[#0ea5a4]', 'text-white');
     }
     
-    categoryTitle.textContent = 'SEARCH RESULTS';
+    // Keep title as "ALL Events" instead of changing to "SEARCH RESULTS"
+    categoryTitle.textContent = 'ALL';
     
     if (!searchTerm) {
         // Show all events if search is empty
         eventCards.forEach(card => {
             card.style.display = 'block';
         });
-        eventCount.textContent = eventCards.length;
         
+        // Update event count
+        const visibleCards = Array.from(eventCards).filter(card => card.style.display !== 'none');
+        eventCount.textContent = visibleCards.length;
+        
+        // Hide no events message
         if (noEventsMessage) {
             noEventsMessage.style.display = 'none';
         }
@@ -1018,7 +406,6 @@ function searchEventsOnDashboard(searchTerm) {
     let visibleCount = 0;
     
     eventCards.forEach(card => {
-        // Get event details from the card
         const title = card.querySelector('.event-title')?.textContent.toLowerCase() || '';
         const description = card.querySelector('.event-description')?.textContent.toLowerCase() || '';
         const venue = card.querySelector('.event-venue')?.textContent.toLowerCase() || '';
@@ -1039,7 +426,7 @@ function searchEventsOnDashboard(searchTerm) {
     // Update event count
     eventCount.textContent = visibleCount;
     
-    // Show/hide no events message
+    // Show no events message if no results
     if (visibleCount === 0) {
         if (noEventsMessage) {
             noEventsMessage.style.display = 'block';

@@ -58,32 +58,68 @@ app.set('views', path.join(__dirname, 'views'));
 // Custom Middleware
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
-    res.locals.success = req.session.success || null;
     
-    // Clear any "Please login to access this page" messages from session
-    if (req.session.error && req.session.error.includes('Please login to access this page')) {
-        req.session.error = null;
-    }
-    
-    // Clear registration messages after they've been displayed once
-    // This prevents messages from appearing on wrong pages
+    // Only set success messages for login page
     const currentPath = req.path;
-    if (currentPath.includes('/events/') && req.session.success) {
-        // If we're on an event details page, only allow the appropriate message
-        if (req.session.success === 'Registration successful!' || 
-            req.session.success === 'Registration cancelled successfully.') {
-            // Allow these messages to show once
+    if (currentPath === '/auth/login') {
+        res.locals.success = req.session.success || null;
+        // Clear success message after setting for display
+        if (req.session.success) {
             const tempSuccess = req.session.success;
-            req.session.success = null; // Clear after setting for display
+            req.session.success = null;
+            res.locals.success = tempSuccess;
+        }
+    } else if (currentPath.includes('/student/events/') && req.session.success) {
+        // Handle event-specific success messages (registration, cancellation, etc.)
+        const eventId = currentPath.split('/').pop();
+        // Show success message if it's for the current event or if no event tracking exists
+        if (!req.session.eventSuccess || req.session.eventSuccess === eventId) {
+            const tempSuccess = req.session.success;
+            req.session.success = null;
+            req.session.eventSuccess = null;
             res.locals.success = tempSuccess;
         } else {
-            // Clear other success messages on event pages
+            // Clear success messages on wrong event pages
             req.session.success = null;
             res.locals.success = null;
         }
+    } else {
+        // Clear success messages on all other pages
+        if (req.session.success) {
+            req.session.success = null;
+        }
+        if (req.session.eventSuccess) {
+            req.session.eventSuccess = null;
+        }
+        res.locals.success = null;
     }
     
-    res.locals.error = req.session.error || null;
+    // Handle event-specific error messages (conflict validation, etc.)
+    if (currentPath.includes('/student/events/') && req.session.error) {
+        // Only show event-specific errors on event details pages
+        const eventId = currentPath.split('/').pop();
+        if (!req.session.eventError || req.session.eventError === eventId) {
+            const tempError = req.session.error;
+            req.session.error = null;
+            req.session.eventError = null;
+            res.locals.error = tempError;
+        } else {
+            // Clear event errors on wrong event pages
+            req.session.error = null;
+            res.locals.error = null;
+        }
+    } else {
+        // Clear any event-specific errors when not on event pages
+        if (req.session.eventError) {
+            req.session.eventError = null;
+        }
+        // Handle other errors (login errors, etc.)
+        if (req.session.error && req.session.error.includes('Please login to access this page')) {
+            req.session.error = null;
+        }
+        res.locals.error = req.session.error || null;
+    }
+    
     next();
 });
 
