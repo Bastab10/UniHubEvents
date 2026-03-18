@@ -359,24 +359,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
     }
 });
 
-// My Events
-router.get('/events', async (req, res) => {
-    try {
-        const { category } = req.query;
-        let query = { organizer: req.session.user._id };
-
-        if (category) query.category = category;
-
-        const events = await Event.find(query)
-            .sort({ createdAt: -1 });
-
-        res.render('faculty/my-events', { title: 'My Events', events, filters: req.query });
-    } catch (error) {
-        console.error('My events error:', error);
-        req.session.error = 'Error loading events';
-        res.redirect('/faculty/dashboard');
-    }
-});
 
 // Edit Event Page
 router.get('/events/:id/edit', async (req, res) => {
@@ -386,13 +368,13 @@ router.get('/events/:id/edit', async (req, res) => {
         
         if (!event) {
             req.session.error = 'Event not found';
-            return res.redirect('/faculty/my-events');
+            return res.redirect('/faculty/dashboard');
         }
         
         // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to edit this event';
-            return res.redirect('/faculty/my-events');
+            return res.redirect('/faculty/dashboard');
         }
         
         res.render('faculty/edit-event', { 
@@ -415,13 +397,13 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
         
         if (!event) {
             req.session.error = 'Event not found';
-            return res.redirect('/faculty/my-events');
+            return res.redirect('/faculty/dashboard');
         }
         
         // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to edit this event';
-            return res.redirect('/faculty/my-events');
+            return res.redirect('/faculty/dashboard');
         }
         
         const {
@@ -611,13 +593,13 @@ router.get('/events/:id', async (req, res) => {
         
         if (!event) {
             req.session.error = 'Event not found';
-            return res.redirect('/faculty/my-events');
+            return res.redirect('/faculty/dashboard');
         }
         
         // Check if the faculty is the organizer
         if (event.organizer._id.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to view this event';
-            return res.redirect('/faculty/my-events');
+            return res.redirect('/faculty/dashboard');
         }
         
         res.render('faculty/view-event', { 
@@ -627,7 +609,7 @@ router.get('/events/:id', async (req, res) => {
     } catch (error) {
         console.error('View event error:', error);
         req.session.error = 'Error loading event details';
-        res.redirect('/faculty/my-events');
+        res.redirect('/faculty/dashboard');
     }
 });
 
@@ -820,7 +802,7 @@ router.delete('/events/:eventId/registrations/:registrationId/delete', async (re
 router.get('/student/:studentId', async (req, res) => {
     try {
         const student = await User.findById(req.params.studentId)
-            .select('profile.firstName profile.lastName profile.collegeId email profile.phone profile.department');
+            .select('profile.firstName profile.lastName profile.fullName profile.collegeId email profile.phone profile.department');
         
         if (!student) {
             req.session.error = 'Student not found';

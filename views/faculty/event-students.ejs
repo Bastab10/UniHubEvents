@@ -1,5 +1,52 @@
 <%- include('../partials/header') %>
 
+<style>
+/* Compact Action Buttons - Match Header Logout Button Style */
+.compact-action-btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #0ea5a4;
+    color: #0ea5a4;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.compact-action-btn:hover {
+    background-color: #0ea5a4;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(14, 165, 164, 0.3);
+}
+
+.compact-action-btn:focus {
+    background-color: #0ea5a4;
+    color: white;
+    outline: none;
+}
+
+/* Mobile responsiveness for compact buttons */
+@media (max-width: 640px) {
+    .compact-action-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .compact-action-btn i {
+        font-size: 0.7rem !important;
+    }
+    
+    .compact-action-btn span {
+        font-size: 0.65rem !important;
+    }
+}
+</style>
+
 <div class="flex min-h-screen">
     <%- include('../partials/sidebar') %>
     
@@ -15,8 +62,9 @@
                         Venue: <%= event.venue %>
                     </p>
                 </div>
-                <a href="/faculty/events" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Events
+                <a href="/faculty/events" class="compact-action-btn">
+                    <i class="fas fa-arrow-left text-sm"></i>
+                    <span class="text-xs">Back to Events</span>
                 </a>
             </div>
 
@@ -102,32 +150,37 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <% if (registration.status === 'pending') { %>
                                                 <button onclick="approveRegistration('<%= registration._id %>')" 
-                                                        class="text-green-600 hover:text-green-900 mr-3">
-                                                    <i class="fas fa-check-circle"></i> Approve
+                                                        class="compact-action-btn mr-2">
+                                                    <i class="fas fa-check-circle text-sm"></i>
+                                                    <span class="text-xs">Approve</span>
                                                 </button>
                                                 <button onclick="rejectRegistration('<%= registration._id %>')" 
-                                                        class="text-red-600 hover:text-red-900">
-                                                    <i class="fas fa-times-circle"></i> Reject
+                                                        class="compact-action-btn mr-2">
+                                                    <i class="fas fa-times-circle text-sm"></i>
+                                                    <span class="text-xs">Reject</span>
                                                 </button>
                                                 <button onclick="deleteRegistration('<%= registration._id %>')" 
-                                                        class="text-orange-600 hover:text-orange-900 ml-3">
-                                                    <i class="fas fa-trash"></i> Delete
+                                                        class="compact-action-btn">
+                                                    <i class="fas fa-trash text-sm"></i>
+                                                    <span class="text-xs">Delete</span>
                                                 </button>
                                             <% } else if (registration.status === 'approved') { %>
                                                 <span class="text-green-600">
                                                     <i class="fas fa-check-circle"></i> Approved
                                                 </span>
                                                 <button onclick="deleteRegistration('<%= registration._id %>')" 
-                                                        class="text-red-600 hover:text-red-900 ml-3">
-                                                    <i class="fas fa-trash"></i> Delete
+                                                        class="compact-action-btn">
+                                                    <i class="fas fa-trash text-sm"></i>
+                                                    <span class="text-xs">Delete</span>
                                                 </button>
                                             <% } else if (registration.status === 'rejected') { %>
                                                 <span class="text-red-600">
                                                     <i class="fas fa-times-circle"></i> Rejected
                                                 </span>
                                                 <button onclick="deleteRegistration('<%= registration._id %>')" 
-                                                        class="text-red-600 hover:text-red-900 ml-3">
-                                                    <i class="fas fa-trash"></i> Delete
+                                                        class="compact-action-btn">
+                                                    <i class="fas fa-trash text-sm"></i>
+                                                    <span class="text-xs">Delete</span>
                                                 </button>
                                             <% } %>
                                         </td>

@@ -82,6 +82,10 @@ const eventSchema = new mongoose.Schema({
             default: Date.now
         },
         teamName: String,
+        teamLeaderName: String,
+        teamLeaderCollegeId: String,
+        teamLeaderEmail: String,
+        teamLeaderDepartment: String,
         teamMembers: [{
             name: String,
             collegeId: String

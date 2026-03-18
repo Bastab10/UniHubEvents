@@ -345,7 +345,7 @@
             width: 85%;
             max-width: 320px;
             height: calc(100vh - 64px);
-            background: #be8cdf;
+            background: #cfe3e6;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1050;
@@ -357,22 +357,23 @@
         }
         
         .mobile-menu-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.02);
             backdrop-filter: blur(10px);
+            position: relative;
         }
         
         .mobile-menu-close {
             position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            width: 40px;
-            height: 40px;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(14, 165, 164, 0.1);
             border: none;
-            color: white;
+            color: #374151; /* Match desktop sidebar */
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -381,7 +382,8 @@
         }
         
         .mobile-menu-close:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(14, 165, 164, 0.2);
+            color: #0ea5a4; /* Match desktop sidebar hover */
             transform: rotate(90deg);
         }
         
@@ -392,33 +394,57 @@
         .mobile-menu-nav a {
             display: flex;
             align-items: center;
-            padding: 1rem 1.5rem;
+            padding: 1rem 1rem;
+            color: #374151; /* Match desktop sidebar text color */
             text-decoration: none;
             transition: all 0.3s ease;
+            position: relative;
             font-weight: 500;
-            border-left: 3px solid transparent;
+            font-size: 0.95rem;
         }
         
         .mobile-menu-nav a:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border-left-color: white;
+            background: rgba(14, 165, 164, 0.05);
+            color: #0ea5a4; /* Match desktop sidebar hover color */
+            padding-left: 1.5rem;
+        }
+        
+        .mobile-menu-nav a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: white;
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu-nav a:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .mobile-menu-nav i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+            color: inherit; /* Inherit text color */
         }
         
         .mobile-nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            border-left-color: #0ea5a4 !important;
+            color: #374151 !important; /* Match desktop sidebar */
         }
         
         .mobile-nav-link:hover {
-            color: white !important;
-            background: rgba(14, 165, 164, 0.2) !important;
-            border-left-color: white !important;
+            color: #0ea5a4 !important; /* Match desktop sidebar hover */
+            background: rgba(14, 165, 164, 0.05) !important;
+            padding-left: 1.5rem !important;
         }
         
         .mobile-nav-section {
             padding: 1rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             margin-bottom: 1rem;
         }
         
@@ -426,18 +452,24 @@
         .mobile-logout-btn {
             display: flex;
             align-items: center;
-            padding: 1rem 1.5rem;
+            padding: 1rem 1rem;
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.9) !important;
-            border-left: 3px solid #0ea5a4 !important;
+            color: #ff6b6b; /* Match desktop sidebar logout color */
             transition: all 0.3s ease;
             font-weight: 500;
+            margin-top: 1rem;
         }
         
         .mobile-logout-btn:hover {
-            color: white !important;
-            background: rgba(14, 165, 164, 0.2) !important;
-            border-left-color: white !important;
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+        }
+        
+        .mobile-logout-btn i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+            color: inherit;
         }
         
         .mobile-menu-nav i {
@@ -663,33 +695,17 @@
     <!-- Mobile Navigation Menu -->
     <div id="mobileMenu" class="mobile-menu">
         <div class="mobile-menu-header">
-            <h3 class="text-white font-bold text-lg sm:text-xl mb-1">
+            <h3 class="text-gray-700 font-bold text-lg sm:text-xl mb-1">
                 <i class="fas fa-graduation-cap mr-2 text-base sm:text-lg"></i>
                 Campus Events
             </h3>
-            <p class="text-white text-xs sm:text-sm opacity-75">Event Management System</p>
+            <p class="text-gray-500 text-xs sm:text-sm opacity-75">Event Management System</p>
             <button class="mobile-menu-close" onclick="closeMobileMenu()">
                 <i class="fas fa-times text-base sm:text-lg"></i>
             </button>
         </div>
         
         <nav class="mobile-menu-nav">
-            <!-- Navigation Links -->
-            <div class="mobile-nav-section">
-                <a href="/" class="mobile-nav-link">
-                    <i class="fas fa-home text-base sm:text-lg"></i>
-                    <span class="text-sm sm:text-base">Home</span>
-                </a>
-                <a href="/about" class="mobile-nav-link">
-                    <i class="fas fa-info-circle text-base sm:text-lg"></i>
-                    <span class="text-sm sm:text-base">About</span>
-                </a>
-                <a href="/contact" class="mobile-nav-link">
-                    <i class="fas fa-envelope text-base sm:text-lg"></i>
-                    <span class="text-sm sm:text-base">Contact</span>
-                </a>
-            </div>
-            
             <% if (currentUser) { %>
                 <% if (currentUser.role === 'admin') { %>
                     <a href="/admin/dashboard">
@@ -720,10 +736,6 @@
                     <a href="/faculty/events/create">
                         <i class="fas fa-plus-circle text-base sm:text-lg"></i>
                         <span class="text-sm sm:text-base">Create Event</span>
-                    </a>
-                    <a href="/faculty/events">
-                        <i class="fas fa-calendar text-base sm:text-lg"></i>
-                        <span class="text-sm sm:text-base">My Events</span>
                     </a>
                     <a href="/faculty/profile">
                         <i class="fas fa-user text-base sm:text-lg"></i>

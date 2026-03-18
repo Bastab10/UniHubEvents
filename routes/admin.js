@@ -705,6 +705,58 @@ router.post('/faculty/:id/reject', async (req, res) => {
     }
 });
 
+// Delete Faculty Member with Cascade Deletion
+router.delete('/faculty/:id/delete', async (req, res) => {
+    try {
+        const facultyId = req.params.id;
+        
+        // Find faculty member first
+        const faculty = await User.findById(facultyId);
+        
+        if (!faculty) {
+            return res.status(404).json({ success: false, message: 'Faculty member not found' });
+        }
+        
+        // Get all events created by this faculty member
+        const facultyEvents = await Event.find({ organizer: facultyId });
+        const eventIds = facultyEvents.map(event => event._id);
+        
+        // Delete all registrations for these events (to prevent orphaned data)
+        if (eventIds.length > 0) {
+            await Event.updateMany(
+                { _id: { $in: eventIds } },
+                { $pull: { registrations: {} } }
+            );
+        }
+        
+        // Delete all events created by this faculty member
+        const deletedEvents = await Event.deleteMany({ organizer: facultyId });
+        
+        // Remove faculty from any student registrations (cleanup)
+        await User.updateMany(
+            { 'registeredEvents': facultyId },
+            { $pull: { registeredEvents: facultyId } }
+        );
+        
+        // Delete faculty member
+        await User.findByIdAndDelete(facultyId);
+        
+        console.log(`Deleted faculty member: ${faculty.profile.firstName} ${faculty.profile.lastName}`);
+        console.log(`Cascade deleted ${deletedEvents.deletedCount} events created by this faculty member`);
+        console.log(`Cleaned up registrations and user references`);
+        
+        res.json({ 
+            success: true, 
+            message: 'Faculty member and all associated data deleted successfully',
+            deletedEvents: deletedEvents.deletedCount
+        });
+        
+    } catch (error) {
+        console.error('Faculty deletion error:', error);
+        res.status(500).json({ success: false, message: 'Error deleting faculty member' });
+    }
+});
+
 // Approved Events
 router.get('/approved-events', async (req, res) => {
     try {

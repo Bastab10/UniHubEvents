@@ -1,5 +1,52 @@
 <%- include('../partials/header') %>
 
+<style>
+/* Compact Action Buttons - Match Header Logout Button Style */
+.compact-action-btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #0ea5a4;
+    color: #0ea5a4;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.compact-action-btn:hover {
+    background-color: #0ea5a4;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(14, 165, 164, 0.3);
+}
+
+.compact-action-btn:focus {
+    background-color: #0ea5a4;
+    color: white;
+    outline: none;
+}
+
+/* Mobile responsiveness for compact buttons */
+@media (max-width: 640px) {
+    .compact-action-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .compact-action-btn i {
+        font-size: 0.7rem !important;
+    }
+    
+    .compact-action-btn span {
+        font-size: 0.65rem !important;
+    }
+}
+</style>
+
 <div class="flex min-h-screen bg-gray-50" style="background-color: #F5F7FB;">
     <%- include('../partials/sidebar') %>
     
@@ -13,11 +60,6 @@
                         <div>
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Event Details</h1>
                             <p class="text-gray-600 mt-2">View event information and registered students</p>
-                        </div>
-                        <div class="mt-4 md:mt-0">
-                            <a href="/faculty/dashboard" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors shadow-lg">
-                                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -175,8 +217,9 @@
                                 <%= event.registrations ? event.registrations.length : 0 %> Total Registrations
                             </span>
                             <% if (event.registrations && event.registrations.length > 0) { %>
-                                <button onclick="exportRegistrations()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
-                                    <i class="fas fa-download mr-2"></i>Export List
+                                <button onclick="exportRegistrations()" class="compact-action-btn">
+                                    <i class="fas fa-download text-sm"></i>
+                                    <span class="text-xs">Export List</span>
                                 </button>
                             <% } %>
                         </div>
@@ -242,14 +285,17 @@
                                             <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                                 <% if (registration.student) { %>
                                                     <button onclick="viewStudentDetails('<%= registration.student._id %>')" 
-                                                            class="text-blue-600 hover:text-blue-900 mr-3"
-                                                            title="View Student Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button onclick="deleteRegistration('<%= registration._id %>')" 
-                                                            class="text-red-600 hover:text-red-900"
-                                                            title="Cancel Registration">
-                                                        <i class="fas fa-trash"></i>
+        class="compact-action-btn mr-2"
+        title="View Student Details">
+    <i class="fas fa-eye text-sm"></i>
+    <span class="text-xs">View</span>
+</button>
+<button onclick="deleteRegistration('<%= registration._id %>')" 
+        class="compact-action-btn"
+        title="Cancel Registration">
+    <i class="fas fa-trash text-sm"></i>
+    <span class="text-xs">Delete</span>
+</button>
                                                     </button>
                                                 <% } else { %>
                                                     <span class="text-gray-400">N/A</span>
@@ -298,19 +344,91 @@ function exportRegistrations() {
         return;
     }
     
-    let csv = 'Student Name,Email,Department';
-    if (eventType === 'team') {
-        csv += ',Team Name,Team Members';
-    }
-    csv += ',Registration Date\n';
+    let csv = '';
     
-    registrations.forEach(reg => {
-        csv += `"${reg.studentName || 'N/A'}","${reg.studentEmail || 'N/A'}","${reg.studentDepartment || 'N/A'}"`;
-        if (eventType === 'team') {
-            csv += `,"${reg.teamName || 'N/A'}","${reg.teamMembers ? reg.teamMembers.map(m => m.name).join('; ') : ''}"`;
-        }
-        csv += `,"${new Date(reg.registrationDate).toLocaleDateString()}"\n`;
-    });
+    if (eventType === 'team') {
+        // Team events - structured format with team leader and members
+        csv = 'Team Name,Team Leader Name,Team Leader College ID,Team Leader Email,Department (Leader),Member1 Name,Member1 College ID,Member2 Name,Member2 College ID,Member3 Name,Member3 College ID,Registration Date\n';
+        
+        registrations.forEach(reg => {
+            // Team Information
+            const teamName = reg.teamName || 'N/A';
+            const teamLeaderName = reg.teamLeaderName || 'N/A';
+            const teamLeaderCollegeId = reg.teamLeaderCollegeId || 'N/A';
+            const teamLeaderEmail = reg.teamLeaderEmail || 'N/A';
+            const teamLeaderDepartment = reg.teamLeaderDepartment || 'N/A';
+            
+            // Team Members - extract up to 3 members
+            let member1Name = '', member1CollegeId = '';
+            let member2Name = '', member2CollegeId = '';
+            let member3Name = '', member3CollegeId = '';
+            
+            if (reg.teamMembers && Array.isArray(reg.teamMembers)) {
+                if (reg.teamMembers[0]) {
+                    member1Name = reg.teamMembers[0].name || '';
+                    member1CollegeId = reg.teamMembers[0].collegeId || '';
+                }
+                if (reg.teamMembers[1]) {
+                    member2Name = reg.teamMembers[1].name || '';
+                    member2CollegeId = reg.teamMembers[1].collegeId || '';
+                }
+                if (reg.teamMembers[2]) {
+                    member3Name = reg.teamMembers[2].name || '';
+                    member3CollegeId = reg.teamMembers[2].collegeId || '';
+                }
+            }
+            
+            // Format registration date properly
+            let registrationDate = 'N/A';
+            if (reg.registeredAt) {
+                try {
+                    const date = new Date(reg.registeredAt);
+                    if (!isNaN(date.getTime())) {
+                        registrationDate = date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+                    }
+                } catch (e) {
+                    registrationDate = 'Invalid Date';
+                }
+            }
+            
+            csv += `"${teamName}","${teamLeaderName}","${teamLeaderCollegeId}","${teamLeaderEmail}","${teamLeaderDepartment}","${member1Name}","${member1CollegeId}","${member2Name}","${member2CollegeId}","${member3Name}","${member3CollegeId}","${registrationDate}"\n`;
+        });
+    } else {
+        // Individual events - original format
+        csv = 'Student Name,Email,College ID,Registration Date\n';
+        
+        registrations.forEach(reg => {
+            // Extract student data from nested structure
+            let studentName = 'N/A';
+            let studentEmail = 'N/A';
+            let collegeId = 'N/A';
+            
+            if (reg.student) {
+                // Try to get fullName first, then fall back to firstName + lastName
+                studentName = reg.student.profile.fullName || 
+                             (reg.student.profile.firstName && reg.student.profile.lastName ? 
+                              reg.student.profile.firstName + ' ' + reg.student.profile.lastName : 
+                              reg.student.profile.firstName || reg.student.profile.lastName || 'N/A');
+                studentEmail = reg.student.email || 'N/A';
+                collegeId = reg.student.profile.collegeId || 'N/A';
+            }
+            
+            // Format registration date properly
+            let registrationDate = 'N/A';
+            if (reg.registeredAt) {
+                try {
+                    const date = new Date(reg.registeredAt);
+                    if (!isNaN(date.getTime())) {
+                        registrationDate = date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+                    }
+                } catch (e) {
+                    registrationDate = 'Invalid Date';
+                }
+            }
+            
+            csv += `"${studentName}","${studentEmail}","${collegeId}","${registrationDate}"\n`;
+        });
+    }
     
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);

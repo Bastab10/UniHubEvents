@@ -210,7 +210,7 @@ router.post('/events/:id/register', async (req, res) => {
         };
 
         if (event.eventType === 'team') {
-            const { teamName, teamLeaderName, teamLeaderCollegeId, teamMembers } = req.body;
+            const { teamName, teamLeaderName, teamLeaderCollegeId, teamLeaderEmail, teamLeaderDepartment, teamMembers } = req.body;
             
             if (!teamName || teamName.trim() === '') {
                 req.session.error = 'Team name is required for team events';
@@ -227,6 +227,16 @@ router.post('/events/:id/register', async (req, res) => {
                 return res.redirect(`/student/events/${req.params.id}`);
             }
 
+            if (!teamLeaderEmail || teamLeaderEmail.trim() === '') {
+                req.session.error = 'Team leader email is required for team events';
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
+
+            if (!teamLeaderDepartment || teamLeaderDepartment.trim() === '') {
+                req.session.error = 'Team leader department is required for team events';
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
+
             // Validate team leader College ID format
             const studentPattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
             if (!studentPattern.test(teamLeaderCollegeId.trim().toUpperCase())) {
@@ -234,9 +244,18 @@ router.post('/events/:id/register', async (req, res) => {
                 return res.redirect(`/student/events/${req.params.id}`);
             }
 
+            // Validate team leader email format
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(teamLeaderEmail.trim())) {
+                req.session.error = 'Invalid Team Leader Email format. Please enter a valid email address.';
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
+
             registrationData.teamName = teamName.trim();
             registrationData.teamLeaderName = teamLeaderName.trim();
             registrationData.teamLeaderCollegeId = teamLeaderCollegeId.trim();
+            registrationData.teamLeaderEmail = teamLeaderEmail.trim();
+            registrationData.teamLeaderDepartment = teamLeaderDepartment.trim();
 
             if (teamMembers && Array.isArray(teamMembers)) {
                 registrationData.teamMembers = teamMembers
