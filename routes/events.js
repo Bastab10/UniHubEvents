@@ -6,7 +6,10 @@ const Event = require('../models/Event');
 router.get('/', async (req, res) => {
     try {
         const { category, search } = req.query;
-        let query = { status: 'approved', date: { $gte: new Date() } };
+        let query = { 
+            status: 'approved', 
+            date: { $gte: new Date() } 
+        };
 
         if (category) query.category = category;
         if (search) {
