@@ -588,7 +588,7 @@ router.get('/events/:id', async (req, res) => {
             .populate('organizer', 'profile.firstName profile.lastName profile.email')
             .populate({
                 path: 'registrations.student',
-                select: 'profile.firstName profile.lastName profile.collegeId email'
+                select: 'profile.firstName profile.lastName profile.collegeId profile.department email'
             });
         
         if (!event) {
@@ -683,7 +683,7 @@ router.get('/events/:id/students', async (req, res) => {
         const event = await Event.findById(eventId)
             .populate({
                 path: 'registrations.student',
-                select: 'profile.fullName profile.collegeId email'
+                select: 'profile.fullName profile.collegeId profile.department email'
             })
             .populate('organizer', 'profile.fullName');
         

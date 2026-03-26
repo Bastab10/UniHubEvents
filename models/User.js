@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
         department: {
             type: String,
             required: function() {
-                return this.parent().role === 'faculty';
+                return this.parent().role === 'faculty' || this.parent().role === 'student';
             }
         },
         year: {

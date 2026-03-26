@@ -223,7 +223,7 @@ router.get('/events/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
             .populate('organizer', 'profile.firstName profile.lastName profile.email profile.department')
-            .populate('registrations.student', 'profile.firstName profile.lastName profile.email profile.collegeId');
+            .populate('registrations.student', 'profile.firstName profile.lastName profile.email profile.collegeId profile.department');
 
         if (!event) {
             req.session.error = 'Event not found';
@@ -244,7 +244,7 @@ router.get('/events/:id', async (req, res) => {
 router.get('/events/:id/registrations', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
-            .populate('registrations.student', 'profile.firstName profile.lastName profile.email profile.collegeId profile.verified')
+            .populate('registrations.student', 'profile.firstName profile.lastName profile.email profile.collegeId profile.department profile.verified')
             .populate('organizer', 'profile.firstName profile.lastName');
 
         if (!event) {
@@ -604,6 +604,7 @@ router.get('/registrations-management', async (req, res) => {
                 'studentDetails.profile.lastName': 1,
                 'studentDetails.profile.email': 1,
                 'studentDetails.profile.collegeId': 1,
+                'studentDetails.profile.department': 1,
                 'studentDetails.profile.verified': 1,
                 'eventDetails.title': 1,
                 'eventDetails.date': 1,

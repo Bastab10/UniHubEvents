@@ -132,6 +132,9 @@
                                         Email
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Department
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         College ID
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -175,6 +178,9 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <%= registration.studentDetails?.[0]?.profile?.email %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <%= registration.studentDetails?.[0]?.profile?.department || 'N/A' %>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <%= registration.studentDetails?.[0]?.profile?.collegeId || 'N/A' %>
@@ -244,7 +250,7 @@
                                     <% }) %>
                                 <% } else { %>
                                     <tr>
-                                        <td colspan="9" class="px-6 py-8 text-center text-gray-500">
+                                        <td colspan="10" class="px-6 py-8 text-center text-gray-500">
                                             <div class="flex flex-col items-center">
                                                 <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
                                                 <p class="text-lg font-medium">No registrations found</p>
@@ -544,35 +550,101 @@
                     registrations.push({
                         studentName: cells[1]?.textContent?.trim(),
                         email: cells[2]?.textContent?.trim(),
-                        collegeId: cells[3]?.textContent?.trim(),
-                        eventTitle: cells[4]?.textContent?.trim(),
-                        date: cells[5]?.textContent?.trim(),
-                        status: cells[6]?.textContent?.trim(),
-                        verification: cells[7]?.textContent?.trim()
+                        department: cells[3]?.textContent?.trim(),
+                        collegeId: cells[4]?.textContent?.trim(),
+                        eventTitle: cells[5]?.textContent?.trim(),
+                        date: cells[6]?.textContent?.trim(),
+                        status: cells[7]?.textContent?.trim(),
+                        verification: cells[8]?.textContent?.trim()
                     });
                 }
             });
 
-            const csv = [
-                ['Student Name', 'Email', 'College ID', 'Event Title', 'Date', 'Status', 'Verification'],
-                ...registrations.map(reg => [
-                    reg.studentName,
-                    reg.email,
-                    reg.collegeId,
-                    reg.eventTitle,
-                    reg.date,
-                    reg.status,
-                    reg.verification
-                ])
-            ].map(row => row.join(',')).join('\n');
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'registrations.csv';
-            a.click();
-            window.URL.revokeObjectURL(url);
+            // Load xlsx library
+            const script = document.createElement('script');
+            script.src = 'https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js';
+            script.onload = function() {
+                // Create workbook and worksheet
+                const wb = XLSX.utils.book_new();
+                const ws_data = [
+                    ['Student Name', 'Email', 'Department', 'College ID', 'Event Title', 'Date', 'Status', 'Verification'],
+                    ...registrations.map(reg => [
+                        reg.studentName,
+                        reg.email,
+                        reg.department,
+                        reg.collegeId,
+                        reg.eventTitle,
+                        reg.date,
+                        reg.status,
+                        reg.verification
+                    ])
+                ];
+                
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                
+                // Set column widths for auto-fit
+                const colWidths = [
+                    { wch: 20 }, // Student Name
+                    { wch: 30 }, // Email
+                    { wch: 15 }, // Department
+                    { wch: 12 }, // College ID
+                    { wch: 25 }, // Event Title
+                    { wch: 12 }, // Date
+                    { wch: 10 }, // Status
+                    { wch: 12 }  // Verification
+                ];
+                ws['!cols'] = colWidths;
+                
+                // Apply formatting to header row
+                const headerRange = XLSX.utils.encode_range({ r: 0, c: 0 }, { r: 0, c: 7 });
+                if (!ws['!merges']) ws['!merges'] = [];
+                
+                // Style the header row (bold)
+                for (let col = 0; col <= 7; col++) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+                    if (!ws[cellAddress]) ws[cellAddress] = {};
+                    ws[cellAddress].s = {
+                        font: { bold: true },
+                        alignment: { horizontal: 'center', vertical: 'center' },
+                        fill: { fgColor: { rgb: 'FFE6B8' } }, // Light yellow background
+                        border: {
+                            top: { style: 'thin', color: { auto: 1 } },
+                            bottom: { style: 'thin', color: { auto: 1 } },
+                            left: { style: 'thin', color: { auto: 1 } },
+                            right: { style: 'thin', color: { auto: 1 } }
+                        }
+                    };
+                }
+                
+                // Style data rows with borders and alignment
+                for (let row = 1; row <= registrations.length; row++) {
+                    for (let col = 0; col <= 7; col++) {
+                        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                        if (!ws[cellAddress]) ws[cellAddress] = {};
+                        ws[cellAddress].s = {
+                            alignment: { 
+                                horizontal: col === 1 ? 'left' : 'center', // Email left-aligned, others center
+                                vertical: 'center',
+                                wrapText: true
+                            },
+                            border: {
+                                top: { style: 'thin', color: { auto: 1 } },
+                                bottom: { style: 'thin', color: { auto: 1 } },
+                                left: { style: 'thin', color: { auto: 1 } },
+                                right: { style: 'thin', color: { auto: 1 } }
+                            }
+                        };
+                    }
+                }
+                
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(wb, ws, 'Registrations');
+                
+                // Generate and download Excel file
+                const fileName = `registrations_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+            };
+            document.head.appendChild(script);
         }
 
         // Select all functionality

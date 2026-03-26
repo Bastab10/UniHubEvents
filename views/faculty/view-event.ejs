@@ -344,101 +344,182 @@ function exportRegistrations() {
         return;
     }
     
-    let csv = '';
-    
-    if (eventType === 'team') {
-        // Team events - structured format with team leader and members
-        csv = 'Team Name,Team Leader Name,Team Leader College ID,Team Leader Email,Department (Leader),Member1 Name,Member1 College ID,Member2 Name,Member2 College ID,Member3 Name,Member3 College ID,Registration Date\n';
+    // Load xlsx library
+    const script = document.createElement('script');
+    script.src = 'https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js';
+    script.onload = function() {
+        // Create workbook and worksheet
+        const wb = XLSX.utils.book_new();
+        let ws_data = [];
+        let colWidths = [];
         
-        registrations.forEach(reg => {
-            // Team Information
-            const teamName = reg.teamName || 'N/A';
-            const teamLeaderName = reg.teamLeaderName || 'N/A';
-            const teamLeaderCollegeId = reg.teamLeaderCollegeId || 'N/A';
-            const teamLeaderEmail = reg.teamLeaderEmail || 'N/A';
-            const teamLeaderDepartment = reg.teamLeaderDepartment || 'N/A';
+        if (eventType === 'team') {
+            // Team events format
+            ws_data = [
+                ['Team Name', 'Team Leader Name', 'Team Leader College ID', 'Team Leader Email', 'Department (Leader)', 'Member1 Name', 'Member1 College ID', 'Member2 Name', 'Member2 College ID', 'Member3 Name', 'Member3 College ID', 'Registration Date']
+            ];
             
-            // Team Members - extract up to 3 members
-            let member1Name = '', member1CollegeId = '';
-            let member2Name = '', member2CollegeId = '';
-            let member3Name = '', member3CollegeId = '';
+            colWidths = [
+                { wch: 15 }, // Team Name
+                { wch: 20 }, // Team Leader Name
+                { wch: 12 }, // Team Leader College ID
+                { wch: 30 }, // Team Leader Email
+                { wch: 15 }, // Department (Leader)
+                { wch: 20 }, // Member1 Name
+                { wch: 12 }, // Member1 College ID
+                { wch: 20 }, // Member2 Name
+                { wch: 12 }, // Member2 College ID
+                { wch: 20 }, // Member3 Name
+                { wch: 12 }, // Member3 College ID
+                { wch: 15 }  // Registration Date
+            ];
             
-            if (reg.teamMembers && Array.isArray(reg.teamMembers)) {
-                if (reg.teamMembers[0]) {
-                    member1Name = reg.teamMembers[0].name || '';
-                    member1CollegeId = reg.teamMembers[0].collegeId || '';
-                }
-                if (reg.teamMembers[1]) {
-                    member2Name = reg.teamMembers[1].name || '';
-                    member2CollegeId = reg.teamMembers[1].collegeId || '';
-                }
-                if (reg.teamMembers[2]) {
-                    member3Name = reg.teamMembers[2].name || '';
-                    member3CollegeId = reg.teamMembers[2].collegeId || '';
-                }
-            }
-            
-            // Format registration date properly
-            let registrationDate = 'N/A';
-            if (reg.registeredAt) {
-                try {
-                    const date = new Date(reg.registeredAt);
-                    if (!isNaN(date.getTime())) {
-                        registrationDate = date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+            registrations.forEach(reg => {
+                // Team Information
+                const teamName = reg.teamName || 'N/A';
+                const teamLeaderName = reg.teamLeaderName || 'N/A';
+                const teamLeaderCollegeId = reg.teamLeaderCollegeId || 'N/A';
+                const teamLeaderEmail = reg.teamLeaderEmail || 'N/A';
+                const teamLeaderDepartment = reg.teamLeaderDepartment || 'N/A';
+                
+                // Team Members - extract up to 3 members
+                let member1Name = '', member1CollegeId = '';
+                let member2Name = '', member2CollegeId = '';
+                let member3Name = '', member3CollegeId = '';
+                
+                if (reg.teamMembers && Array.isArray(reg.teamMembers)) {
+                    if (reg.teamMembers[0]) {
+                        member1Name = reg.teamMembers[0].name || '';
+                        member1CollegeId = reg.teamMembers[0].collegeId || '';
                     }
-                } catch (e) {
-                    registrationDate = 'Invalid Date';
+                    if (reg.teamMembers[1]) {
+                        member2Name = reg.teamMembers[1].name || '';
+                        member2CollegeId = reg.teamMembers[1].collegeId || '';
+                    }
+                    if (reg.teamMembers[2]) {
+                        member3Name = reg.teamMembers[2].name || '';
+                        member3CollegeId = reg.teamMembers[2].collegeId || '';
+                    }
                 }
-            }
+                
+                // Format registration date properly
+                let registrationDate = 'N/A';
+                if (reg.registeredAt) {
+                    try {
+                        const date = new Date(reg.registeredAt);
+                        if (!isNaN(date.getTime())) {
+                            registrationDate = date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+                        }
+                    } catch (e) {
+                        registrationDate = 'Invalid Date';
+                    }
+                }
+                
+                ws_data.push([
+                    teamName, teamLeaderName, teamLeaderCollegeId, teamLeaderEmail, teamLeaderDepartment,
+                    member1Name, member1CollegeId, member2Name, member2CollegeId, member3Name, member3CollegeId,
+                    registrationDate
+                ]);
+            });
+        } else {
+            // Individual events format
+            ws_data = [
+                ['Student Name', 'Email', 'Department', 'College ID', 'Registration Date']
+            ];
             
-            csv += `"${teamName}","${teamLeaderName}","${teamLeaderCollegeId}","${teamLeaderEmail}","${teamLeaderDepartment}","${member1Name}","${member1CollegeId}","${member2Name}","${member2CollegeId}","${member3Name}","${member3CollegeId}","${registrationDate}"\n`;
-        });
-    } else {
-        // Individual events - original format
-        csv = 'Student Name,Email,College ID,Registration Date\n';
+            colWidths = [
+                { wch: 20 }, // Student Name
+                { wch: 30 }, // Email
+                { wch: 15 }, // Department
+                { wch: 12 }, // College ID
+                { wch: 15 }  // Registration Date
+            ];
+            
+            registrations.forEach(reg => {
+                // Extract student data from nested structure
+                let studentName = 'N/A';
+                let studentEmail = 'N/A';
+                let studentDepartment = 'N/A';
+                let collegeId = 'N/A';
+                
+                if (reg.student) {
+                    // Try to get fullName first, then fall back to firstName + lastName
+                    studentName = reg.student.profile.fullName || 
+                                 (reg.student.profile.firstName && reg.student.profile.lastName ? 
+                                  reg.student.profile.firstName + ' ' + reg.student.profile.lastName : 
+                                  reg.student.profile.firstName || reg.student.profile.lastName || 'N/A');
+                    studentEmail = reg.student.email || 'N/A';
+                    studentDepartment = reg.student.profile.department || 'N/A';
+                    collegeId = reg.student.profile.collegeId || 'N/A';
+                }
+                
+                // Format registration date properly
+                let registrationDate = 'N/A';
+                if (reg.registeredAt) {
+                    try {
+                        const date = new Date(reg.registeredAt);
+                        if (!isNaN(date.getTime())) {
+                            registrationDate = date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+                        }
+                    } catch (e) {
+                        registrationDate = 'Invalid Date';
+                    }
+                }
+                
+                ws_data.push([studentName, studentEmail, studentDepartment, collegeId, registrationDate]);
+            });
+        }
         
-        registrations.forEach(reg => {
-            // Extract student data from nested structure
-            let studentName = 'N/A';
-            let studentEmail = 'N/A';
-            let collegeId = 'N/A';
-            
-            if (reg.student) {
-                // Try to get fullName first, then fall back to firstName + lastName
-                studentName = reg.student.profile.fullName || 
-                             (reg.student.profile.firstName && reg.student.profile.lastName ? 
-                              reg.student.profile.firstName + ' ' + reg.student.profile.lastName : 
-                              reg.student.profile.firstName || reg.student.profile.lastName || 'N/A');
-                studentEmail = reg.student.email || 'N/A';
-                collegeId = reg.student.profile.collegeId || 'N/A';
-            }
-            
-            // Format registration date properly
-            let registrationDate = 'N/A';
-            if (reg.registeredAt) {
-                try {
-                    const date = new Date(reg.registeredAt);
-                    if (!isNaN(date.getTime())) {
-                        registrationDate = date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
-                    }
-                } catch (e) {
-                    registrationDate = 'Invalid Date';
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        ws['!cols'] = colWidths;
+        
+        // Apply formatting to header row
+        const numCols = ws_data[0].length;
+        for (let col = 0; col < numCols; col++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+            if (!ws[cellAddress]) ws[cellAddress] = {};
+            ws[cellAddress].s = {
+                font: { bold: true },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                fill: { fgColor: { rgb: 'FFE6B8' } }, // Light yellow background
+                border: {
+                    top: { style: 'thin', color: { auto: 1 } },
+                    bottom: { style: 'thin', color: { auto: 1 } },
+                    left: { style: 'thin', color: { auto: 1 } },
+                    right: { style: 'thin', color: { auto: 1 } }
                 }
+            };
+        }
+        
+        // Style data rows with borders and alignment
+        for (let row = 1; row <= registrations.length; row++) {
+            for (let col = 0; col < numCols; col++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                if (!ws[cellAddress]) ws[cellAddress] = {};
+                ws[cellAddress].s = {
+                    alignment: { 
+                        horizontal: (eventType === 'team' ? (col === 3 ? 'left' : 'center') : (col === 1 ? 'left' : 'center')), // Email columns left-aligned
+                        vertical: 'center',
+                        wrapText: true
+                    },
+                    border: {
+                        top: { style: 'thin', color: { auto: 1 } },
+                        bottom: { style: 'thin', color: { auto: 1 } },
+                        left: { style: 'thin', color: { auto: 1 } },
+                        right: { style: 'thin', color: { auto: 1 } }
+                    }
+                };
             }
-            
-            csv += `"${studentName}","${studentEmail}","${collegeId}","${registrationDate}"\n`;
-        });
-    }
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', eventTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_registrations.csv');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+        }
+        
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Registrations');
+        
+        // Generate and download Excel file
+        const fileName = eventTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_registrations_' + new Date().toISOString().split('T')[0] + '.xlsx';
+        XLSX.writeFile(wb, fileName);
+    };
+    document.head.appendChild(script);
 }
 
 // View Student Details
