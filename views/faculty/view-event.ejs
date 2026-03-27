@@ -6,15 +6,17 @@
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    padding: 0.375rem 0.75rem;
+    padding: 0.5rem 0.875rem;
     border-radius: 0.5rem;
     border: 1px solid #0ea5a4;
     color: #0ea5a4;
     transition: all 0.2s ease;
     font-weight: 500;
     white-space: nowrap;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     cursor: pointer;
+    min-height: 2.5rem;
+    justify-content: center;
 }
 
 .compact-action-btn:hover {
@@ -33,16 +35,196 @@
 /* Mobile responsiveness for compact buttons */
 @media (max-width: 640px) {
     .compact-action-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.7rem;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.75rem;
+        min-height: 2.75rem;
+        width: 100%;
+        margin-bottom: 0.5rem;
     }
     
     .compact-action-btn i {
-        font-size: 0.7rem !important;
+        font-size: 0.875rem !important;
     }
     
     .compact-action-btn span {
-        font-size: 0.65rem !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+/* Mobile Responsive Layout */
+@media (max-width: 768px) {
+    .flex.min-h-screen.bg-gray-50 {
+        padding: 0.5rem;
+    }
+    
+    main {
+        padding: 0.75rem;
+        margin: 0;
+        overflow-x: hidden;
+    }
+    
+    .bg-white.rounded-xl.shadow-xl.p-8 {
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+    
+    .grid.grid-cols-1.md\\:grid-cols-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .bg-gray-50.rounded-lg.p-4 {
+        padding: 0.875rem;
+    }
+}
+
+/* Mobile Table Responsiveness */
+@media (max-width: 768px) {
+    .overflow-x-auto {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        min-width: 600px;
+        font-size: 0.875rem;
+    }
+    
+    th, td {
+        padding: 0.5rem !important;
+    }
+    
+    .px-4 {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    
+    .py-4 {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+}
+
+/* Mobile Card View for Tables */
+@media (max-width: 640px) {
+    .mobile-table-container {
+        display: none;
+    }
+    
+    .mobile-cards-container {
+        display: block;
+    }
+    
+    .student-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .student-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .student-card-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .student-card-actions {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .student-info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .student-info-label {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+    
+    .student-info-value {
+        color: #6b7280;
+        word-break: break-word;
+    }
+}
+
+/* Desktop Table View */
+@media (min-width: 641px) {
+    .mobile-table-container {
+        display: block;
+    }
+    
+    .mobile-cards-container {
+        display: none;
+    }
+}
+
+/* Typography Mobile Optimization */
+@media (max-width: 640px) {
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    h3 {
+        font-size: 1.125rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .text-2xl {
+        font-size: 1.5rem;
+    }
+    
+    .text-lg {
+        font-size: 1rem;
+    }
+}
+
+/* Button Groups Mobile */
+@media (max-width: 640px) {
+    .flex.items-center.gap-4 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .flex.justify-between.items-center {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+/* Remove horizontal scrolling */
+@media (max-width: 640px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    main {
+        overflow-x: hidden;
     }
 }
 </style>
@@ -226,8 +408,8 @@
                     </div>
 
                     <% if (event.registrations && event.registrations.length > 0) { %>
-                        <!-- Students Table -->
-                        <div class="overflow-x-auto">
+                        <!-- Desktop Table View -->
+                        <div class="mobile-table-container overflow-x-auto">
                             <table class="w-full table-auto">
                                 <thead>
                                     <tr class="bg-gray-50 border-b border-gray-200">
@@ -285,18 +467,17 @@
                                             <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                                 <% if (registration.student) { %>
                                                     <button onclick="viewStudentDetails('<%= registration.student._id %>')" 
-        class="compact-action-btn mr-2"
-        title="View Student Details">
-    <i class="fas fa-eye text-sm"></i>
-    <span class="text-xs">View</span>
-</button>
+            class="compact-action-btn mr-2"
+            title="View Student Details">
+        <i class="fas fa-eye text-sm"></i>
+        <span class="text-xs">View</span>
+    </button>
 <button onclick="deleteRegistration('<%= registration._id %>')" 
-        class="compact-action-btn"
-        title="Cancel Registration">
-    <i class="fas fa-trash text-sm"></i>
-    <span class="text-xs">Delete</span>
-</button>
-                                                    </button>
+            class="compact-action-btn"
+            title="Cancel Registration">
+        <i class="fas fa-trash text-sm"></i>
+        <span class="text-xs">Delete</span>
+    </button>
                                                 <% } else { %>
                                                     <span class="text-gray-400">N/A</span>
                                                 <% } %>
@@ -305,6 +486,97 @@
                                     <% }) %>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile Card View -->
+                        <div class="mobile-cards-container">
+                            <% event.registrations.forEach((registration, index) => { %>
+                                <div class="student-card">
+                                    <div class="student-card-header">
+                                        <% if (registration.student) { %>
+                                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                                                <%= registration.student.profile.fullName ? registration.student.profile.fullName.charAt(0).toUpperCase() : 'S' %>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="font-semibold text-gray-900">
+                                                    <%= registration.student.profile.fullName %>
+                                                </h4>
+                                                <% if (event.eventType === 'team') { %>
+                                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                                                        <%= registration.teamName || 'No Team' %>
+                                                    </span>
+                                                <% } %>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                                                ?
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="font-semibold text-gray-400">Student not found</h4>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <div class="student-card-body">
+                                        <div class="student-info-item">
+                                            <span class="student-info-label">Email</span>
+                                            <span class="student-info-value">
+                                                <% if (registration.student) { %>
+                                                    <%= registration.student.email %>
+                                                <% } else { %>
+                                                    N/A
+                                                <% } %>
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="student-info-item">
+                                            <span class="student-info-label">Student ID</span>
+                                            <span class="student-info-value">
+                                                <% if (registration.student) { %>
+                                                    <%= registration.student.profile.collegeId %>
+                                                <% } else { %>
+                                                    N/A
+                                                <% } %>
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="student-info-item">
+                                            <span class="student-info-label">Registration Date</span>
+                                            <span class="student-info-value">
+                                                <%= new Date(registration.registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                            </span>
+                                        </div>
+                                        
+                                        <% if (event.eventType === 'team') { %>
+                                            <div class="student-info-item">
+                                                <span class="student-info-label">Team Name</span>
+                                                <span class="student-info-value">
+                                                    <%= registration.teamName || 'No Team' %>
+                                                </span>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <div class="student-card-actions">
+                                        <% if (registration.student) { %>
+                                            <button onclick="viewStudentDetails('<%= registration.student._id %>')" 
+                                                    class="compact-action-btn"
+                                                    title="View Student Details">
+                                                <i class="fas fa-eye text-sm"></i>
+                                                <span class="text-xs">View Details</span>
+                                            </button>
+                                            <button onclick="deleteRegistration('<%= registration._id %>')" 
+                                                    class="compact-action-btn"
+                                                    title="Cancel Registration">
+                                                <i class="fas fa-trash text-sm"></i>
+                                                <span class="text-xs">Delete Registration</span>
+                                            </button>
+                                        <% } else { %>
+                                            <span class="text-gray-400">No actions available</span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% }) %>
                         </div>
                     <% } else { %>
                         <!-- No Registrations State -->

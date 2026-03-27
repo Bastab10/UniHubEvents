@@ -1,5 +1,153 @@
 <%- include('../partials/header') %>
 
+<style>
+/* Mobile Responsive Layout for Student Details - Specific to page content only */
+@media (max-width: 768px) {
+    main .flex.min-h-screen.bg-gray-50 {
+        padding: 0.5rem;
+    }
+    
+    main {
+        padding: 0.75rem;
+        margin: 0;
+        overflow-x: hidden;
+    }
+    
+    main .bg-white.rounded-xl.shadow-lg.p-6 {
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    main .bg-white.rounded-xl.shadow-xl.p-8 {
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+    
+    main .grid.grid-cols-1.md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* Mobile Profile Section - Specific to page content only */
+@media (max-width: 640px) {
+    main .flex.items-center.mb-8 {
+        flex-direction: column;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    main .w-20.h-20 {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1rem;
+        margin-right: 0;
+    }
+    
+    main .flex.flex-col.md\:flex-row.justify-between.items-start.md\:items-center {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    main .flex.items-center {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    main .text-sm.font-medium.text-gray-500.w-32 {
+        width: 100%;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+    }
+    
+    main .text-sm.text-gray-900 {
+        width: 100%;
+        word-break: break-word;
+    }
+}
+
+/* Mobile Typography - Specific to page content only */
+@media (max-width: 640px) {
+    main h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    main h2 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    main h3 {
+        font-size: 1.125rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    main .text-2xl {
+        font-size: 1.5rem;
+    }
+    
+    main .text-xl {
+        font-size: 1.125rem;
+    }
+}
+
+/* Mobile Buttons - Specific to page content only */
+@media (max-width: 640px) {
+    main .bg-gray-600.text-white.px-6.py-3 {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        text-align: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    main .bg-blue-600.text-white.px-6.py-2 {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* Mobile Spacing - Specific to page content only */
+@media (max-width: 640px) {
+    main .space-y-6 > * + * {
+        margin-top: 1rem;
+    }
+    
+    main .space-y-4 > * + * {
+        margin-top: 0.75rem;
+    }
+    
+    main .mb-8 {
+        margin-bottom: 1.5rem;
+    }
+    
+    main .mb-6 {
+        margin-bottom: 1rem;
+    }
+    
+    main .mb-4 {
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* Remove horizontal scrolling - Specific to page content only */
+@media (max-width: 640px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    main {
+        overflow-x: hidden;
+    }
+}
+</style>
+
 <div class="flex min-h-screen bg-gray-50">
     <%- include('../partials/sidebar') %>
     
@@ -14,11 +162,11 @@
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Student Details</h1>
                             <p class="text-gray-600 mt-2">View detailed student information</p>
                         </div>
-                        <div class="mt-4 md:mt-0">
+                        <!-- <div class="mt-4 md:mt-0">
                             <a href="javascript:history.back()" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors shadow-lg">
                                 <i class="fas fa-arrow-left mr-2"></i>Back
                             </a>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -26,13 +174,7 @@
                 <div class="bg-white rounded-xl shadow-xl p-8 border border-gray-200">
                     <% if (student) { %>
                         <!-- Student Profile -->
-                        <div class="flex items-center mb-8">
-                            <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mr-6">
-                                <%= (student.profile.fullName || 
-                                   (student.profile.firstName && student.profile.lastName ? 
-                                    student.profile.firstName + ' ' + student.profile.lastName : 
-                                    student.profile.firstName || student.profile.lastName || 'S')).charAt(0).toUpperCase() %>
-                            </div>
+                        <div class="mb-8">
                             <div>
                                 <h2 class="text-2xl font-bold text-gray-800">
                                     <%= student.profile.fullName || 
