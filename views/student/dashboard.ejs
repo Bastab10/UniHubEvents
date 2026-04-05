@@ -88,7 +88,7 @@
         <!-- Existing Content -->
         <div class="p-4 sm:p-6">
             <!-- Welcome Section -->
-            <h2 class="responsive-text-3xl font-bold mb-2 text-gray-800">Welcome back, <%= currentUser.profile.firstName %>!</h2>
+            <h2 class="responsive-text-3xl font-bold mb-2 text-gray-800">Welcome back, <%= currentUser.profile.fullName %>!</h2>
             <p class="text-gray-700 sm:text-gray-600 text-base sm:text-lg mb-6 sm:mb-8">Here's your personalized dashboard overview</p>
 
             <!-- Events Section -->
@@ -158,12 +158,12 @@
                                 <!-- Event Content -->
                                 <div class="event-content">
                                     <!-- Title and Category Badge -->
-                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
-                                        <h3 class="event-title mb-2 sm:mb-0 sm:mr-2">
+                                    <div class="event-title-row">
+                                        <h3 class="event-title">
                                             <%= event.title %>
                                         </h3>
                                         <% if (event.category) { %>
-                                            <span class="category-badge ml-0 sm:ml-2 flex-shrink-0
+                                            <span class="category-badge flex-shrink-0
                                                 <% if (event.category === 'sports') { %>
                                                     bg-green-100 text-green-800
                                                 <% } else if (event.category === 'workshop') { %>
@@ -188,25 +188,23 @@
                                     
                                     <!-- Event Details -->
                                     <div class="event-details mb-4">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-calendar mr-2 text-gray-400"></i>
-                                            <span><%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></span>
+                                        <!-- First row: Date and Time -->
+                                        <div class="detail-row">
+                                            <div class="detail-item">
+                                                <i class="fas fa-calendar text-gray-400"></i>
+                                                <span><%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <i class="fas fa-clock text-gray-400"></i>
+                                                <span><%= event.startTime %> - <%= event.endTime %></span>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-clock mr-2 text-gray-400"></i>
-                                            <span><%= event.startTime %> - <%= event.endTime %></span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                                            <span><%= event.venue %></span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-user mr-2 text-gray-400"></i>
-                                            <span><%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %></span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-users mr-2 text-gray-400"></i>
-                                            <span><%= event.registrations ? event.registrations.length : 0 %> / <%= event.maxParticipants || 'Unlimited' %> registered</span>
+                                        <!-- Second row: Organized By -->
+                                        <div class="detail-row full-width">
+                                            <div class="detail-item">
+                                                <i class="fas fa-user text-gray-400"></i>
+                                                <span><b>Organized By</b> <%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %></span>
+                                            </div>
                                         </div>
                                     </div>
                                     

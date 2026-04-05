@@ -174,7 +174,16 @@ app.get('/', (req, res) => {
     res.render('home', { title: 'Welcome to Campus Events' });
 });
 
-// 404 Handler
+// About Route - Common for all user roles
+app.get('/about', (req, res) => {
+    res.render('about', { title: 'About North Lakhimpur College' });
+});
+
+app.get('/contact', (req, res) => {
+    res.render('contact', { title: 'Contact North Lakhimpur College' });
+});
+
+// 404 Handler`
 app.use((req, res) => {
     res.status(404).render('error', { 
         title: 'Page Not Found',

@@ -388,6 +388,31 @@ router.get('/history', async (req, res) => {
     }
 });
 
+// Past Events - All completed events
+router.get('/past-events', async (req, res) => {
+    try {
+        const today = new Date();
+        
+        // Get all past events (date < today)
+        const pastEvents = await Event.find({ 
+            status: 'approved',
+            date: { $lt: today }
+        })
+        .populate('organizer', 'profile.firstName profile.lastName')
+        .sort({ date: -1 }); // Most recent first
+        
+        res.render('student/past-events', { 
+            title: 'Past Events', 
+            events: pastEvents,
+            isPastEvents: true
+        });
+    } catch (error) {
+        console.error('Past events error:', error);
+        req.session.error = 'Error loading past events';
+        res.redirect('/student/dashboard');
+    }
+});
+
 // Profile
 router.get('/profile', (req, res) => {
     res.render('student/profile', { title: 'My Profile' });

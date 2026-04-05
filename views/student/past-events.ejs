@@ -1,0 +1,218 @@
+<%- include('../partials/header') %>
+
+<!-- Dashboard Styles -->
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<div class="dashboard-container">
+    <%- include('../partials/sidebar') %>
+    
+    <main class="flex-1">
+        <!-- Past Events Content -->
+        <div class="p-4 sm:p-6">
+            <!-- Header Section -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+                <h2 class="responsive-text-2xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-history mr-3 text-gray-600"></i>
+                    Past Events
+                </h2>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <span class="text-xs sm:text-sm text-gray-500">Total Past Events</span>
+                    <span id="event-count" class="text-lg sm:text-xl font-bold text-gray-600"><%= events.length %></span>
+                </div>
+            </div>
+
+            <p class="text-gray-600 mb-4">Browse through all completed events from the past.</p>
+            
+            <!-- Category Filter Buttons
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button onclick="filterPastEvents('all')" class="category-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-[#0ea5a4] text-white border border-[#0ea5a4]">
+                    All Past Events
+                </button>
+                <button onclick="filterPastEvents('seminar')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Seminars
+                </button>
+                <button onclick="filterPastEvents('workshop')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Workshops
+                </button>
+                <button onclick="filterPastEvents('hackathon')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Hackathons
+                </button>
+                <button onclick="filterPastEvents('quiz')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Quizzes
+                </button>
+                <button onclick="filterPastEvents('talkshow')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Talk Shows
+                </button>
+                <button onclick="filterPastEvents('bootcamp')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Bootcamps
+                </button>
+                <button onclick="filterPastEvents('cultural')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Cultural
+                </button>
+                <button onclick="filterPastEvents('sports')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
+                    Sports
+                </button>
+            </div> -->
+            
+            <% if (events && events.length > 0) { %>
+                <div class="events-grid">
+                    <% events.forEach((event, index) => { %>
+                        <div class="event-card group" data-category="<%= event.category || 'other' %>">
+                            <!-- Event Image -->
+                            <div class="event-image">
+                                <% if (event.poster && event.poster.trim() !== '') { %>
+                                    <img src="/uploads/<%= event.poster %>" 
+                                         alt="<%= event.title %>" 
+                                         class="w-full h-full object-cover"
+                                         style="object-fit: cover;">
+                                <% } else { %>
+                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                        <div class="text-center">
+                                            <i class="fas fa-calendar-check text-4xl text-gray-500 mb-2"></i>
+                                            <p class="text-gray-500 text-sm">Event completed</p>
+                                        </div>
+                                    </div>
+                                <% } %>
+
+                            </div>
+                            
+                            <!-- Event Content -->
+                            <div class="event-content">
+                                <!-- Title and Category Badge -->
+                                <div class="event-title-row">
+                                    <h3 class="event-title">
+                                        <%= event.title %>
+                                    </h3>
+                                    <% if (event.category) { %>
+                                        <span class="category-badge flex-shrink-0
+                                            <% if (event.category === 'sports') { %>
+                                                bg-green-100 text-green-800
+                                            <% } else if (event.category === 'workshop') { %>
+                                                bg-blue-100 text-blue-800
+                                            <% } else if (event.category === 'cultural') { %>
+                                                bg-purple-100 text-purple-800
+                                            <% } else if (event.category === 'seminar') { %>
+                                                bg-yellow-100 text-yellow-800
+                                            <% } else { %>
+                                                bg-gray-100 text-gray-800
+                                            <% } %>
+                                        ">
+                                            <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
+                                        </span>
+                                    <% } %>
+                                </div>
+                                
+                                <!-- Description -->
+                                <p class="event-description mb-3">
+                                    <%= event.description || 'No description available' %>
+                                </p>
+                                
+                                <!-- Event Details -->
+                                <div class="event-details mb-4">
+                                    <!-- First row: Date and Time -->
+                                    <div class="detail-row">
+                                        <div class="detail-item">
+                                            <i class="fas fa-calendar text-gray-400"></i>
+                                            <span><%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-clock text-gray-400"></i>
+                                            <span><%= event.startTime %> - <%= event.endTime %></span>
+                                        </div>
+                                    </div>
+                                    <!-- Second row: Organized By -->
+                                    <div class="detail-row full-width">
+                                        <div class="detail-item">
+                                            <i class="fas fa-user text-gray-400"></i>
+                                            <span>Organized By <%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- View Details Button -->
+                                <div class="flex justify-end">
+                                    <a href="/student/events/<%= event._id %>" class="view-details-btn">
+                                        <i class="fas fa-eye mr-2"></i>
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="no-events" id="no-past-events" style="display: none;">
+                    <i class="fas fa-calendar-times text-gray-300 text-6xl mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No past events found</h3>
+                    <p class="text-gray-500">No past events match the selected filter.</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+// Filter past events by category
+function filterPastEvents(category) {
+    const eventCards = document.querySelectorAll('.event-card');
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const eventCount = document.getElementById('event-count');
+    const noEventsMessage = document.getElementById('no-past-events');
+    
+    // Update active button styling
+    categoryButtons.forEach(btn => {
+        btn.classList.remove('bg-[#0ea5a4]', 'text-white', 'active');
+        btn.classList.add('bg-gray-200', 'text-gray-700');
+        
+        btn.style.opacity = '0.7';
+        btn.style.transform = 'scale(0.95)';
+        btn.style.color = '#000000';
+        btn.style.boxShadow = 'none';
+        btn.style.backgroundColor = '#f3f4f6';
+    });
+    
+    // Find and activate the clicked button
+    let activeButton = null;
+    categoryButtons.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(`filterPastEvents('${category}')`)) {
+            activeButton = btn;
+        }
+    });
+    
+    if (activeButton) {
+        activeButton.classList.remove('bg-gray-200', 'text-gray-700');
+        activeButton.classList.add('bg-[#0ea5a4]', 'text-white', 'active');
+        activeButton.style.opacity = '1';
+        activeButton.style.transform = 'scale(1)';
+        activeButton.style.color = '#ffffff';
+        activeButton.style.boxShadow = '0 4px 12px rgba(14, 165, 164, 0.3)';
+        activeButton.style.backgroundColor = '#0ea5a4';
+    }
+    
+    // Filter events
+    let visibleCount = 0;
+    eventCards.forEach(card => {
+        const eventCategory = card.getAttribute('data-category');
+        
+        if (category === 'all' || eventCategory === category) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Update event count
+    eventCount.textContent = visibleCount;
+    
+    // Show/hide no events message
+    if (visibleCount === 0) {
+        noEventsMessage.style.display = 'block';
+    } else {
+        noEventsMessage.style.display = 'none';
+    }
+}
+</script>

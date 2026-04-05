@@ -158,6 +158,7 @@
 
             <!-- Team Registration Section -->
             <% const availableSpots = event.maxParticipants ? event.maxParticipants - event.registrations.length : null; %>
+            <% const isPastEvent = new Date(event.date) < new Date(); %>
             
             <!-- Debug Information (remove in production) -->
             <% if (process.env.NODE_ENV === 'development') { %>
@@ -166,12 +167,23 @@
                     <div>Current User ID: <%= currentUser._id %></div>
                     <div>Event ID: <%= event._id %></div>
                     <div>Is Registered (from route): <%= isRegistered %></div>
+                    <div>Is Past Event: <%= isPastEvent %></div>
                     <div>Total Registrations: <%= event.registrations.length %></div>
-                    <div>Registrations: <%= JSON.stringify(event.registrations.map(r => ({ student: r.student._id, studentStr: r.student._id.toString(), currentUserStr: currentUser._id.toString(), match: r.student._id.toString() === currentUser._id.toString() }))) %></div>
                 </div>
             <% } %>
             
-            <% if (isRegistered) { %>
+            <% if (isPastEvent) { %>
+                <!-- Past Event - No Registration -->
+                <div class="bg-white rounded-lg shadow-md p-6 text-center mx-auto max-w-2xl">
+                    <i class="fas fa-calendar-check text-gray-500 text-4xl mb-3"></i>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Event Completed</h3>
+                    <p class="text-gray-600">This event has already taken place.</p>
+                    <div class="mt-4 inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-full">
+                        <i class="fas fa-history mr-2"></i>
+                        <span class="font-medium">Past Event</span>
+                    </div>
+                </div>
+            <% } else if (isRegistered) { %>
                 <!-- Already Registered Card -->
                 <div class="bg-white rounded-lg shadow-md p-6 text-center mx-auto max-w-2xl">
                     <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>

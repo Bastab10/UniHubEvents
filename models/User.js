@@ -72,7 +72,6 @@ const userSchema = new mongoose.Schema({
     isApproved: {
         type: Boolean,
         default: function() {
-            // Students are auto-approved, faculty require admin approval
             if (this.role === 'admin' || this.role === 'student') {
                 return true;
             } else if (this.role === 'faculty') {
