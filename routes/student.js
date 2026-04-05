@@ -105,8 +105,15 @@ router.get('/dashboard', async (req, res) => {
     try {
         const studentId = req.session.user._id;
         
-        // Get all approved events for display
-        const allEvents = await Event.find({ status: 'approved' })
+        // Get today's date at midnight for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Get all approved events that are active (date >= today)
+        const allEvents = await Event.find({ 
+            status: 'approved',
+            date: { $gte: today }
+        })
             .populate('organizer', 'profile.firstName profile.lastName')
             .sort({ createdAt: -1 }); // Sort by creation date, newest first
         
@@ -391,9 +398,11 @@ router.get('/history', async (req, res) => {
 // Past Events - All completed events
 router.get('/past-events', async (req, res) => {
     try {
+        // Get today's date at midnight for comparison
         const today = new Date();
+        today.setHours(0, 0, 0, 0);
         
-        // Get all past events (date < today)
+        // Get all past events (date < today - strictly before today)
         const pastEvents = await Event.find({ 
             status: 'approved',
             date: { $lt: today }
