@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Event = require('../models/Event');
-const Sport = require('../models/Sport');
 require('dotenv').config();
 
 async function seedDatabase() {
@@ -14,7 +13,6 @@ async function seedDatabase() {
         // Clear existing data
         await User.deleteMany({});
         await Event.deleteMany({});
-        await Sport.deleteMany({});
         console.log('Cleared existing data');
 
         // Create admin user
@@ -122,61 +120,6 @@ async function seedDatabase() {
             await student.save();
         }
         console.log('Created student users');
-
-        // Create sports categories
-        const sports = [
-            {
-                name: 'Cricket',
-                description: 'Traditional cricket matches',
-                category: 'outdoor',
-                maxTeamSize: 11,
-                minTeamSize: 11,
-                equipment: ['Cricket bat', 'Ball', 'Stumps', 'Pads', 'Gloves'],
-                rules: 'Standard ICC rules apply'
-            },
-            {
-                name: 'Football',
-                description: 'Soccer matches',
-                category: 'outdoor',
-                maxTeamSize: 11,
-                minTeamSize: 7,
-                equipment: ['Football', 'Goal posts', 'Jerseys'],
-                rules: 'Standard FIFA rules apply'
-            },
-            {
-                name: 'Basketball',
-                description: 'Basketball tournaments',
-                category: 'indoor',
-                maxTeamSize: 5,
-                minTeamSize: 3,
-                equipment: ['Basketball', 'Hoop', 'Jerseys'],
-                rules: 'Standard NBA rules apply'
-            },
-            {
-                name: 'Chess',
-                description: 'Chess competitions',
-                category: 'individual',
-                maxTeamSize: 1,
-                minTeamSize: 1,
-                equipment: ['Chess board', 'Chess pieces', 'Timer'],
-                rules: 'Standard FIDE rules apply'
-            },
-            {
-                name: 'Table Tennis',
-                description: 'Table tennis matches',
-                category: 'indoor',
-                maxTeamSize: 2,
-                minTeamSize: 1,
-                equipment: ['Table tennis table', 'Rackets', 'Ball'],
-                rules: 'Standard ITTF rules apply'
-            }
-        ];
-
-        for (const sportData of sports) {
-            const sport = new Sport(sportData);
-            await sport.save();
-        }
-        console.log('Created sports categories');
 
         // Create sample events
         const events = [

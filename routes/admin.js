@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Event = require('../models/Event');
-const Sport = require('../models/Sport');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 
 // 1. Dashboard Overview
@@ -28,8 +27,7 @@ router.get('/dashboard', async (req, res) => {
             User.countDocuments({ role: 'faculty', isApproved: true }),
             Event.countDocuments({ status: 'pending' }),
             Event.countDocuments({ status: 'approved' }),
-            Event.find({ date: { $gte: new Date() } }).sort({ date: 1 }).limit(5),
-            Event.find({ category: 'sports' }).sort({ date: -1 }).limit(10)
+            Event.find({ date: { $gte: new Date() } }).sort({ date: 1 }).limit(5)
         ]);
 
         const [
@@ -38,11 +36,17 @@ router.get('/dashboard', async (req, res) => {
             totalFaculty,
             pendingEvents,
             approvedEvents,
-            upcomingEvents,
-            sportsEvents
+            upcomingEvents
         ] = stats;
 
-        const allEventsList = await Event.find({})
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Get only active/upcoming approved events (matching Student Dashboard)
+        const allEventsList = await Event.find({
+            status: 'approved',
+            date: { $gte: today }
+        })
             .sort({ createdAt: -1 })
             .limit(6)
             .populate('organizer', 'profile.firstName profile.lastName');
@@ -152,7 +156,6 @@ router.get('/dashboard', async (req, res) => {
                 pendingEvents,
                 approvedEvents,
                 upcomingEvents,
-                sportsEvents,
                 pendingFaculty: pendingFaculty.length,
                 pendingRegistrations: pendingRegistrations.length,
                 totalRegistrations: totalRegistrations.length > 0 ? totalRegistrations[0].total : 0
@@ -161,7 +164,6 @@ router.get('/dashboard', async (req, res) => {
             upcomingEvents: upcomingEventsList,
             recentRegistrations,
             registeredStudents: allRegisteredStudents,
-            sportsEvents: sportsEvents,
             allStudents,
             allFaculty,
             pendingFaculty,
@@ -174,47 +176,22 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
-// Sports Management
-router.get('/sports', async (req, res) => {
+// All Events - Show complete list of all events in the system
+router.get('/events', async (req, res) => {
     try {
-        const sports = await Sport.find().sort({ name: 1 });
-        res.render('admin/sports', { title: 'Sports Management', sports });
-    } catch (error) {
-        console.error('Sports error:', error);
-        res.redirect('/admin/dashboard');
-    }
-});
+        // Get ALL events (past, present, and future)
+        const events = await Event.find({})
+            .sort({ date: -1 })
+            .populate('organizer', 'profile.firstName profile.lastName');
 
-// Add sport
-router.post('/sports/add', async (req, res) => {
-    try {
-        const {
-            name,
-            description,
-            category,
-            maxTeamSize,
-            minTeamSize,
-            equipment,
-            rules
-        } = req.body;
-
-        const newSport = new Sport({
-            name,
-            description,
-            category,
-            maxTeamSize: maxTeamSize || 1,
-            minTeamSize: minTeamSize || 1,
-            equipment: equipment
-                ? equipment.split(',').map(e => e.trim())
-                : [],
-            rules
+        res.render('admin/events', {
+            title: 'All Events',
+            events,
+            currentPath: '/admin/events'
         });
-
-        await newSport.save();
-        res.redirect('/admin/sports');
     } catch (error) {
-        console.error('Add sport error:', error);
-        res.redirect('/admin/sports');
+        console.error('All events error:', error);
+        res.status(500).send('Error loading events');
     }
 });
 
@@ -515,6 +492,24 @@ router.post('/registrations/bulk-reject', async (req, res) => {
     }
 });
 
+// All Students - Show all registered students
+router.get('/students', async (req, res) => {
+    try {
+        const students = await User.find({ role: 'student' })
+            .select('profile.firstName profile.lastName profile.email profile.collegeId profile.department profile.verified createdAt')
+            .sort({ createdAt: -1 });
+
+        res.render('admin/students-management', {
+            title: 'All Students',
+            students,
+            currentPath: '/admin/students'
+        });
+    } catch (error) {
+        console.error('All students error:', error);
+        res.status(500).send('Error loading students');
+    }
+});
+
 // Student Verification Routes
 router.post('/students/:id/verify', async (req, res) => {
     try {
@@ -540,6 +535,31 @@ router.post('/students/:id/verify', async (req, res) => {
     } catch (error) {
         console.error('Student verification error:', error);
         res.status(500).json({ success: false, message: 'Error verifying student' });
+    }
+});
+
+// Delete Student
+router.delete('/students/:id', async (req, res) => {
+    try {
+        const student = await User.findOneAndDelete({ 
+            _id: req.params.id, 
+            role: 'student' 
+        });
+        
+        if (student) {
+            // Also remove student registrations from all events
+            await Event.updateMany(
+                { 'registrations.student': req.params.id },
+                { $pull: { registrations: { student: req.params.id } } }
+            );
+            
+            res.json({ success: true, message: 'Student deleted successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'Student not found' });
+        }
+    } catch (error) {
+        console.error('Student deletion error:', error);
+        res.status(500).json({ success: false, message: 'Error deleting student' });
     }
 });
 
@@ -854,23 +874,27 @@ router.get('/approved-registrations', async (req, res) => {
     }
 });
 
-// Faculty Management
+// All Coordinator Members - Show only approved faculty coordinators
 router.get('/faculty', async (req, res) => {
     try {
-        const faculty = await User.find({ role: 'faculty' })
+        // Get only approved faculty coordinators
+        const coordinators = await User.find({
+            role: 'faculty',
+            isApproved: true
+        })
             .select(
-                'profile.firstName profile.lastName profile.email profile.department profile.collegeId createdAt'
+                'profile.firstName profile.lastName profile.email profile.department profile.collegeId profile.phone createdAt approvalDate'
             )
-            .sort({ createdAt: -1 })
-            .limit(50);
+            .sort({ approvalDate: -1 });
 
-        res.render('admin/faculty-management', {
-            title: 'Faculty Management',
-            faculty
+        res.render('admin/coordinators', {
+            title: 'All Coordinator Members',
+            coordinators,
+            currentPath: '/admin/faculty'
         });
     } catch (error) {
-        console.error('Faculty management error:', error);
-        res.status(500).send('Error loading faculty management');
+        console.error('Coordinators error:', error);
+        res.status(500).send('Error loading coordinators');
     }
 });
 

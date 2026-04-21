@@ -21,16 +21,6 @@
                             <h1 class="text-2xl font-bold text-gray-800">Event Details</h1>
                             <p class="text-gray-600">Complete event information and management</p>
                         </div>
-                        <div class="flex space-x-4">
-                            <a href="/admin/events" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                                <i class="fas fa-arrow-left mr-2"></i>
-                                Back to Events
-                            </a>
-                            <a href="/admin/dashboard" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-tachometer-alt mr-2"></i>
-                                Dashboard
-                            </a>
-                        </div>
                     </div>
                 </div>
 
@@ -135,68 +125,6 @@
                         <div class="mt-6">
                             <h3 class="text-sm font-medium text-gray-700 mb-2">Description</h3>
                             <p class="text-sm text-gray-600"><%= event.description || 'No description provided' %></p>
-                        </div>
-                    </div>
-
-                    <!-- Registration Statistics -->
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <div class="flex items-center mb-4">
-                            <div class="h-16 w-16 rounded-full bg-green-200 flex items-center justify-center">
-                                <i class="fas fa-users text-green-600 text-2xl"></i>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-900">Registration Statistics</h3>
-                                <p class="text-sm text-gray-600">Student registration overview</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-blue-600">
-                                    <%= event.registrations ? event.registrations.length : 0 %>
-                                </div>
-                                <p class="text-sm text-gray-600">Total Registrations</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-green-600">
-                                    <%= event.registrations ? event.registrations.filter(reg => reg.status === 'approved').length : 0 %>
-                                </div>
-                                <p class="text-sm text-gray-600">Approved</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-yellow-600">
-                                    <%= event.registrations ? event.registrations.filter(reg => reg.status === 'pending').length : 0 %>
-                                </div>
-                                <p class="text-sm text-gray-600">Pending</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-red-600">
-                                    <%= event.registrations ? event.registrations.filter(reg => reg.status === 'rejected').length : 0 %>
-                                </div>
-                                <p class="text-sm text-gray-600">Rejected</p>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="mt-6 flex space-x-4">
-                            <% if (event.status === 'pending') { %>
-                                <button onclick="approveEvent('<%= event._id %>')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-check mr-2"></i>
-                                    Approve Event
-                                </button>
-                                <button onclick="rejectEvent('<%= event._id %>')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
-                                    <i class="fas fa-times mr-2"></i>
-                                    Reject Event
-                                </button>
-                            <% } %>
-                            <button onclick="viewRegistrations()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-users mr-2"></i>
-                                View All Registrations
-                            </button>
-                            <button onclick="editEvent('<%= event._id %>')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
-                                <i class="fas fa-edit mr-2"></i>
-                                Edit Event
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -347,8 +275,7 @@
         }
 
         function rejectEvent(eventId) {
-            const reason = prompt('Please enter rejection reason:');
-            if (reason) {
+            if (confirm('Are you sure you want to reject this event?')) {
                 fetch(`/admin/events/${eventId}/reject`, {
                     method: 'POST',
                     headers: {

@@ -758,43 +758,6 @@
     </main>
 </div>
 
-<!-- ✅ Store JSON safely in HTML -->
-<script id="sportsDataJSON" type="application/json">
-    <%- JSON.stringify(sportsEvents || []) %>
-</script>
-
-<!-- Chart CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-    const ctx = document.getElementById('sportsChart').getContext('2d');
-
-    // ✅ Read JSON safely (No EJS inside JS now)
-    const sportsData = JSON.parse(
-        document.getElementById('sportsDataJSON').textContent
-    );
-
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: sportsData.map(s => s._id || 'Other'),
-            datasets: [{
-                label: 'Participants',
-                data: sportsData.map(s => s.count),
-                backgroundColor: 'rgba(59,130,246,0.5)',
-                borderColor: 'rgba(59,130,246,1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-</script>
-
 <script>
     function showSection(section) {
         // Hide all content sections
@@ -848,8 +811,7 @@
     }
 
     function rejectCoordinator(facultyId) {
-        const reason = prompt('Please provide a reason for rejecting this faculty registration:');
-        if (reason) {
+        if (confirm('Are you sure you want to reject this coordinator?')) {
             // Show loading state
             const button = event.target;
             const originalText = button.innerHTML;
@@ -861,7 +823,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ reason })
+                body: JSON.stringify({ reason: 'Rejected by administrator' })
             })
             .then(response => response.json())
             .then(data => {

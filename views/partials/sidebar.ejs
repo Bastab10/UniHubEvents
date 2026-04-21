@@ -165,6 +165,23 @@
     transform: scaleY(1);
 }
 
+.sidebar-nav a.active {
+    background: rgba(14, 165, 164, 0.1);
+    color: #0ea5a4;
+    padding-left: 1.5rem;
+}
+
+.sidebar-nav a.active::before {
+    transform: scaleY(1);
+    background: #0ea5a4;
+}
+
+@media (min-width: 640px) {
+    .sidebar-nav a.active {
+        padding-left: 2rem;
+    }
+}
+
 .sidebar-nav i {
     width: 24px;
     margin-right: 0.75rem;
@@ -328,21 +345,13 @@
     
     <nav class="sidebar-nav">
         <% if (currentUser.role === 'admin') { %>
-            <a href="/admin/dashboard">
+            <a href="/admin/dashboard" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/dashboard') ? 'active' : '' %>">
                 <i class="fas fa-tachometer-alt"></i>
                 Dashboard
             </a>
-            <a href="/admin/students">
+            <a href="/admin/students" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/students') ? 'active' : '' %>">
                 <i class="fas fa-graduation-cap"></i>
                 Students
-            </a>
-            <a href="/admin/faculty">
-                <i class="fas fa-chalkboard-teacher"></i>
-                Coordinators
-            </a>
-            <a href="/admin/events">
-                <i class="fas fa-calendar"></i>
-                Events
             </a>
 
             <div class="sidebar-divider"></div>
