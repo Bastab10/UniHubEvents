@@ -413,77 +413,112 @@
                             <table class="w-full table-auto">
                                 <thead>
                                     <tr class="bg-gray-50 border-b border-gray-200">
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID / Roll Number</th>
                                         <% if (event.eventType === 'team') { %>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team Name</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teams Count</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Members</th>
+                                        <% } else { %>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID / Roll Number</th>
                                         <% } %>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <% event.registrations.forEach((registration, index) => { %>
-                                        <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-4 py-4 whitespace-nowrap">
-                                                <% if (registration.student) { %>
+                                    <% if (event.eventType === 'team' && departmentGroups && departmentGroups.length > 0) { %>
+                                        <% departmentGroups.forEach(deptGroup => { %>
+                                            <tr class="hover:bg-gray-50 transition-colors">
+                                                <!-- Team Event: Show Department Group -->
+                                                <td class="px-4 py-4 whitespace-nowrap">
                                                     <div class="flex items-center">
-                                                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
-                                                            <%= registration.student.profile.fullName ? registration.student.profile.fullName.charAt(0).toUpperCase() : 'S' %>
+                                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                                            <i class="fas fa-building text-blue-600 text-sm"></i>
                                                         </div>
-                                                        <span class="font-medium text-gray-900">
-                                                            <%= registration.student.profile.fullName %>
-                                                        </span>
+                                                        <span class="text-sm font-semibold text-gray-900"><%= deptGroup.department %></span>
                                                     </div>
-                                                <% } else { %>
-                                                    <span class="text-gray-400">Student not found</span>
-                                                <% } %>
-                                            </td>
-                                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                <% if (registration.student) { %>
-                                                    <%= registration.student.email %>
-                                                <% } else { %>
-                                                    N/A
-                                                <% } %>
-                                            </td>
-                                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                <% if (registration.student) { %>
-                                                    <%= registration.student.profile.collegeId %>
-                                                <% } else { %>
-                                                    N/A
-                                                <% } %>
-                                            </td>
-                                            <% if (event.eventType === 'team') { %>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
-                                                        <%= registration.teamName || 'No Team' %>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                    <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium">
+                                                        <%= deptGroup.teamCount %> team<%= deptGroup.teamCount > 1 ? 's' : '' %>
                                                     </span>
                                                 </td>
-                                            <% } %>
-                                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                <%= new Date(registration.registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
-                                            </td>
-                                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                                                <% if (registration.student) { %>
-                                                    <button onclick="viewStudentDetails('<%= registration.student._id %>')" 
-            class="compact-action-btn mr-2"
-            title="View Student Details">
-        <i class="fas fa-eye text-sm"></i>
-        <span class="text-xs">View</span>
-    </button>
-<button onclick="deleteRegistration('<%= registration._id %>')" 
-            class="compact-action-btn"
-            title="Cancel Registration">
-        <i class="fas fa-trash text-sm"></i>
-        <span class="text-xs">Delete</span>
-    </button>
-                                                <% } else { %>
-                                                    <span class="text-gray-400">N/A</span>
-                                                <% } %>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    <%= deptGroup.totalMembers %> members
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <%= new Date(deptGroup.teams[0].registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div class="flex items-center gap-2">
+                                                        <a href="/faculty/events/<%= event._id %>/department/<%= encodeURIComponent(deptGroup.department) %>" class="inline-flex items-center gap-1 bg-teal-500 hover:bg-teal-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                                                            <i class="fas fa-eye"></i>
+                                                            View
+                                                        </a>
+                                                        <button onclick="deleteDepartmentTeams('<%= event._id %>', '<%= encodeURIComponent(deptGroup.department) %>')" class="inline-flex items-center gap-1 bg-white border border-teal-500 text-teal-600 hover:bg-teal-50 px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                                                            <i class="fas fa-trash"></i>
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <% event.registrations.forEach((registration, index) => { %>
+                                            <tr class="hover:bg-gray-50 transition-colors">
+                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                    <% if (registration.student) { %>
+                                                        <div class="flex items-center">
+                                                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                                                                <%= registration.student.profile.fullName ? registration.student.profile.fullName.charAt(0).toUpperCase() : 'S' %>
+                                                            </div>
+                                                            <span class="font-medium text-gray-900">
+                                                                <%= registration.student.profile.fullName %>
+                                                            </span>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <span class="text-gray-400">Student not found</span>
+                                                    <% } %>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <% if (registration.student) { %>
+                                                        <%= registration.student.email %>
+                                                    <% } else { %>
+                                                        N/A
+                                                    <% } %>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <% if (registration.student) { %>
+                                                        <%= registration.student.profile.collegeId %>
+                                                    <% } else { %>
+                                                        N/A
+                                                    <% } %>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                    <%= new Date(registration.registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <% if (registration.student) { %>
+                                                        <button onclick="viewStudentDetails('<%= registration.student._id %>')" 
+                class="compact-action-btn mr-2"
+                title="View Student Details">
+            <i class="fas fa-eye text-sm"></i>
+            <span class="text-xs">View</span>
+        </button>
+    <button onclick="deleteRegistration('<%= registration._id %>')" 
+                class="compact-action-btn"
+                title="Cancel Registration">
+            <i class="fas fa-trash text-sm"></i>
+            <span class="text-xs">Delete</span>
+        </button>
+                                                    <% } else { %>
+                                                        <span class="text-gray-400">N/A</span>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
@@ -798,6 +833,31 @@ function exportRegistrations() {
 function viewStudentDetails(studentId) {
     // Redirect to student details page or show modal
     window.location.href = `/faculty/student/${studentId}`;
+}
+
+// Delete Department Teams
+function deleteDepartmentTeams(eventId, departmentName) {
+    if (confirm('Are you sure you want to delete all teams from this department? This action cannot be undone.')) {
+        fetch(`/faculty/events/${eventId}/department/${departmentName}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to show updated registrations
+                location.reload();
+            } else {
+                alert('Error deleting department teams: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting department teams');
+        });
+    }
 }
 
 // Delete Registration

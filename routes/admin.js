@@ -207,9 +207,31 @@ router.get('/events/:id', async (req, res) => {
             return res.redirect('/admin/dashboard');
         }
 
+        // For team events, group registrations by department
+        let departmentGroups = null;
+        if (event.eventType === 'team' && event.registrations) {
+            const groups = {};
+            event.registrations.forEach(reg => {
+                const dept = reg.teamLeaderDepartment || 'Unknown';
+                if (!groups[dept]) {
+                    groups[dept] = {
+                        department: dept,
+                        teams: [],
+                        totalMembers: 0,
+                        teamCount: 0
+                    };
+                }
+                groups[dept].teams.push(reg);
+                groups[dept].teamCount++;
+                groups[dept].totalMembers += (reg.teamMembers?.length || 0) + 1; // +1 for team leader
+            });
+            departmentGroups = Object.values(groups);
+        }
+
         res.render('admin/event-details', {
             title: 'Event Details',
-            event
+            event,
+            departmentGroups
         });
     } catch (error) {
         console.error('Event details error:', error);
@@ -874,6 +896,107 @@ router.get('/approved-registrations', async (req, res) => {
     }
 });
 
+// Past Events - Show only events that have already taken place
+router.get('/past-events', async (req, res) => {
+    try {
+        // Get today's date at midnight for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Fetch only past events (date < today)
+        const pastEvents = await Event.find({
+            date: { $lt: today }
+        })
+            .sort({ date: -1 }) // Sort by date descending (newest past event first)
+            .populate('organizer', 'profile.firstName profile.lastName profile.email profile.department');
+
+        res.render('admin/past-events', {
+            title: 'Past Events',
+            pastEvents,
+            currentPath: '/admin/past-events'
+        });
+    } catch (error) {
+        console.error('Past events error:', error);
+        res.status(500).send('Error loading past events');
+    }
+});
+
+// View Past Event Details
+router.get('/past-events/:id', async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id)
+            .populate('organizer', 'profile.firstName profile.lastName profile.email profile.department createdAt')
+            .populate('registrations.student', 'profile.firstName profile.lastName profile.email profile.collegeId profile.department');
+
+        if (!event) {
+            req.session.error = 'Event not found';
+            return res.redirect('/admin/past-events');
+        }
+
+        // Verify this is actually a past event
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const eventDate = new Date(event.date);
+        eventDate.setHours(0, 0, 0, 0);
+
+        if (eventDate >= today) {
+            req.session.error = 'This event is not a past event';
+            return res.redirect('/admin/past-events');
+        }
+
+        res.render('admin/view-past-event', {
+            title: 'Past Event Details',
+            event
+        });
+    } catch (error) {
+        console.error('Past event details error:', error);
+        res.status(500).send('Error loading past event details');
+    }
+});
+
+// Delete Past Event (Admin Only)
+router.delete('/past-events/:id/delete', async (req, res) => {
+    try {
+        const eventId = req.params.id;
+
+        // Find the event first
+        const event = await Event.findById(eventId);
+
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Event not found' });
+        }
+
+        // Verify this is a past event
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const eventDate = new Date(event.date);
+        eventDate.setHours(0, 0, 0, 0);
+
+        if (eventDate >= today) {
+            return res.status(400).json({ success: false, message: 'Cannot delete upcoming or current events from past events section' });
+        }
+
+        // Clean up poster file if it exists
+        if (event.poster && event.poster.trim() !== '') {
+            const path = require('path');
+            const fs = require('fs');
+            const posterPath = path.join(__dirname, '..', 'uploads', event.poster);
+            if (fs.existsSync(posterPath)) {
+                fs.unlinkSync(posterPath);
+                console.log('Cleaned up poster file:', posterPath);
+            }
+        }
+
+        // Delete the event
+        await Event.findByIdAndDelete(eventId);
+
+        res.json({ success: true, message: 'Past event deleted successfully' });
+    } catch (error) {
+        console.error('Delete past event error:', error);
+        res.status(500).json({ success: false, message: 'Error deleting past event: ' + error.message });
+    }
+});
+
 // All Coordinator Members - Show only approved faculty coordinators
 router.get('/faculty', async (req, res) => {
     try {
@@ -1164,6 +1287,43 @@ router.post('/events/:id/delete', async (req, res) => {
     } catch (error) {
         console.error('Delete event error:', error);
         req.session.error = 'Error deleting event';
+        res.redirect('/admin/dashboard');
+    }
+});
+
+// Department Teams View (Full Page)
+router.get('/events/:eventId/department/:departmentName', async (req, res) => {
+    try {
+        const { eventId, departmentName } = req.params;
+        
+        const event = await Event.findById(eventId)
+            .populate('organizer', 'profile.firstName profile.lastName profile.email');
+
+        if (!event) {
+            req.session.error = 'Event not found';
+            return res.redirect('/admin/dashboard');
+        }
+
+        // Filter teams by department
+        const departmentTeams = event.registrations.filter(
+            reg => reg.teamLeaderDepartment && 
+                   reg.teamLeaderDepartment.toLowerCase() === decodeURIComponent(departmentName).toLowerCase()
+        );
+
+        if (departmentTeams.length === 0) {
+            req.session.error = 'No teams found for this department';
+            return res.redirect(`/admin/events/${eventId}`);
+        }
+
+        res.render('admin/department-teams', {
+            title: `${decodeURIComponent(departmentName)} - Team Details`,
+            event,
+            department: decodeURIComponent(departmentName),
+            teams: departmentTeams
+        });
+    } catch (error) {
+        console.error('Department teams view error:', error);
+        req.session.error = 'Error loading department teams';
         res.redirect('/admin/dashboard');
     }
 });

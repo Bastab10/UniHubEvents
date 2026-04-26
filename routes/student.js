@@ -80,15 +80,47 @@ router.get('/events/:id', isAuthenticatedForEventDetails, checkRoleForEventDetai
         }
 
         // Check if student is already registered
-        const isRegistered = event.registrations.some(
+        // For individual events: block if already registered
+        // For team events: show as registered but allow multiple teams (up to department limit)
+        let isRegistered = event.registrations.some(
             reg => reg.student._id.toString() === req.session.user._id.toString()
         );
+
+        // Calculate department team counts for team events
+        let maxDeptTeams = 0;
+        let deptTeamsCount = 0;
+        let remainingTeamSlots = 0;
+        let hasDepartmentTeams = false;
+        
+        if (event.eventType === 'team') {
+            maxDeptTeams = event.maxTeamsPerDepartment || 0;
+            
+            // Get student's department from their profile
+            const student = await User.findById(req.session.user._id);
+            const studentDept = student?.profile?.department || '';
+            
+            if (studentDept && maxDeptTeams > 0) {
+                deptTeamsCount = event.registrations.filter(
+                    reg => reg.teamLeaderDepartment && 
+                           reg.teamLeaderDepartment.toLowerCase() === studentDept.toLowerCase()
+                ).length;
+                remainingTeamSlots = maxDeptTeams - deptTeamsCount;
+                hasDepartmentTeams = deptTeamsCount > 0;
+            } else if (maxDeptTeams === 0) {
+                // Unlimited teams
+                remainingTeamSlots = -1;
+                hasDepartmentTeams = isRegistered;
+            }
+        }
 
         res.render('student/event-details', { 
             title: event.title, 
             event, 
             isRegistered,
-            currentUser: req.session.user
+            currentUser: req.session.user,
+            maxDeptTeams,
+            deptTeamsCount,
+            remainingTeamSlots
         });
     } catch (error) {
         console.error('Event details error:', error);
@@ -175,21 +207,23 @@ router.post('/events/:id/register', async (req, res) => {
             return res.redirect('/student/events');
         }
 
-        // Check if already registered
-        const isAlreadyRegistered = event.registrations.some(
-            reg => reg.student.toString() === req.session.user._id.toString()
-        );
+        // Check if already registered (for individual events only)
+        if (event.eventType !== 'team') {
+            const isAlreadyRegistered = event.registrations.some(
+                reg => reg.student.toString() === req.session.user._id.toString()
+            );
 
-        if (isAlreadyRegistered) {
-            req.session.error = 'You are already registered for this event';
-            req.session.eventError = req.params.id; // Track which event this error is for
-            return res.redirect(`/student/events/${req.params.id}`);
+            if (isAlreadyRegistered) {
+                req.session.error = 'You are already registered for this event';
+                req.session.eventError = req.params.id;
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
         }
 
         // Check if event is full
         if (event.maxParticipants && event.registrations.length >= event.maxParticipants) {
             req.session.error = 'Event is full';
-            req.session.eventError = req.params.id; // Track which event this error is for
+            req.session.eventError = req.params.id;
             return res.redirect(`/student/events/${req.params.id}`);
         }
 
@@ -208,87 +242,177 @@ router.post('/events/:id/register', async (req, res) => {
             return res.redirect(`/student/events/${req.params.id}`);
         }
 
-        // Handle team registration
-        let registrationData = {
+        // Handle team registration (bulk support)
+        const studentPattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (event.eventType === 'team') {
+            const { teams } = req.body;
+            
+            if (!teams || !Array.isArray(teams) || teams.length === 0) {
+                req.session.error = 'At least one team is required for team events';
+                return res.redirect(`/student/events/${req.params.id}`);
+            }
+
+            // Validate all teams first
+            const teamsToRegister = [];
+            const usedTeamNames = new Set();
+            
+            for (let i = 0; i < teams.length; i++) {
+                const team = teams[i];
+                
+                // Validate required fields
+                if (!team.teamName || team.teamName.trim() === '') {
+                    req.session.error = `Team ${i + 1}: Team name is required`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                if (!team.teamLeaderName || team.teamLeaderName.trim() === '') {
+                    req.session.error = `Team ${i + 1}: Team leader name is required`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                if (!team.teamLeaderCollegeId || team.teamLeaderCollegeId.trim() === '') {
+                    req.session.error = `Team ${i + 1}: Team leader college ID is required`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                if (!team.teamLeaderEmail || team.teamLeaderEmail.trim() === '') {
+                    req.session.error = `Team ${i + 1}: Team leader email is required`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                if (!team.teamLeaderDepartment || team.teamLeaderDepartment.trim() === '') {
+                    req.session.error = `Team ${i + 1}: Team leader department is required`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                // Validate formats
+                if (!studentPattern.test(team.teamLeaderCollegeId.trim().toUpperCase())) {
+                    req.session.error = `Team ${i + 1}: Invalid Team Leader College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                if (!emailPattern.test(team.teamLeaderEmail.trim())) {
+                    req.session.error = `Team ${i + 1}: Invalid Team Leader Email format`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                // Check for duplicate team names
+                const teamNameLower = team.teamName.trim().toLowerCase();
+                if (usedTeamNames.has(teamNameLower)) {
+                    req.session.error = `Team ${i + 1}: Duplicate team name "${team.teamName}". Each team must have a unique name.`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+                usedTeamNames.add(teamNameLower);
+
+                // Check for existing team names in event
+                const existingTeam = event.registrations.find(
+                    reg => reg.teamName && reg.teamName.toLowerCase() === teamNameLower
+                );
+                if (existingTeam) {
+                    req.session.error = `Team ${i + 1}: Team name "${team.teamName}" already exists for this event.`;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+
+                // Process team members
+                let teamMembers = [];
+                if (team.members && Array.isArray(team.members)) {
+                    for (const member of team.members) {
+                        if (member && member.name && member.collegeId) {
+                            const memberCollegeId = member.collegeId.trim();
+                            if (!studentPattern.test(memberCollegeId.toUpperCase())) {
+                                req.session.error = `Team ${i + 1}: Invalid College ID format for member "${member.name}". Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)`;
+                                return res.redirect(`/student/events/${req.params.id}`);
+                            }
+                            teamMembers.push({
+                                name: member.name.trim(),
+                                collegeId: memberCollegeId
+                            });
+                        }
+                    }
+                }
+
+                teamsToRegister.push({
+                    teamName: team.teamName.trim(),
+                    teamLeaderName: team.teamLeaderName.trim(),
+                    teamLeaderCollegeId: team.teamLeaderCollegeId.trim(),
+                    teamLeaderEmail: team.teamLeaderEmail.trim(),
+                    teamLeaderDepartment: team.teamLeaderDepartment.trim(),
+                    teamMembers: teamMembers
+                });
+            }
+
+            // Check department team limit
+            if (event.maxTeamsPerDepartment && event.maxTeamsPerDepartment > 0) {
+                const firstDept = teamsToRegister[0].teamLeaderDepartment.toLowerCase();
+                const currentDeptCount = event.registrations.filter(
+                    reg => reg.teamLeaderDepartment && reg.teamLeaderDepartment.toLowerCase() === firstDept
+                ).length;
+                
+                if (currentDeptCount + teamsToRegister.length > event.maxTeamsPerDepartment) {
+                    const allowed = event.maxTeamsPerDepartment - currentDeptCount;
+                    req.session.error = `Maximum team limit reached. You can only register ${allowed} more team(s) from your department.`;
+                    req.session.eventError = req.params.id;
+                    return res.redirect(`/student/events/${req.params.id}`);
+                }
+            }
+
+            // Create registration data for each team
+            const registeredTeams = [];
+            for (const team of teamsToRegister) {
+                const registrationData = {
+                    student: req.session.user._id,
+                    status: 'approved',
+                    registeredAt: new Date(),
+                    approvalDate: new Date(),
+                    teamName: team.teamName,
+                    teamLeaderName: team.teamLeaderName,
+                    teamLeaderCollegeId: team.teamLeaderCollegeId,
+                    teamLeaderEmail: team.teamLeaderEmail,
+                    teamLeaderDepartment: team.teamLeaderDepartment,
+                    teamMembers: team.teamMembers
+                };
+                event.registrations.push(registrationData);
+                registeredTeams.push(team.teamName);
+            }
+
+            await event.save();
+            
+            // Success message
+            let successMessage = `Successfully registered ${registeredTeams.length} team(s)`;
+            if (event.maxTeamsPerDepartment && event.maxTeamsPerDepartment > 0) {
+                const firstDept = teamsToRegister[0].teamLeaderDepartment.toLowerCase();
+                const updatedDeptCount = event.registrations.filter(
+                    reg => reg.teamLeaderDepartment && reg.teamLeaderDepartment.toLowerCase() === firstDept
+                ).length;
+                const remainingSlots = event.maxTeamsPerDepartment - updatedDeptCount;
+                
+                if (remainingSlots > 0) {
+                    successMessage += `. You can register ${remainingSlots} more team(s) from your department.`;
+                } else {
+                    successMessage += `. Your department has reached the maximum limit of ${event.maxTeamsPerDepartment} teams.`;
+                }
+            }
+            
+            req.session.success = successMessage;
+            req.session.eventSuccess = req.params.id;
+            return res.redirect(`/student/events/${req.params.id}`);
+        }
+
+        // Handle individual registration
+        const registrationData = {
             student: req.session.user._id,
             status: 'approved',
             registeredAt: new Date(),
             approvalDate: new Date()
         };
 
-        if (event.eventType === 'team') {
-            const { teamName, teamLeaderName, teamLeaderCollegeId, teamLeaderEmail, teamLeaderDepartment, teamMembers } = req.body;
-            
-            if (!teamName || teamName.trim() === '') {
-                req.session.error = 'Team name is required for team events';
-                return res.redirect(`/student/events/${req.params.id}`);
-            }
-
-            if (!teamLeaderName || teamLeaderName.trim() === '') {
-                req.session.error = 'Team leader name is required for team events';
-                return res.redirect(`/student/events/${req.params.id}`);
-            }
-
-            if (!teamLeaderCollegeId || teamLeaderCollegeId.trim() === '') {
-                req.session.error = 'Team leader college ID is required for team events';
-                return res.redirect(`/student/events/${req.params.id}`);
-            }
-
-            if (!teamLeaderEmail || teamLeaderEmail.trim() === '') {
-                req.session.error = 'Team leader email is required for team events';
-                return res.redirect(`/student/events/${req.params.id}`);
-            }
-
-            if (!teamLeaderDepartment || teamLeaderDepartment.trim() === '') {
-                req.session.error = 'Team leader department is required for team events';
-                return res.redirect(`/student/events/${req.params.id}`);
-            }
-
-            // Validate team leader College ID format
-            const studentPattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
-            if (!studentPattern.test(teamLeaderCollegeId.trim().toUpperCase())) {
-                req.session.error = 'Invalid Team Leader College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)';
-                return res.redirect(`/student/events/${req.params.id}`);
-            }
-
-            // Validate team leader email format
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(teamLeaderEmail.trim())) {
-                req.session.error = 'Invalid Team Leader Email format. Please enter a valid email address.';
-                return res.redirect(`/student/events/${req.params.id}`);
-            }
-
-            registrationData.teamName = teamName.trim();
-            registrationData.teamLeaderName = teamLeaderName.trim();
-            registrationData.teamLeaderCollegeId = teamLeaderCollegeId.trim();
-            registrationData.teamLeaderEmail = teamLeaderEmail.trim();
-            registrationData.teamLeaderDepartment = teamLeaderDepartment.trim();
-
-            if (teamMembers && Array.isArray(teamMembers)) {
-                registrationData.teamMembers = teamMembers
-                    .filter(member => member && member.name && member.collegeId)
-                    .map(member => {
-                        const memberCollegeId = member.collegeId.trim();
-                        // Validate team member College ID format
-                        const studentPattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
-                        if (!studentPattern.test(memberCollegeId.toUpperCase())) {
-                            req.session.error = `Invalid College ID format for team member "${member.name}". Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)`;
-                            return res.redirect(`/student/events/${req.params.id}`);
-                        }
-                        return {
-                            name: member.name.trim(),
-                            collegeId: memberCollegeId
-                        };
-                    });
-            }
-        }
-
-        // Add registration
         event.registrations.push(registrationData);
         await event.save();
 
         req.session.success = 'Registration successful';
-        req.session.eventSuccess = req.params.id; // Track which event this success message is for
+        req.session.eventSuccess = req.params.id;
         res.redirect(`/student/events/${req.params.id}`);
     } catch (error) {
         console.error('Event registration error:', error);

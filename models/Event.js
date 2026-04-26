@@ -37,6 +37,10 @@ const eventSchema = new mongoose.Schema({
             return this.eventType === 'team';
         }
     },
+    maxTeamsPerDepartment: {
+        type: Number,
+        default: null
+    },
     date: {
         type: Date,
         required: true

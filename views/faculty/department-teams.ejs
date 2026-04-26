@@ -1,0 +1,217 @@
+<%- include('../partials/header') %>
+
+<style>
+    .team-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="flex min-h-screen bg-gray-50">
+    <%- include('../partials/sidebar') %>
+    
+    <main class="flex-1 overflow-y-auto">
+        <!-- Clean Header -->
+        <div class="bg-white border-b border-gray-200 px-8 py-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center gap-4 mb-4">
+                    <a href="/faculty/events/<%= event._id %>" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Event
+                    </a>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
+                            <%= department %> Department
+                        </h1>
+                        <p class="text-gray-500 mt-1 text-lg">
+                            <%= event.title %>
+                        </p>
+                    </div>
+                 
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto p-6 space-y-6">
+
+            <!-- Teams Grid -->
+            <div class="grid grid-cols-1 gap-6">
+                <% teams.forEach((team, index) => { %>
+                    <div class="team-card bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                        <!-- Team Header -->
+                        <div class="bg-gray-100 px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-lg bg-white flex items-center justify-center shadow-sm">
+                                    <i class="fas fa-users text-gray-600 text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">
+                                        <%= team.teamName || 'Team ' + (index + 1) %>
+                                    </h3>
+                                    <p class="text-gray-500 text-sm">
+                                        <i class="fas fa-calendar-alt text-xs mr-1"></i>
+                                        <%= new Date(team.registeredAt).toLocaleDateString() %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-5 space-y-5">
+                            <!-- Team Leader Section -->
+                            <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="h-8 w-8 rounded-lg bg-blue-500 flex items-center justify-center">
+                                        <i class="fas fa-crown text-white text-xs"></i>
+                                    </div>
+                                    <h4 class="text-sm font-semibold text-gray-800">Team Leader</h4>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div class="bg-white rounded-lg p-2.5 border border-blue-100">
+                                        <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Full Name</p>
+                                        <p class="text-sm font-semibold text-gray-800"><%= team.teamLeaderName || 'N/A' %></p>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-2.5 border border-blue-100">
+                                        <p class="text-xs font-semibold text-gray-500 uppercase mb-1">College ID</p>
+                                        <p class="text-sm font-semibold text-gray-800 font-mono"><%= team.teamLeaderCollegeId || 'N/A' %></p>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-2.5 border border-blue-100">
+                                        <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Email Address</p>
+                                        <p class="text-sm font-semibold text-gray-800 truncate"><%= team.teamLeaderEmail || 'N/A' %></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Team Members Section -->
+                            <% if (team.teamMembers && team.teamMembers.length > 0) { %>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <div class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                                            <i class="fas fa-user-friends text-gray-600 text-xs"></i>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-sm font-semibold text-gray-800">Team Members</h4>
+                                            <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-full">
+                                                <%= team.teamMembers.length %>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="overflow-hidden rounded-lg border border-gray-200">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase w-10">
+                                                        #
+                                                    </th>
+                                                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                                                        Member Name
+                                                    </th>
+                                                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">
+                                                        College ID
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                <% team.teamMembers.forEach((member, mIndex) => { %>
+                                                    <tr class="hover:bg-gray-50">
+                                                        <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
+                                                            <%= mIndex + 1 %>
+                                                        </td>
+                                                        <td class="px-3 py-2 whitespace-nowrap">
+                                                            <div class="flex items-center gap-2">
+                                                                <div class="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center">
+                                                                    <span class="text-xs font-bold text-gray-600"><%= (member.name || 'U').charAt(0).toUpperCase() %></span>
+                                                                </div>
+                                                                <span class="text-sm font-medium text-gray-800"><%= member.name || 'N/A' %></span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-3 py-2 whitespace-nowrap text-sm font-mono text-gray-600">
+                                                            <%= member.collegeId || 'N/A' %>
+                                                        </td>
+                                                    </tr>
+                                                <% }) %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                                    <i class="fas fa-user-plus text-gray-400 mb-2"></i>
+                                    <p class="text-gray-600 text-sm">No additional team members</p>
+                                </div>
+                            <% } %>
+
+                            <!-- Team Footer -->
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-3 border-t border-gray-100">
+                                <div class="flex items-center gap-3 text-sm text-gray-500">
+                                    <span><i class="fas fa-users mr-1"></i><%= (team.teamMembers?.length || 0) + 1 %> members</span>
+                                    <span><i class="far fa-clock mr-1"></i><%= new Date(team.registeredAt).toLocaleDateString() %></span>
+                                </div>
+                                <% if (team.status === 'pending') { %>
+                                    <div class="flex gap-2">
+                                        <button onclick="approveTeam('<%= team._id %>')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded text-sm font-medium">
+                                            <i class="fas fa-check text-xs"></i>Approve
+                                        </button>
+                                        <button onclick="rejectTeam('<%= team._id %>')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium">
+                                            <i class="fas fa-times text-xs"></i>Reject
+                                        </button>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function approveTeam(teamId) {
+        if (confirm('Are you sure you want to approve this team?')) {
+            fetch(`/faculty/registrations/${teamId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error approving team: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving team');
+            });
+        }
+    }
+
+    function rejectTeam(teamId) {
+        if (confirm('Are you sure you want to reject this team?')) {
+            fetch(`/faculty/registrations/${teamId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error rejecting team: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error rejecting team');
+            });
+        }
+    }
+</script>
+
+<%- include('../partials/footer') %>

@@ -104,7 +104,11 @@ router.get('/profile', async (req, res) => {
 router.get('/dashboard', async (req, res) => {
     try {
         const facultyId = req.session.user._id;
-        
+
+        // Get current date at midnight for date comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         const stats = await Promise.all([
             Event.countDocuments({ organizer: facultyId }),
             Event.aggregate([
@@ -112,9 +116,13 @@ router.get('/dashboard', async (req, res) => {
                 { $unwind: '$registrations' },
                 { $count: 'total' }
             ]),
-            Event.find({ organizer: facultyId })
+            // Only fetch current and upcoming events (date >= today)
+            Event.find({
+                organizer: facultyId,
+                date: { $gte: today }
+            })
                 .populate('organizer', 'profile.firstName profile.lastName')
-                .sort({ createdAt: -1 }) // Sort by creation date, newest first
+                .sort({ date: 1 }) // Sort by event date, soonest first
         ]);
 
         const [totalEvents, registrationCount, allEvents] = stats;
@@ -132,6 +140,34 @@ router.get('/dashboard', async (req, res) => {
         console.error('Faculty dashboard error:', error);
         req.session.error = 'Error loading dashboard';
         res.render('faculty/dashboard', { title: 'Faculty Dashboard' });
+    }
+});
+
+// Past Events Page
+router.get('/past-events', async (req, res) => {
+    try {
+        const facultyId = req.session.user._id;
+
+        // Get yesterday's date at midnight for filtering past events
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Fetch only past events (date < today)
+        const pastEvents = await Event.find({
+            organizer: facultyId,
+            date: { $lt: today }
+        })
+            .populate('organizer', 'profile.firstName profile.lastName')
+            .sort({ date: -1 }); // Sort by date descending (newest past event first)
+
+        res.render('faculty/past-events', {
+            title: 'Past Events',
+            pastEvents
+        });
+    } catch (error) {
+        console.error('Past events error:', error);
+        req.session.error = 'Error loading past events';
+        res.render('faculty/past-events', { title: 'Past Events', pastEvents: [] });
     }
 });
 
@@ -168,6 +204,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             eventType,
             maxParticipants,
             teamSize,
+            maxTeamsPerDepartment,
             date,
             startTime,
             endTime,
@@ -219,8 +256,8 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
                 });
             }
         } else {
-                console.log('ℹ️ No file uploaded');
-            }
+            console.log('ℹ No file uploaded');
+        }
 
         // Validation
         console.log('Starting validation...');
@@ -308,6 +345,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             eventType: eventType || 'individual',
             maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
             teamSize: eventType === 'team' ? parseInt(teamSize) : 1,
+            maxTeamsPerDepartment: eventType === 'team' && maxTeamsPerDepartment ? parseInt(maxTeamsPerDepartment) : null,
             date: new Date(date),
             startTime,
             endTime,
@@ -414,6 +452,7 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             eventType,
             maxParticipants,
             teamSize,
+            maxTeamsPerDepartment,
             date,
             startTime,
             endTime,
@@ -508,6 +547,7 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
         event.eventType = eventType || 'individual';
         event.maxParticipants = maxParticipants ? parseInt(maxParticipants) : null;
         event.teamSize = eventType === 'team' ? parseInt(teamSize) : 1;
+        event.maxTeamsPerDepartment = eventType === 'team' && maxTeamsPerDepartment ? parseInt(maxTeamsPerDepartment) : null;
         event.date = new Date(date);
         event.startTime = startTime;
         event.endTime = endTime;
@@ -602,9 +642,31 @@ router.get('/events/:id', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
         
+        // For team events, group registrations by department
+        let departmentGroups = null;
+        if (event.eventType === 'team' && event.registrations) {
+            const groups = {};
+            event.registrations.forEach(reg => {
+                const dept = reg.teamLeaderDepartment || 'Unknown';
+                if (!groups[dept]) {
+                    groups[dept] = {
+                        department: dept,
+                        teams: [],
+                        totalMembers: 0,
+                        teamCount: 0
+                    };
+                }
+                groups[dept].teams.push(reg);
+                groups[dept].teamCount++;
+                groups[dept].totalMembers += (reg.teamMembers?.length || 0) + 1; // +1 for team leader
+            });
+            departmentGroups = Object.values(groups);
+        }
+        
         res.render('faculty/view-event', { 
             title: 'Event Details', 
-            event
+            event,
+            departmentGroups
         });
     } catch (error) {
         console.error('View event error:', error);
@@ -817,6 +879,89 @@ router.get('/student/:studentId', async (req, res) => {
         console.error('View student error:', error);
         req.session.error = 'Error loading student details';
         res.redirect('/faculty/events');
+    }
+});
+
+// Department Teams View (Full Page)
+router.get('/events/:eventId/department/:departmentName', async (req, res) => {
+    try {
+        const { eventId, departmentName } = req.params;
+        
+        const event = await Event.findById(eventId)
+            .populate('organizer', 'profile.firstName profile.lastName profile.email');
+
+        if (!event) {
+            req.session.error = 'Event not found';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        // Check if the faculty is the organizer
+        if (event.organizer._id.toString() !== req.session.user._id.toString()) {
+            req.session.error = 'You are not authorized to view this event';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        // Filter teams by department
+        const departmentTeams = event.registrations.filter(
+            reg => reg.teamLeaderDepartment && 
+                   reg.teamLeaderDepartment.toLowerCase() === decodeURIComponent(departmentName).toLowerCase()
+        );
+
+        if (departmentTeams.length === 0) {
+            req.session.error = 'No teams found for this department';
+            return res.redirect(`/faculty/events/${eventId}`);
+        }
+
+        res.render('faculty/department-teams', {
+            title: `${decodeURIComponent(departmentName)} - Team Details`,
+            event,
+            department: decodeURIComponent(departmentName),
+            teams: departmentTeams
+        });
+    } catch (error) {
+        console.error('Department teams view error:', error);
+        req.session.error = 'Error loading department teams';
+        res.redirect('/faculty/dashboard');
+    }
+});
+
+// Delete Department Teams
+router.delete('/events/:eventId/department/:departmentName/delete', async (req, res) => {
+    try {
+        const { eventId, departmentName } = req.params;
+
+        const event = await Event.findById(eventId);
+
+        if (!event) {
+            return res.json({ success: false, message: 'Event not found' });
+        }
+
+        // Check if the faculty is the organizer
+        if (event.organizer.toString() !== req.session.user._id.toString()) {
+            return res.json({ success: false, message: 'You are not authorized to delete teams from this event' });
+        }
+
+        // Filter out teams from the specified department
+        const decodedDeptName = decodeURIComponent(departmentName).toLowerCase();
+        const originalCount = event.registrations.length;
+        
+        event.registrations = event.registrations.filter(
+            reg => !reg.teamLeaderDepartment || 
+                   reg.teamLeaderDepartment.toLowerCase() !== decodedDeptName
+        );
+
+        const deletedCount = originalCount - event.registrations.length;
+
+        if (deletedCount === 0) {
+            return res.json({ success: false, message: 'No teams found for this department' });
+        }
+
+        await event.save();
+
+        res.json({ success: true, message: `${deletedCount} team(s) deleted successfully` });
+    } catch (error) {
+        console.error('Delete department teams error:', error);
+        res.json({ success: false, message: 'Error deleting department teams' });
     }
 });
 

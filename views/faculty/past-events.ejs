@@ -1,0 +1,300 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/sidebar') %>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<style>
+/* Force white background for Past Events page on all devices */
+main {
+    background-color: #ffffff !important;
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+}
+
+/* Override dark mode styles for Past Events page */
+@media (prefers-color-scheme: dark) {
+    main {
+        background-color: #ffffff !important;
+    }
+}
+
+/* Mobile-specific override */
+@media (max-width: 768px) {
+    main {
+        background-color: #ffffff !important;
+        padding: 0.75rem;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100vw;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+}
+
+/* Ensure all content areas are white */
+.bg-gray-50 {
+    background-color: #ffffff !important;
+}
+
+@media (max-width: 768px) {
+    .bg-gray-50 {
+        background-color: #ffffff !important;
+    }
+}
+
+/* Compact Action Buttons - Match Header Logout Button Style */
+.compact-action-btn {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    border: 1px solid #0ea5a4;
+    color: #0ea5a4;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    min-height: 2.5rem;
+    justify-content: center;
+}
+
+.compact-action-btn:hover {
+    background-color: #0ea5a4;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(14, 165, 164, 0.3);
+}
+
+.compact-action-btn:focus {
+    background-color: #0ea5a4;
+    color: white;
+    outline: none;
+}
+
+/* Mobile responsiveness for compact buttons */
+@media (max-width: 640px) {
+    .compact-action-btn {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.75rem;
+        min-height: 2.75rem;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .compact-action-btn i {
+        font-size: 0.875rem !important;
+    }
+
+    .compact-action-btn span {
+        font-size: 0.75rem !important;
+    }
+
+    /* Button groups on mobile */
+    .flex.gap-2.justify-end {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+
+    .flex.gap-3 {
+        flex-direction: column;
+        gap: 0.75rem !important;
+    }
+}
+
+/* Events Grid Mobile Optimization */
+@media (max-width: 640px) {
+    .events-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+        padding: 0;
+    }
+}
+
+/* Typography Mobile Optimization */
+@media (max-width: 640px) {
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .text-gray-700 {
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Remove horizontal scrolling */
+@media (max-width: 640px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    main {
+        overflow-x: hidden;
+    }
+}
+
+/* Past event badge styling */
+.past-event-badge {
+    background-color: #6b7280;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Stats summary card */
+.stats-summary {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border-left: 4px solid #6b7280;
+}
+</style>
+
+<main class="flex-1">
+    <!-- Past Events Title -->
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Past Events</h1>
+    <p class="text-gray-700 sm:text-gray-600 mb-8">View all your previous events that have already taken place.</p>
+
+    <% if (pastEvents && pastEvents.length > 0) { %>
+        <!-- Stats Summary -->
+        <div class="stats-summary rounded-lg shadow-md p-4 mb-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-gray-500 rounded-full">
+                    <i class="fas fa-history text-white text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-gray-600">Total Past Events</p>
+                    <p class="text-xl font-bold text-gray-800"><%= pastEvents.length %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Past Events Grid -->
+        <div class="events-grid">
+            <% pastEvents.forEach(event => { %>
+                <div class="event-card group" data-category="<%= event.category || 'other' %>">
+                    <!-- Event Image -->
+                    <div class="event-image">
+                        <% if (event.poster && event.poster.trim() !== '') { %>
+                            <img src="/uploads/<%= event.poster %>"
+                                 alt="<%= event.title %>"
+                                 class="w-full h-full object-cover"
+                                 style="object-fit: cover;">
+                        <% } else { %>
+                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                <div class="text-center">
+                                    <i class="fas fa-calendar-alt text-4xl text-gray-500 mb-2"></i>
+                                    <p class="text-gray-500 text-sm">No poster uploaded</p>
+                                </div>
+                            </div>
+                        <% } %>
+                        <!-- Past Event Overlay -->
+                        <div class="absolute top-3 right-3">
+                            <span class="past-event-badge">Completed</span>
+                        </div>
+                    </div>
+
+                    <!-- Event Content -->
+                    <div class="event-content">
+                        <!-- Title and Category Badge -->
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
+                            <h3 class="event-title mb-2 sm:mb-0 sm:mr-2">
+                                <%= event.title %>
+                            </h3>
+                            <% if (event.category) { %>
+                                <span class="category-badge ml-0 sm:ml-2 flex-shrink-0
+                                    <% if (event.category === 'sports') { %>
+                                        bg-green-100 text-green-800
+                                    <% } else if (event.category === 'workshop') { %>
+                                        bg-blue-100 text-blue-800
+                                    <% } else if (event.category === 'cultural') { %>
+                                        bg-purple-100 text-purple-800
+                                    <% } else if (event.category === 'seminar') { %>
+                                        bg-yellow-100 text-yellow-800
+                                    <% } else { %>
+                                        bg-gray-100 text-gray-800
+                                    <% } %>
+                                ">
+                                    <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
+                                </span>
+                            <% } %>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="event-description mb-3">
+                            <%= event.description || 'No description available' %>
+                        </p>
+
+                        <!-- Event Details -->
+                        <div class="event-details mb-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar mr-2 text-gray-400"></i>
+                                <span><%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-2 text-gray-400"></i>
+                                <span><%= event.startTime %> - <%= event.endTime %></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                                <span><%= event.venue %></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2 text-gray-400"></i>
+                                <span><%= event.organizer.profile.firstName %> <%= event.organizer.profile.lastName %></span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-users mr-2 text-gray-400"></i>
+                                <span><%= event.registrations ? event.registrations.length : 0 %> / <%= event.maxParticipants || 'Unlimited' %> registered</span>
+                            </div>
+                        </div>
+
+                        <!-- View Button -->
+                        <div class="flex gap-2 justify-end">
+                            <a href="/faculty/events/<%= event._id %>" class="compact-action-btn">
+                                <i class="fas fa-eye text-sm"></i>
+                                <span class="text-xs">View Details</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <!-- No Past Events State -->
+        <div class="text-center py-12 bg-white rounded-xl shadow-lg mb-8">
+            <i class="fas fa-calendar-check text-gray-400 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Past Events</h3>
+            <p class="text-gray-500 mb-6">You haven't had any events that have completed yet.</p>
+            <a href="/faculty/dashboard" class="compact-action-btn">
+                <i class="fas fa-arrow-left text-sm"></i>
+                <span class="text-xs">Back to Dashboard</span>
+            </a>
+        </div>
+    <% } %>
+
+    <!-- Quick Actions Section -->
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+    <div class="flex flex-wrap gap-3">
+        <a href="/faculty/dashboard" class="compact-action-btn">
+            <i class="fas fa-tachometer-alt text-sm"></i>
+            <span class="text-xs">Dashboard</span>
+        </a>
+        <a href="/faculty/events/create" class="compact-action-btn">
+            <i class="fas fa-plus text-sm"></i>
+            <span class="text-xs">Create Event</span>
+        </a>
+    </div>
+</main>
+
+<%- include('../partials/footer') %>

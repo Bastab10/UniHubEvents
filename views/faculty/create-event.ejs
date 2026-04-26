@@ -1,6 +1,28 @@
 <%- include('../partials/header') %>
 
 <style>
+/* Flash Message Styles */
+.flash-message {
+    animation: slideIn 0.3s ease-out;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.flash-message.hide {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Compact Action Buttons - Match Header Logout Button Style */
 .compact-action-btn {
     text-decoration: none;
@@ -211,7 +233,7 @@
                     <p class="text-gray-600 mt-2">Fill in the details to create a new event</p>
 
                     <% if (error) { %>
-                        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mt-4">
+                        <div id="flash-message" class="flash-message bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mt-4">
                             <div class="flex items-center">
                                 <i class="fas fa-exclamation-triangle mr-2"></i>
                                 <span><%= error %></span>
@@ -220,7 +242,7 @@
                     <% } %>
 
                     <% if (success) { %>
-                        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mt-4">
+                        <div id="flash-message" class="flash-message bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mt-4">
                             <div class="flex items-center">
                                 <i class="fas fa-check-circle mr-2"></i>
                                 <span><%= success %></span>
@@ -292,11 +314,27 @@
                                 </div>
 
                                 <div id="teamSizeDiv" class="hidden">
-                                    <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">Team Size *</label>
-                                    <input type="number" id="teamSize" name="teamSize" min="2" max="20"
+                                    <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">
+                                        Team Size (Members Only)
+                                        <span class="text-xs font-normal text-gray-500 ml-1">(excluding team leader)</span>
+                                    </label>
+                                    <input type="number" id="teamSize" name="teamSize" min="1" max="20"
                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
-                                           placeholder="Number of team members">
+                                           placeholder="Number of team members (excluding leader)">
+                                    <p class="text-xs text-gray-500 mt-1">Total people = 1 leader + N members</p>
                                 </div>
+                            </div>
+
+                            <!-- Maximum Teams per Department - Shows only for Team events -->
+                            <div id="maxTeamsPerDeptDiv" class="hidden">
+                                <label for="maxTeamsPerDepartment" class="block text-sm font-semibold mb-2 text-gray-700">
+                                    Maximum Teams per Department
+                                    <span class="text-xs font-normal text-gray-500 ml-1">(Optional - Leave empty for unlimited)</span>
+                                </label>
+                                <input type="number" id="maxTeamsPerDepartment" name="maxTeamsPerDepartment" min="1" max="50"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
+                                       placeholder="e.g., 2 (only 2 teams allowed per department)">
+                                <p class="text-xs text-gray-500 mt-1">Leave empty to allow unlimited teams from any department</p>
                             </div>
 
                             <!-- Maximum Participants - Full Width -->
@@ -419,13 +457,29 @@
 </div>
 
 <script>
-// Show/hide team size field based on event type
+// Auto-hide flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const flashMessage = document.getElementById('flash-message');
+    if (flashMessage) {
+        setTimeout(function() {
+            flashMessage.classList.add('hide');
+            setTimeout(function() {
+                flashMessage.style.display = 'none';
+            }, 500); // Wait for fade out animation
+        }, 5000); // 5 seconds
+    }
+});
+
+// Show/hide team fields based on event type
 document.getElementById('eventType').addEventListener('change', function() {
     const teamSizeDiv = document.getElementById('teamSizeDiv');
+    const maxTeamsPerDeptDiv = document.getElementById('maxTeamsPerDeptDiv');
     if (this.value === 'team') {
         teamSizeDiv.classList.remove('hidden');
+        maxTeamsPerDeptDiv.classList.remove('hidden');
     } else {
         teamSizeDiv.classList.add('hidden');
+        maxTeamsPerDeptDiv.classList.add('hidden');
     }
 });
 

@@ -421,6 +421,23 @@
                                            placeholder="Leave empty for unlimited">
                                 </div>
                             </div>
+
+                            <!-- Maximum Teams per Department - Shows only for Team events -->
+                            <div id="maxTeamsPerDeptField" style="display: none;">
+                                <label for="maxTeamsPerDepartment" class="block text-sm font-semibold mb-2 text-gray-700">
+                                    Maximum Teams per Department
+                                    <span class="text-xs font-normal text-gray-500 ml-1">(Optional - Leave empty for unlimited)</span>
+                                </label>
+                                <input type="number"
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
+                                       id="maxTeamsPerDepartment"
+                                       name="maxTeamsPerDepartment"
+                                       value="<%= formData.maxTeamsPerDepartment || event.maxTeamsPerDepartment %>"
+                                       min="1"
+                                       max="50"
+                                       placeholder="e.g., 2 (only 2 teams allowed per department)">
+                                <p class="text-xs text-gray-500 mt-1">Leave empty to allow unlimited teams from any department</p>
+                            </div>
                         </div>
 
                         <!-- Subcategory Section (for Sports) -->
@@ -557,15 +574,18 @@
 </div>
 
 <script>
-// Show/hide team size field based on event type
+// Show/hide team fields based on event type
 function toggleTeamSize() {
     const eventType = document.getElementById('eventType').value;
     const teamSizeField = document.getElementById('teamSizeField');
-    
+    const maxTeamsPerDeptField = document.getElementById('maxTeamsPerDeptField');
+
     if (eventType === 'team') {
         teamSizeField.style.display = 'block';
+        maxTeamsPerDeptField.style.display = 'block';
     } else {
         teamSizeField.style.display = 'none';
+        maxTeamsPerDeptField.style.display = 'none';
     }
 }
 

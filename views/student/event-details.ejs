@@ -172,6 +172,36 @@
                 </div>
             <% } %>
             
+            <%
+                // Calculate department team registration status for team events
+                let deptTeamsCount = 0;
+                let maxDeptTeams = event.maxTeamsPerDepartment || 0;
+                let canRegisterMoreTeams = true;
+                let remainingTeamSlots = 0;
+
+                if (event.eventType === 'team' && currentUser.profile && currentUser.profile.department) {
+                    const studentDept = currentUser.profile.department.toLowerCase();
+                    deptTeamsCount = event.registrations.filter(
+                        reg => reg.teamLeaderDepartment && reg.teamLeaderDepartment.toLowerCase() === studentDept
+                    ).length;
+
+                    if (maxDeptTeams > 0) {
+                        remainingTeamSlots = maxDeptTeams - deptTeamsCount;
+                        canRegisterMoreTeams = remainingTeamSlots > 0;
+                    } else {
+                        // Unlimited teams allowed
+                        remainingTeamSlots = -1; // Indicates unlimited
+                        canRegisterMoreTeams = true;
+                    }
+                }
+
+                // For individual events, check if already registered
+                const isIndividualRegistered = event.eventType !== 'team' && isRegistered;
+
+                // For team events, check if department limit reached
+                const isTeamLimitReached = event.eventType === 'team' && maxDeptTeams > 0 && remainingTeamSlots <= 0;
+            %>
+
             <% if (isPastEvent) { %>
                 <!-- Past Event - No Registration -->
                 <div class="bg-white rounded-lg shadow-md p-6 text-center mx-auto max-w-2xl">
@@ -183,14 +213,44 @@
                         <span class="font-medium">Past Event</span>
                     </div>
                 </div>
-            <% } else if (isRegistered) { %>
-                <!-- Already Registered Card -->
+            <% } else if (isIndividualRegistered) { %>
+                <!-- Already Registered Card (Individual Events) -->
                 <div class="bg-white rounded-lg shadow-md p-6 text-center mx-auto max-w-2xl">
                     <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">Already Registered</h3>
                     <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full">
                         <i class="fas fa-ticket-alt mr-2"></i>
                         <span class="font-medium">Registration Confirmed</span>
+                    </div>
+                </div>
+            <% } else if (event.eventType === 'team' && isRegistered) { %>
+                <!-- Already Registered for Team Event - Show status and allow more registrations -->
+                <div class="bg-white rounded-lg shadow-md p-6 mx-auto max-w-3xl">
+                    <div class="text-center mb-6 pb-6 border-b border-gray-200">
+                        <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Already Registered</h3>
+                        <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full mb-3">
+                            <i class="fas fa-ticket-alt mr-2"></i>
+                            <span class="font-medium">Registration Confirmed</span>
+                        </div>
+                        <p class="text-gray-600">You can register more teams for this event if needed.</p>
+                    </div>
+                    
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-user-plus text-purple-600 text-xl mr-3"></i>
+                        <h2 class="text-xl font-bold text-gray-800">Register Additional Teams</h2>
+                    </div>
+            <% } else if (isTeamLimitReached) { %>
+                <!-- Team Department Limit Reached -->
+                <div class="bg-white rounded-lg shadow-md p-6 text-center mx-auto max-w-2xl">
+                    <i class="fas fa-ban text-orange-500 text-4xl mb-3"></i>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Department Team Limit Reached</h3>
+                    <p class="text-gray-600 mb-3">Maximum team limit reached for your department.</p>
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+                        <p class="text-sm text-orange-800">
+                            <strong>Limit:</strong> <%= maxDeptTeams %> teams per department<br>
+                            <strong>Registered from your dept:</strong> <%= deptTeamsCount %> teams
+                        </p>
                     </div>
                 </div>
             <% } else if (availableSpots !== null && availableSpots <= 0) { %>
@@ -206,87 +266,79 @@
                         <h2 class="text-xl font-bold text-gray-800">Event Registration</h2>
                     </div>
 
-                    <form method="POST" action="/student/events/<%= event._id %>/register" id="teamRegistrationForm">
-                        <% if (event.eventType === 'team') { %>
-                            <!-- Compact Team Information -->
-                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-4">
-                                <h3 class="text-base font-semibold text-gray-800 mb-3">Team Information</h3>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
-                                        <input type="text" id="teamName" name="teamName" required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
-                                               placeholder="Enter team name">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader Name *</label>
-                                        <input type="text" id="teamLeaderName" name="teamLeaderName" required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
-                                               placeholder="Team leader name">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader College ID *</label>
-                                        <input type="text" id="teamLeaderCollegeId" name="teamLeaderCollegeId" required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
-                                               placeholder="e.g., 23BCA123">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader Email *</label>
-                                        <input type="email" id="teamLeaderEmail" name="teamLeaderEmail" required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
-                                               placeholder="leader@example.com">
-                                    </div>
-                                    
-                                    <div class="md:col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Department (Leader) *</label>
-                                        <select id="teamLeaderDepartment" name="teamLeaderDepartment" required
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900">
-                                            <option value="">Select Department</option>
-                                            <option value="Computer Science">Computer Science</option>
-                                            <option value="Information Technology">Information Technology</option>
-                                            <option value="Electronics & Communication">Electronics & Communication</option>
-                                            <option value="Electrical Engineering">Electrical Engineering</option>
-                                            <option value="Mechanical Engineering">Mechanical Engineering</option>
-                                            <option value="Civil Engineering">Civil Engineering</option>
-                                            <option value="Chemical Engineering">Chemical Engineering</option>
-                                            <option value="Biotechnology">Biotechnology</option>
-                                            <option value="Business Administration">Business Administration</option>
-                                            <option value="Applied Sciences">Applied Sciences</option>
-                                        </select>
-                                    </div>
+                    <% if (event.eventType === 'team' && currentUser.profile && currentUser.profile.department) { %>
+                        <!-- Department Team Registration Status -->
+                        <div class="mb-4 p-4 rounded-lg border
+                            <% if (maxDeptTeams > 0) { %>
+                                <%= remainingTeamSlots > 0 ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200' %>
+                            <% } else { %>
+                                bg-blue-50 border-blue-200
+                            <% } %>">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-semibold
+                                        <% if (maxDeptTeams > 0) { %>
+                                            <%= remainingTeamSlots > 0 ? 'text-green-800' : 'text-orange-800' %>
+                                        <% } else { %>
+                                            text-blue-800
+                                        <% } %>">
+                                        <i class="fas fa-users mr-2"></i>
+                                        Department: <%= currentUser.profile.department %>
+                                    </p>
+                                    <p class="text-xs mt-1
+                                        <% if (maxDeptTeams > 0) { %>
+                                            <%= remainingTeamSlots > 0 ? 'text-green-600' : 'text-orange-600' %>
+                                        <% } else { %>
+                                            text-blue-600
+                                        <% } %>">
+                                        <% if (maxDeptTeams > 0) { %>
+                                            <strong><%= deptTeamsCount %></strong> team(s) registered from your department.
+                                            <% if (remainingTeamSlots > 0) { %>
+                                                You can register <strong><%= remainingTeamSlots %></strong> more team(s).
+                                            <% } else { %>
+                                                Limit reached (<%= maxDeptTeams %> teams max).
+                                            <% } %>
+                                        <% } else { %>
+                                            <strong><%= deptTeamsCount %></strong> team(s) registered.
+                                            Unlimited teams allowed per department.
+                                        <% } %>
+                                    </p>
+                                </div>
+                                <div class="text-center">
+                                    <% if (maxDeptTeams > 0) { %>
+                                        <div class="text-2xl font-bold
+                                            <%= remainingTeamSlots > 0 ? 'text-green-600' : 'text-orange-600' %>">
+                                            <%= remainingTeamSlots > 0 ? remainingTeamSlots : 0 %>
+                                        </div>
+                                        <div class="text-xs text-gray-500">slots left</div>
+                                    <% } else { %>
+                                        <div class="text-2xl font-bold text-blue-600">∞</div>
+                                        <div class="text-xs text-gray-500">unlimited</div>
+                                    <% } %>
                                 </div>
                             </div>
+                        </div>
+                    <% } %>
 
-                            <!-- Compact Team Members Table -->
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                                <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                                    <div class="flex items-center justify-between">
-                                        <h3 class="text-base font-semibold text-gray-800">Team Members Information</h3>
-                                        <button type="button" id="addMemberBtn" class="px-3 py-1 bg-[#0ea5a4] text-white rounded-md hover:bg-[#0d9488] transition-colors text-sm font-medium border border-[#0ea5a4]">
-                                            <i class="fas fa-plus mr-1"></i>Add Member
-                                        </button>
-                                    </div>
-                                    <p class="text-xs text-gray-600 mt-1">Maximum <%= event.teamSize %> members (including team leader)</p>
-                                </div>
-                                
-                                <div class="overflow-x-auto">
-                                    <table class="w-full" id="teamMembersTable">
-                                        <thead class="bg-gray-50 border-b border-gray-200">
-                                            <tr>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member Name</th>
-                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College ID</th>
-                                                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200" id="teamMembersBody">
-                                            <!-- Dynamic members will be added here -->
-                                        </tbody>
-                                    </table>
-                                </div>
+                    <form method="POST" action="/student/events/<%= event._id %>/register" id="teamRegistrationForm">
+                        <% if (event.eventType === 'team') { %>
+                            <!-- Bulk Team Registration Interface -->
+                            <div id="teamsContainer">
+                                <!-- Team sections will be dynamically added here -->
+                            </div>
+                            
+                            <!-- Add Team Button -->
+                            <div class="mt-4 text-center">
+                                <button type="button" id="addTeamBtn" class="px-4 py-2 bg-[#0ea5a4] text-white rounded-lg hover:bg-[#0d9488] transition-colors font-medium border border-[#0ea5a4]">
+                                    <i class="fas fa-plus mr-2"></i>Add Another Team
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    <% if (maxDeptTeams > 0) { %>
+                                        You can register up to <%= remainingTeamSlots %> more team(s) from your department
+                                    <% } else { %>
+                                        Unlimited teams allowed per department
+                                    <% } %>
+                                </p>
                             </div>
                         <% } else { %>
                             <!-- Individual Registration -->
@@ -296,11 +348,11 @@
                             </div>
                         <% } %>
 
-                        <!-- Compact Submit Button -->
+                        <!-- Submit Button -->
                         <div class="mt-6 text-center">
                             <button type="submit" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-md">
                                 <i class="fas fa-check-circle mr-2"></i>
-                                <% if (event.eventType === 'team') { %>Register Team<% } else { %>Register for Event<% } %>
+                                <% if (event.eventType === 'team') { %>Register All Teams<% } else { %>Register for Event<% } %>
                             </button>
                         </div>
                     </form>
@@ -311,139 +363,340 @@
 </div>
 
 <script>
-let memberCount = 0;
-const maxMembers = parseInt("<%= event.eventType === 'team' ? event.teamSize - 1 : 0 %>");
+// Bulk Team Registration JavaScript
+const maxTeamsPerDept = parseInt("<%= maxDeptTeams || 0 %>") || 0;
+const currentDeptTeams = parseInt("<%= deptTeamsCount || 0 %>") || 0;
+const remainingSlots = maxTeamsPerDept > 0 ? maxTeamsPerDept - currentDeptTeams : -1; // -1 means unlimited
+const maxMembersPerTeam = parseInt("<%= event.eventType === 'team' ? event.teamSize : 0 %>") || 0;
+let teamCount = 0;
+const maxAllowedTeams = remainingSlots > 0 ? remainingSlots : (remainingSlots === -1 ? 10 : 0);
+const teamMemberCounts = {};
 
-// Add initial member rows
-if (maxMembers > 0) {
-    for (let i = 0; i < Math.min(2, maxMembers); i++) {
-        addMemberRow();
+// Initialize with first team section
+if ('<%= event.eventType %>' === 'team' && maxAllowedTeams > 0) {
+    addTeamSection();
+}
+
+// Add Team Button Handler
+document.getElementById('addTeamBtn').addEventListener('click', function() {
+    if (teamCount < maxAllowedTeams) {
+        addTeamSection();
+    } else {
+        if (remainingSlots === -1) {
+            alert('Maximum 10 teams allowed per submission');
+        } else {
+            alert('Maximum team limit reached for your department');
+        }
+    }
+});
+
+function addTeamSection() {
+    if (teamCount >= maxAllowedTeams) return;
+    
+    teamCount++;
+    const teamIndex = teamCount - 1;
+    const autoTeamName = `Team${teamCount}`;
+    
+    const container = document.getElementById('teamsContainer');
+    const teamSection = document.createElement('div');
+    teamSection.className = 'team-section bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-4 border border-blue-200';
+    teamSection.id = `teamSection_${teamIndex}`;
+    teamSection.dataset.teamIndex = teamIndex;
+    
+    teamSection.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-semibold text-gray-800">Team ${teamCount}</h3>
+            ${teamCount > 1 ? `<button type="button" onclick="removeTeamSection(${teamIndex})" class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-trash mr-1"></i>Remove</button>` : ''}
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
+                <input type="text" name="teams[${teamIndex}][teamName]" required value="${autoTeamName}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 team-name-input"
+                       placeholder="Enter team name" onchange="validateTeamName(this)">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader Name *</label>
+                <input type="text" name="teams[${teamIndex}][teamLeaderName]" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                       placeholder="Team leader name">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader College ID *</label>
+                <input type="text" name="teams[${teamIndex}][teamLeaderCollegeId]" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 college-id-input"
+                       placeholder="e.g., 23BCA123">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Team Leader Email *</label>
+                <input type="email" name="teams[${teamIndex}][teamLeaderEmail]" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 email-input"
+                       placeholder="leader@example.com">
+            </div>
+            
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Department (Leader) *</label>
+                <select name="teams[${teamIndex}][teamLeaderDepartment]" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 department-select">
+                    <option value="">Select Department</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Electronics & Communication">Electronics & Communication</option>
+                    <option value="Electrical Engineering">Electrical Engineering</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                    <option value="Chemical Engineering">Chemical Engineering</option>
+                    <option value="Biotechnology">Biotechnology</option>
+                    <option value="Business Administration">Business Administration</option>
+                    <option value="Applied Sciences">Applied Sciences</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Team Members Section -->
+        <div class="mt-4 bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold text-gray-800">Team Members</h4>
+                    <button type="button" onclick="addTeamMemberRow(${teamIndex})" class="px-3 py-1 bg-[#0ea5a4] text-white rounded-md hover:bg-[#0d9488] transition-colors text-sm font-medium border border-[#0ea5a4] add-member-btn-${teamIndex}">
+                        <i class="fas fa-plus mr-1"></i>Add Member
+                    </button>
+                </div>
+                <p class="text-xs text-gray-600 mt-1">Maximum ${maxMembersPerTeam} members (excluding leader)</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full" id="teamMembersTable_${teamIndex}">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Member Name</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">College ID</th>
+                            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="teamMembersBody_${teamIndex}">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(teamSection);
+    
+    // Add initial member rows (2 by default or max if less)
+    const initialMembers = Math.min(2, maxMembersPerTeam);
+    for (let i = 0; i < initialMembers; i++) {
+        addTeamMemberRow(teamIndex);
+    }
+    
+    // Update add team button visibility
+    updateAddTeamButton();
+}
+
+function removeTeamSection(teamIndex) {
+    const section = document.getElementById(`teamSection_${teamIndex}`);
+    if (section) {
+        section.remove();
+        reindexTeams();
     }
 }
 
-// Form validation before submission
-document.getElementById('teamRegistrationForm').addEventListener('submit', function(e) {
-    if ('<%= event.eventType %>' === 'team') {
-        // Check for duplicate College IDs
-        const collegeIds = new Set();
+function reindexTeams() {
+    const sections = document.querySelectorAll('.team-section');
+    teamCount = 0;
+    sections.forEach((section, index) => {
+        teamCount++;
+        section.id = `teamSection_${index}`;
+        section.dataset.teamIndex = index;
+        section.querySelector('h3').textContent = `Team ${teamCount}`;
         
-        // Add team leader College ID
-        const leaderCollegeId = document.getElementById('teamLeaderCollegeId').value.trim().toUpperCase();
-        if (leaderCollegeId) {
-            collegeIds.add(leaderCollegeId);
-        }
-        
-        // Check team member College IDs
-        const memberInputs = document.querySelectorAll('input[name*="collegeId"]');
-        memberInputs.forEach(input => {
-            const collegeId = input.value.trim().toUpperCase();
-            if (collegeId) {
-                if (collegeIds.has(collegeId)) {
-                    e.preventDefault();
-                    alert('Duplicate College ID detected: ' + collegeId + '. Each team member must have a unique College ID.');
-                    input.focus();
-                    return;
-                }
-                collegeIds.add(collegeId);
+        // Update all input names
+        const inputs = section.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name) {
+                const newName = name.replace(/teams\[\d+\]/, `teams[${index}]`);
+                input.setAttribute('name', newName);
             }
         });
         
-        // Validate College ID format
+        // Update table id and member rows
+        const table = section.querySelector('table');
+        const tbody = section.querySelector('tbody');
+        table.id = `teamMembersTable_${index}`;
+        tbody.id = `teamMembersBody_${index}`;
+        
+        // Update add member button onclick
+        const addBtn = section.querySelector(`[class*="add-member-btn-"]`);
+        if (addBtn) {
+            addBtn.className = addBtn.className.replace(/add-member-btn-\d+/, `add-member-btn-${index}`);
+            addBtn.setAttribute('onclick', `addTeamMemberRow(${index})`);
+        }
+        
+        // Update remove button
+        const removeBtn = section.querySelector('button[onclick^="removeTeamSection"]');
+        if (removeBtn) {
+            removeBtn.setAttribute('onclick', `removeTeamSection(${index})`);
+        }
+    });
+    
+    updateAddTeamButton();
+}
+
+function updateAddTeamButton() {
+    const addBtn = document.getElementById('addTeamBtn');
+    if (addBtn) {
+        if (teamCount >= maxAllowedTeams) {
+            addBtn.disabled = true;
+            addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            addBtn.disabled = false;
+            addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+}
+
+function addTeamMemberRow(teamIndex) {
+    // Ensure the team index exists in our counter
+    if (typeof teamMemberCounts[teamIndex] === 'undefined') {
+        teamMemberCounts[teamIndex] = 0;
+    }
+    if (!teamMemberCounts[teamIndex]) teamMemberCounts[teamIndex] = 0;
+    
+    if (teamMemberCounts[teamIndex] >= maxMembersPerTeam) {
+        alert('Maximum team members reached!');
+        return;
+    }
+    
+    const tbody = document.getElementById(`teamMembersBody_${teamIndex}`);
+    if (!tbody) return;
+    
+    const memberIndex = teamMemberCounts[teamIndex];
+    const row = document.createElement('tr');
+    row.className = 'hover:bg-gray-50';
+    row.innerHTML = `
+        <td class="px-4 py-2">
+            <input type="text" name="teams[${teamIndex}][members][${memberIndex}][name]" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
+                   placeholder="Member name">
+        </td>
+        <td class="px-4 py-2">
+            <input type="text" name="teams[${teamIndex}][members][${memberIndex}][collegeId]" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 college-id-input"
+                   placeholder="College ID">
+        </td>
+        <td class="px-4 py-2 text-center">
+            <button type="button" onclick="removeTeamMemberRow(this, ${teamIndex})" class="text-red-600 hover:text-red-800">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(row);
+    teamMemberCounts[teamIndex]++;
+    
+    // Update add button state
+    const addBtn = document.querySelector(`.add-member-btn-${teamIndex}`);
+    if (addBtn && teamMemberCounts[teamIndex] >= maxMembersPerTeam) {
+        addBtn.disabled = true;
+        addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+}
+
+function removeTeamMemberRow(button, teamIndex) {
+    const row = button.closest('tr');
+    row.remove();
+    teamMemberCounts[teamIndex]--;
+    
+    // Re-index remaining members
+    const tbody = document.getElementById(`teamMembersBody_${teamIndex}`);
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach((r, idx) => {
+        const inputs = r.querySelectorAll('input');
+        inputs[0].name = `teams[${teamIndex}][members][${idx}][name]`;
+        inputs[1].name = `teams[${teamIndex}][members][${idx}][collegeId]`;
+    });
+    
+    // Re-enable add button
+    const addBtn = document.querySelector(`.add-member-btn-${teamIndex}`);
+    if (addBtn) {
+        addBtn.disabled = false;
+        addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+
+function validateTeamName(input) {
+    // Get all team names
+    const nameInputs = document.querySelectorAll('.team-name-input');
+    const names = Array.from(nameInputs).map(i => i.value.trim().toLowerCase());
+    const currentName = input.value.trim().toLowerCase();
+    
+    // Check for duplicates
+    const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
+    if (duplicates.includes(currentName)) {
+        alert('Team name must be unique!');
+        input.value = '';
+        input.focus();
+    }
+}
+
+// Form validation
+document.getElementById('teamRegistrationForm').addEventListener('submit', function(e) {
+    if ('<%= event.eventType %>' === 'team') {
         const studentPattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
-        const allCollegeInputs = document.querySelectorAll('input[name*="CollegeId"], input[name*="collegeId"]');
-        allCollegeInputs.forEach(input => {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        // Validate all College IDs
+        const collegeIdInputs = document.querySelectorAll('.college-id-input');
+        const collegeIds = new Set();
+        
+        for (const input of collegeIdInputs) {
             const collegeId = input.value.trim().toUpperCase();
-            if (collegeId && !studentPattern.test(collegeId)) {
+            if (!collegeId) continue;
+            
+            if (!studentPattern.test(collegeId)) {
                 e.preventDefault();
                 alert('Invalid College ID format: ' + collegeId + '. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)');
                 input.focus();
                 return;
             }
-        });
+            
+            if (collegeIds.has(collegeId)) {
+                e.preventDefault();
+                alert('Duplicate College ID detected: ' + collegeId + '. Each team member must have a unique College ID.');
+                input.focus();
+                return;
+            }
+            collegeIds.add(collegeId);
+        }
         
-        // Validate email format
-        const emailInput = document.getElementById('teamLeaderEmail');
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailInput.value && !emailPattern.test(emailInput.value.trim())) {
-            e.preventDefault();
-            alert('Invalid email format. Please enter a valid email address.');
-            emailInput.focus();
-            return;
+        // Validate all emails
+        const emailInputs = document.querySelectorAll('.email-input');
+        for (const input of emailInputs) {
+            const email = input.value.trim();
+            if (email && !emailPattern.test(email)) {
+                e.preventDefault();
+                alert('Invalid email format: ' + email);
+                input.focus();
+                return;
+            }
+        }
+        
+        // Validate department selection
+        const deptSelects = document.querySelectorAll('.department-select');
+        for (const select of deptSelects) {
+            if (!select.value) {
+                e.preventDefault();
+                alert('Please select a department for all teams');
+                select.focus();
+                return;
+            }
         }
     }
 });
-
-document.getElementById('addMemberBtn').addEventListener('click', function() {
-    if (memberCount < maxMembers) {
-        addMemberRow();
-    } else {
-        alert('Maximum team size reached!');
-    }
-});
-
-function addMemberRow() {
-    const tbody = document.getElementById('teamMembersBody');
-    const row = document.createElement('tr');
-    row.className = 'hover:bg-gray-50';
-    row.innerHTML = '<td class="px-6 py-4">' +
-        '<input type="text" name="teamMembers[' + memberCount + '][name]" required ' +
-        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900" ' +
-        'placeholder="Member name">' +
-        '</td>' +
-        '<td class="px-6 py-4">' +
-        '<input type="text" name="teamMembers[' + memberCount + '][collegeId]" required ' +
-        'class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900" ' +
-        'placeholder="College ID">' +
-        '</td>' +
-        '<td class="px-6 py-4 text-center">' +
-        '<button type="button" onclick="removeMember(this)" class="text-red-600 hover:text-red-800">' +
-        '<i class="fas fa-trash"></i>' +
-        '</button>' +
-        '</td>';
-    tbody.appendChild(row);
-    memberCount++;
-    
-    // Apply mobile styles to new inputs
-    if (window.innerWidth <= 640) {
-        const newInputs = row.querySelectorAll('input[type="text"]');
-        newInputs.forEach(input => {
-            input.style.color = '#000000';
-            input.style.backgroundColor = '#ffffff';
-        });
-    }
-    
-    // Disable add button if max reached
-    if (memberCount >= maxMembers) {
-        document.getElementById('addMemberBtn').disabled = true;
-        document.getElementById('addMemberBtn').classList.add('opacity-50', 'cursor-not-allowed');
-    }
-}
-
-function removeMember(button) {
-    const row = button.closest('tr');
-    row.remove();
-    memberCount--;
-    
-    // Re-enable add button if below max
-    if (memberCount < maxMembers) {
-        document.getElementById('addMemberBtn').disabled = false;
-        document.getElementById('addMemberBtn').classList.remove('opacity-50', 'cursor-not-allowed');
-    }
-    
-    // Re-index remaining members
-    reindexMembers();
-}
-
-function reindexMembers() {
-    const rows = document.querySelectorAll('#teamMembersBody tr');
-    memberCount = 0;
-    rows.forEach((row, index) => {
-        const inputs = row.querySelectorAll('input');
-        inputs[0].name = 'teamMembers[' + index + '][name]';
-        inputs[1].name = 'teamMembers[' + index + '][collegeId]';
-        memberCount++;
-    });
-}
 </script>
 
 <script>
