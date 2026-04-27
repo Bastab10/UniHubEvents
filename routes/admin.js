@@ -25,8 +25,6 @@ router.get('/dashboard', async (req, res) => {
             Event.countDocuments(),
             User.countDocuments({ role: 'student' }),
             User.countDocuments({ role: 'faculty', isApproved: true }),
-            Event.countDocuments({ status: 'pending' }),
-            Event.countDocuments({ status: 'approved' }),
             Event.find({ date: { $gte: new Date() } }).sort({ date: 1 }).limit(5)
         ]);
 
@@ -34,17 +32,14 @@ router.get('/dashboard', async (req, res) => {
             totalEvents,
             totalStudents,
             totalFaculty,
-            pendingEvents,
-            approvedEvents,
             upcomingEvents
         ] = stats;
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Get only active/upcoming approved events (matching Student Dashboard)
+        // Get only active/upcoming events (matching Student Dashboard)
         const allEventsList = await Event.find({
-            status: 'approved',
             date: { $gte: today }
         })
             .sort({ createdAt: -1 })
@@ -153,8 +148,6 @@ router.get('/dashboard', async (req, res) => {
                 totalEvents,
                 totalStudents,
                 totalFaculty,
-                pendingEvents,
-                approvedEvents,
                 upcomingEvents,
                 pendingFaculty: pendingFaculty.length,
                 pendingRegistrations: pendingRegistrations.length,
@@ -270,119 +263,6 @@ router.get('/events/:id/registrations', async (req, res) => {
         console.error('Event registrations error:', error);
         req.session.error = 'Error loading event registrations';
         res.redirect('/admin/events');
-    }
-});
-
-// Event Approval (GET route for anchor tags)
-router.get('/events/:id/approve', async (req, res) => {
-    try {
-        const eventId = req.params.id;
-        
-        const event = await Event.findByIdAndUpdate(
-            eventId,
-            { 
-                status: 'approved',
-                approvedBy: req.session.user._id,
-                approvalDate: new Date()
-            },
-            { new: true }
-        ).populate('organizer', 'profile.firstName profile.lastName');
-        
-        if (event) {
-            req.session.success = 'Event approved successfully!';
-            res.redirect('/admin/dashboard');
-        } else {
-            req.session.error = 'Event not found';
-            res.redirect('/admin/dashboard');
-        }
-    } catch (error) {
-        console.error('Approve event error:', error);
-        req.session.error = 'Error approving event';
-        res.redirect('/admin/dashboard');
-    }
-});
-
-// Event Approval (POST route for AJAX)
-router.post('/events/:id/approve', async (req, res) => {
-    try {
-        const eventId = req.params.id;
-        
-        const event = await Event.findByIdAndUpdate(
-            eventId,
-            { 
-                status: 'approved',
-                approvedBy: req.session.user._id,
-                approvalDate: new Date()
-            },
-            { new: true }
-        ).populate('organizer', 'profile.firstName profile.lastName');
-        
-        if (event) {
-            res.json({ success: true, message: 'Event approved successfully' });
-        } else {
-            res.status(404).json({ success: false, message: 'Event not found' });
-        }
-    } catch (error) {
-        console.error('Approve event error:', error);
-        res.status(500).json({ success: false, message: 'Error approving event' });
-    }
-});
-
-// Event Rejection (GET route for anchor tags)
-router.get('/events/:id/reject', async (req, res) => {
-    try {
-        const eventId = req.params.id;
-        
-        const event = await Event.findByIdAndUpdate(
-            eventId,
-            { 
-                status: 'rejected',
-                rejectionReason: 'Rejected by administrator',
-                approvedBy: req.session.user._id,
-                approvalDate: new Date()
-            },
-            { new: true }
-        ).populate('organizer', 'profile.firstName profile.lastName');
-        
-        if (event) {
-            req.session.success = 'Event rejected successfully!';
-            res.redirect('/admin/dashboard');
-        } else {
-            req.session.error = 'Event not found';
-            res.redirect('/admin/dashboard');
-        }
-    } catch (error) {
-        console.error('Reject event error:', error);
-        req.session.error = 'Error rejecting event';
-        res.redirect('/admin/dashboard');
-    }
-});
-
-// Event Rejection (POST route for AJAX)
-router.post('/events/:id/reject', async (req, res) => {
-    try {
-        const eventId = req.params.id;
-        const { reason } = req.body;
-        
-        const event = await Event.findByIdAndUpdate(
-            eventId,
-            { 
-                status: 'rejected',
-                rejectionReason: reason,
-                approvedBy: req.session.user._id,
-                approvalDate: new Date()
-            },
-            { new: true }
-        ).populate('organizer', 'profile.firstName profile.lastName');
-        
-        if (event) {
-            res.json({ success: true, message: 'Event rejected successfully' });
-        } else {
-            res.status(404).json({ success: false, message: 'Event not found' });
-        }
-    } catch (error) {
-        console.error('Reject event error:', error);
-        res.status(500).json({ success: false, message: 'Error rejecting event' });
     }
 });
 
@@ -800,28 +680,10 @@ router.delete('/faculty/:id/delete', async (req, res) => {
     }
 });
 
-// Approved Events
-router.get('/approved-events', async (req, res) => {
-    try {
-        const approvedEvents = await Event.find({ status: 'approved' })
-            .sort({ date: 1 })
-            .populate('organizer', 'profile.firstName profile.lastName');
-
-        res.render('admin/approved-events', {
-            title: 'Approved Events',
-            approvedEvents
-        });
-    } catch (error) {
-        console.error('Approved events error:', error);
-        res.status(500).send('Error loading approved events');
-    }
-});
-
 // Approved Registrations
 router.get('/approved-registrations', async (req, res) => {
     try {
         const approvedRegistrations = await Event.aggregate([
-            { $match: { status: 'approved' } },
             { $unwind: '$registrations' },
             { $match: { 'registrations.status': 'approved' } },
             { $lookup: {

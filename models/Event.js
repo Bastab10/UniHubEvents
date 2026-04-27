@@ -66,11 +66,6 @@ const eventSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    status: {
-        type: String,
-        enum: ['pending', 'approved', 'rejected', 'completed', 'cancelled'],
-        default: 'pending'
-    },
     registrations: [{
         student: {
             type: mongoose.Schema.Types.ObjectId,
@@ -95,12 +90,6 @@ const eventSchema = new mongoose.Schema({
             collegeId: String
         }]
     }],
-    approvedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    approvalDate: Date,
-    rejectionReason: String,
     isCompleted: {
         type: Boolean,
         default: false
@@ -116,7 +105,6 @@ const eventSchema = new mongoose.Schema({
 // Index for efficient queries
 eventSchema.index({ date: 1, startTime: 1, venue: 1 });
 eventSchema.index({ category: 1 });
-eventSchema.index({ status: 1 });
 eventSchema.index({ organizer: 1 });
 
 module.exports = mongoose.model('Event', eventSchema);

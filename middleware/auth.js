@@ -1,6 +1,5 @@
 const User = require('../models/User');
 
-// Check if user is authenticated
 exports.isAuthenticated = (req, res, next) => {
     if (req.session.user) {
         return next();
@@ -8,23 +7,21 @@ exports.isAuthenticated = (req, res, next) => {
     res.redirect('/auth/login');
 };
 
-// Check user role
 exports.checkRole = (...roles) => {
     return (req, res, next) => {
         if (!req.session.user) {
             return res.redirect('/auth/login');
         }
-        
+
         if (!roles.includes(req.session.user.role)) {
             req.session.error = 'Access denied. You do not have permission to access this page.';
             return res.redirect('/auth/login');
         }
-        
+
         next();
     };
 };
 
-// Check if user is approved
 exports.isApproved = async (req, res, next) => {
     try {
         const user = await User.findById(req.session.user._id);
@@ -40,7 +37,6 @@ exports.isApproved = async (req, res, next) => {
     }
 };
 
-// Check if user is active
 exports.isActive = async (req, res, next) => {
     try {
         const user = await User.findById(req.session.user._id);

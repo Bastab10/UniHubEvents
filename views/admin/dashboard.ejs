@@ -392,124 +392,7 @@
                     </div>
                 </div>
 
-                <!-- Pending Events Section -->
-                <div id="pending-section" class="content-section" style="display: none;">
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="mb-6 flex justify-between items-center">
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-800">Pending Event Approvals</h2>
-                                <p class="text-gray-600">Events awaiting admin approval</p>
-                            </div>
-                            <button onclick="showSection('default')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                                <i class="fas fa-arrow-left mr-2"></i>
-                                Back to Dashboard
-                            </button>
-                        </div>             
-                       <!-- Pending Events List -->
-                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                            <div class="overflow-x-auto">
-                                <table class="w-full">
-                                    <thead class="bg-gray-50 border-b border-gray-200">
-                                        <tr>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Event Details</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Organizer</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date & Time</th>
-                                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-200">
-                                        <% if (allEvents && allEvents.length > 0) { %>
-                                            <% allEvents.filter(event => event.status === 'pending').forEach(event => { %>
-                                                <tr class="hover:bg-gray-50 transition-colors">
-                                                    <td class="px-6 py-4">
-                                                        <div class="flex items-center">
-                                                            <% if (event.poster) { %>
-                                                                <img src="/uploads/<%= event.poster %>" alt="<%= event.title %>" 
-                                                                     class="h-12 w-12 rounded-lg object-cover mr-4 border border-gray-200">
-                                                            <% } else { %>
-                                                                <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center mr-4 border border-gray-200">
-                                                                    <i class="fas fa-calendar text-gray-400"></i>
-                                                                </div>
-                                                            <% } %>
-                                                            <div>
-                                                                <div class="text-sm font-semibold text-gray-900 mb-1">
-                                                                    <%= event.title %>
-                                                                </div>
-                                                                <div class="flex items-center space-x-2">
-                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                                        <%= event.category %>
-                                                                    </span>
-                                                                    <% if (event.subCategory) { %>
-                                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                                                            <%= event.subCategory %>
-                                                                        </span>
-                                                                    <% } %>
-                                                                </div> 
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-6 py-4">
-                                                        <div class="text-sm">
-                                                            <div class="font-medium text-gray-900">
-                                                                <%= (event.organizer && event.organizer.profile) ? event.organizer.profile.fullName : 'Unknown' %>
-                                                            </div>
-                                                            <div class="text-gray-500">
-                                                                <%= (event.organizer && event.organizer.email) ? event.organizer.email : '' %>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-6 py-4">
-                                                        <div class="text-sm">
-                                                            <div class="font-medium text-gray-900">
-                                                                <%= new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
-                                                            </div>
-                                                            <div class="text-gray-500">
-                                                                <%= event.startTime %> - <%= event.endTime %>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="px-6 py-4">
-                                                        <div class="flex items-center space-x-2">
-                                                            <a href="/admin/events/<%= event._id %>" 
-                                                               class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                                <i class="fas fa-eye mr-1"></i>
-                                                                View
-                                                            </a>
-                                                            <a href="/admin/events/<%= event._id %>/approve" 
-                                                               class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                                <i class="fas fa-check mr-1"></i>
-                                                                Approve
-                                                            </a>
-                                                            <a href="/admin/events/<%= event._id %>/reject" 
-                                                               class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                                                <i class="fas fa-times mr-1"></i>
-                                                                Reject
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <% }) %>
-                                        <% } else { %>
-                                            <tr>
-                                                <td colspan="4" class="px-6 py-12 text-center">
-                                                    <div class="text-center">
-                                                        <div class="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                                                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                                                        </div>
-                                                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Events</h3>
-                                                        <p class="text-gray-500">There are no events awaiting approval.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <% } %>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Default Events Section (already exists) -->
+                <!-- Default Events Section -->
                 <div id="default-section" class="content-section">
 
             <!-- Events Section -->
@@ -542,9 +425,6 @@
                                         Date & Time
                                     </th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -552,7 +432,7 @@
                             <tbody class="divide-y divide-gray-200">
                                 <% if (allEvents && allEvents.length > 0) { %>
                                     <% allEvents.forEach(event => { %>
-                                        <tr class="hover:bg-gray-50 transition-colors event-row" data-status="<%= event.status %>">
+                                        <tr class="hover:bg-gray-50 transition-colors event-row">
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center">
                                                     <% if (event.poster) { %>
@@ -601,30 +481,12 @@
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-                                                    <% if (event.status === 'approved') { %>bg-green-100 text-green-800<% } else if (event.status === 'pending') { %>bg-yellow-100 text-yellow-800<% } else if (event.status === 'rejected') { %>bg-red-100 text-red-800<% } else { %>bg-gray-100 text-gray-800<% } %>">
-                                                    <%= event.status.charAt(0).toUpperCase() + event.status.slice(1) %>
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4">
                                                 <div class="flex items-center space-x-2">
                                                     <a href="/admin/events/<%= event._id %>" 
                                                        class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                                         <i class="fas fa-eye mr-1"></i>
                                                         View
                                                     </a>
-                                                    <% if (event.status === 'pending') { %>
-                                                        <a href="/admin/events/<%= event._id %>/approve" 
-                                                           class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                            <i class="fas fa-check mr-1"></i>
-                                                            Approve
-                                                        </a>
-                                                        <a href="/admin/events/<%= event._id %>/reject" 
-                                                           class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                                            <i class="fas fa-times mr-1"></i>
-                                                            Reject
-                                                        </a>
-                                                    <% } %>
                                                 </div>
                                             </td>
                                         </tr>

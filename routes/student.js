@@ -74,11 +74,6 @@ router.get('/events/:id', isAuthenticatedForEventDetails, checkRoleForEventDetai
             return res.redirect('/student/events');
         }
 
-        if (event.status !== 'approved') {
-            req.session.error = 'Event not available for registration';
-            return res.redirect('/student/events');
-        }
-
         // Check if student is already registered
         // For individual events: block if already registered
         // For team events: show as registered but allow multiple teams (up to department limit)
@@ -141,9 +136,8 @@ router.get('/dashboard', async (req, res) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Get all approved events that are active (date >= today)
+        // Get all active events (date >= today)
         const allEvents = await Event.find({ 
-            status: 'approved',
             date: { $gte: today }
         })
             .populate('organizer', 'profile.firstName profile.lastName')
@@ -162,7 +156,7 @@ router.get('/dashboard', async (req, res) => {
         
         // Calculate stats
         const stats = await Promise.all([
-            Event.countDocuments({ status: 'approved' }),
+            Event.countDocuments(),
             Event.countDocuments({ 
                 'registrations.student': studentId,
                 'registrations.status': 'approved' 
@@ -202,12 +196,17 @@ router.post('/events/:id/register', async (req, res) => {
             return res.redirect('/student/events');
         }
 
-        if (event.status !== 'approved') {
-            req.session.error = 'Event not available for registration';
-            return res.redirect('/student/events');
-        }
+        const studentId = req.session.user._id;
 
-        // Check if already registered (for individual events only)
+        // Check if student has approved registration for another event at the same time
+        const exactConflict = await Event.findOne({
+            _id: { $ne: req.params.id },
+            'registrations.student': studentId,
+            'registrations.status': 'approved',
+            date: event.date,
+            startTime: event.startTime
+        });
+
         if (event.eventType !== 'team') {
             const isAlreadyRegistered = event.registrations.some(
                 reg => reg.student.toString() === req.session.user._id.toString()
@@ -226,15 +225,6 @@ router.post('/events/:id/register', async (req, res) => {
             req.session.eventError = req.params.id;
             return res.redirect(`/student/events/${req.params.id}`);
         }
-
-        // Check for exact date and start time conflict
-        const exactConflict = await Event.findOne({
-            _id: { $ne: req.params.id },
-            'registrations.student': req.session.user._id,
-            'registrations.status': 'approved',
-            date: event.date,
-            startTime: event.startTime
-        });
 
         if (exactConflict) {
             req.session.error = 'You are already registered for another event at the same time. Please cancel the existing registration to proceed.';
@@ -528,7 +518,6 @@ router.get('/past-events', async (req, res) => {
         
         // Get all past events (date < today - strictly before today)
         const pastEvents = await Event.find({ 
-            status: 'approved',
             date: { $lt: today }
         })
         .populate('organizer', 'profile.firstName profile.lastName')
@@ -549,6 +538,34 @@ router.get('/past-events', async (req, res) => {
 // Profile
 router.get('/profile', (req, res) => {
     res.render('student/profile', { title: 'My Profile' });
+});
+
+// View Event Result - Podium Display
+router.get('/events/:id/result', async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id)
+            .populate('organizer', 'profile.firstName profile.lastName profile.department');
+
+        if (!event) {
+            req.session.error = 'Event not found';
+            return res.redirect('/student/past-events');
+        }
+
+        // Get result if available
+        const Result = require('../models/Result');
+        const result = await Result.findOne({ event: req.params.id });
+
+        res.render('student/view-result', {
+            title: `Result - ${event.title}`,
+            event,
+            result,
+            coordinator: event.organizer
+        });
+    } catch (error) {
+        console.error('View result error:', error);
+        req.session.error = 'Error loading result';
+        res.redirect('/student/past-events');
+    }
 });
 
 // Update Profile

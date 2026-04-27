@@ -70,14 +70,12 @@ router.get('/profile', async (req, res) => {
         // Calculate faculty statistics
         const stats = await Promise.all([
             Event.countDocuments({ organizer: facultyId }),
-            Event.countDocuments({ organizer: facultyId, status: 'pending' }),
-            Event.countDocuments({ organizer: facultyId, status: 'approved' }),
             Event.find({ organizer: facultyId })
                 .sort({ createdAt: -1 })
                 .limit(10)
         ]);
 
-        const [totalEvents, pendingEvents, approvedEvents, recentEvents] = stats;
+        const [totalEvents, recentEvents] = stats;
         const totalRegistrations = await Event.aggregate([
             { $match: { organizer: facultyId } },
             { $unwind: '$registrations' },
@@ -134,7 +132,8 @@ router.get('/dashboard', async (req, res) => {
                 totalEvents,
                 totalRegistrations
             },
-            allEvents
+            allEvents,
+            user: req.session.user
         });
     } catch (error) {
         console.error('Faculty dashboard error:', error);
@@ -211,7 +210,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             venue
         } = req.body;
 
-        // Enhanced file upload validation for mobile
         let posterPath = null;
         if (req.file) {
             console.log('File details:', {
@@ -221,10 +219,9 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
                 path: req.file.path,
                 filename: req.file.filename
             });
-            
-            // File size validation (5MB limit)
+
             if (req.file.size > 5 * 1024 * 1024) {
-                // Clean up uploaded file if size exceeds limit
+
                 const fs = require('fs');
                 if (fs.existsSync(req.file.path)) {
                     fs.unlinkSync(req.file.path);
@@ -237,11 +234,10 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
                     error: 'File size exceeds 5MB limit'
                 });
             }
-            
-            // Verify file exists and is accessible
+ 
             const fs = require('fs');
             if (fs.existsSync(req.file.path)) {
-                posterPath = req.file.filename; // Store only filename, not full path
+                posterPath = req.file.filename; 
                 console.log(' File saved successfully at:', posterPath);
                 console.log(' File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
                 console.log(' Full file path:', req.file.path);
@@ -259,7 +255,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             console.log('ℹ No file uploaded');
         }
 
-        // Validation
+
         console.log('Starting validation...');
         if (!title || !description || !category || !date || !startTime || !endTime || !venue) {
             console.log('Validation failed: Missing required fields');
@@ -272,7 +268,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Time validation
         if (startTime >= endTime) {
             req.session.error = 'End time must be after start time';
             return res.render('faculty/create-event', { 
@@ -282,7 +277,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Date validation
+
         const eventDate = new Date(date);
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
@@ -296,7 +291,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Team size validation for team events
+
         if (eventType === 'team' && (!teamSize || teamSize < 2)) {
             req.session.error = 'Team size must be at least 2 for team events';
             return res.render('faculty/create-event', { 
@@ -306,7 +301,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Check for time and venue clashes
         const clashCheck = await Event.findOne({
             date: new Date(date),
             $or: [
@@ -323,8 +317,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
                     ]
                 }
             ],
-            venue: venue,
-            status: { $in: ['approved', 'pending'] }
+            venue: venue
         });
 
         if (clashCheck) {
@@ -350,11 +343,8 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             startTime,
             endTime,
             venue,
-            poster: posterPath, // Use the validated poster path
-            organizer: req.session.user._id,
-            status: 'approved',
-            approvedBy: req.session.user._id,
-            approvalDate: new Date()
+            poster: posterPath, 
+            organizer: req.session.user._id
         });
 
         console.log('Event object created:', newEvent);
@@ -369,7 +359,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
         } catch (saveError) {
             console.error('Error saving event:', saveError);
             
-            // Clean up uploaded file if event save fails
             if (req.file && posterPath) {
                 const fs = require('fs');
                 const filePath = req.file.path;
@@ -387,7 +376,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
         console.error('Error message:', error.message);
         console.error('Error stack:', error.stack);
         
-        // For mobile compatibility, render the form with error instead of redirecting
         req.session.error = 'Error creating event: ' + error.message;
         return res.render('faculty/create-event', { 
             title: 'Create Event',
@@ -398,7 +386,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
 });
 
 
-// Edit Event Page
 router.get('/events/:id/edit', async (req, res) => {
     try {
         const eventId = req.params.id;
@@ -409,7 +396,6 @@ router.get('/events/:id/edit', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
         
-        // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to edit this event';
             return res.redirect('/faculty/dashboard');
@@ -427,7 +413,6 @@ router.get('/events/:id/edit', async (req, res) => {
     }
 });
 
-// Edit Event Process
 router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
     try {
         const eventId = req.params.id;
@@ -438,7 +423,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
         
-        // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to edit this event';
             return res.redirect('/faculty/dashboard');
@@ -459,7 +443,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             venue
         } = req.body;
 
-        // Validation
         if (!title || !description || !category || !date || !startTime || !endTime || !venue) {
             req.session.error = 'All required fields must be filled';
             return res.render('faculty/edit-event', { 
@@ -470,7 +453,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Time validation
         if (startTime >= endTime) {
             req.session.error = 'End time must be after start time';
             return res.render('faculty/edit-event', { 
@@ -481,7 +463,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Date validation
         const eventDate = new Date(date);
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
@@ -496,7 +477,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Team size validation for team events
         if (eventType === 'team' && (!teamSize || teamSize < 2)) {
             req.session.error = 'Team size must be at least 2 for team events';
             return res.render('faculty/edit-event', { 
@@ -507,7 +487,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Check for time and venue clashes (excluding current event)
         const clashCheck = await Event.findOne({
             _id: { $ne: eventId },
             date: new Date(date),
@@ -525,8 +504,7 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
                     ]
                 }
             ],
-            venue: venue,
-            status: { $in: ['approved', 'pending'] }
+            venue: venue
         });
 
         if (clashCheck) {
@@ -593,11 +571,6 @@ router.delete('/events/:id/delete', async (req, res) => {
         // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             return res.json({ success: false, message: 'You are not authorized to delete this event' });
-        }
-        
-        // Only allow deleting pending events
-        if (event.status !== 'pending') {
-            return res.json({ success: false, message: 'Only pending events can be deleted' });
         }
         
         // Clean up poster file if it exists
@@ -692,8 +665,6 @@ router.get('/profile', async (req, res) => {
         
         // Calculate statistics
         const totalEvents = faculty.createdEvents ? faculty.createdEvents.length : 0;
-        const approvedEvents = faculty.createdEvents ? faculty.createdEvents.filter(e => e.status === 'approved').length : 0;
-        const pendingEvents = faculty.createdEvents ? faculty.createdEvents.filter(e => e.status === 'pending').length : 0;
         const totalRegistrations = faculty.createdEvents ? 
             faculty.createdEvents.reduce((sum, event) => sum + (event.registrations ? event.registrations.length : 0), 0) : 0;
         
@@ -702,8 +673,6 @@ router.get('/profile', async (req, res) => {
             faculty,
             stats: {
                 totalEvents,
-                approvedEvents,
-                pendingEvents,
                 totalRegistrations
             }
         });
@@ -962,6 +931,109 @@ router.delete('/events/:eventId/department/:departmentName/delete', async (req, 
     } catch (error) {
         console.error('Delete department teams error:', error);
         res.json({ success: false, message: 'Error deleting department teams' });
+    }
+});
+
+// Upload Result - GET (Display Form)
+router.get('/upload-result', async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Get all past events created by this coordinator
+        const events = await Event.find({
+            organizer: req.session.user._id,
+            date: { $lt: today }
+        }).sort({ date: -1 });
+
+        // Check which events already have results
+        const Result = require('../models/Result');
+        const existingResults = await Result.find({
+            event: { $in: events.map(e => e._id) }
+        }).select('event');
+        
+        const resultEventIds = new Set(existingResults.map(r => r.event.toString()));
+        
+        // Add hasResult flag to each event
+        const eventsWithResultFlag = events.map(event => ({
+            ...event.toObject(),
+            hasResult: resultEventIds.has(event._id.toString())
+        }));
+
+        res.render('faculty/upload-result', {
+            title: 'Upload Result',
+            events: eventsWithResultFlag,
+            success: req.session.success,
+            error: req.session.error
+        });
+        
+        // Clear flash messages
+        delete req.session.success;
+        delete req.session.error;
+    } catch (error) {
+        console.error('Upload result page error:', error);
+        res.render('faculty/upload-result', {
+            title: 'Upload Result',
+            events: [],
+            error: 'Error loading events'
+        });
+    }
+});
+
+// Upload Result - POST (Submit Form)
+router.post('/upload-result', async (req, res) => {
+    try {
+        const { eventId, firstPosition, secondPosition, thirdPosition } = req.body;
+        
+        // Validate event exists and belongs to this coordinator
+        const event = await Event.findOne({
+            _id: eventId,
+            organizer: req.session.user._id
+        });
+        
+        if (!event) {
+            req.session.error = 'Event not found or you are not authorized';
+            return res.redirect('/faculty/upload-result');
+        }
+        
+        // Check if result already exists for this event
+        const Result = require('../models/Result');
+        const existingResult = await Result.findOne({ event: eventId });
+        
+        if (existingResult) {
+            req.session.error = 'Result has already been uploaded for this event';
+            return res.redirect('/faculty/upload-result');
+        }
+        
+        // Create new result
+        const result = new Result({
+            event: eventId,
+            coordinator: req.session.user._id,
+            firstPosition: {
+                name: firstPosition.name,
+                department: firstPosition.department || '',
+                collegeId: firstPosition.collegeId || ''
+            },
+            secondPosition: {
+                name: secondPosition.name,
+                department: secondPosition.department || '',
+                collegeId: secondPosition.collegeId || ''
+            },
+            thirdPosition: {
+                name: thirdPosition.name,
+                department: thirdPosition.department || '',
+                collegeId: thirdPosition.collegeId || ''
+            }
+        });
+        
+        await result.save();
+        
+        req.session.success = 'Result uploaded successfully!';
+        res.redirect('/faculty/upload-result');
+    } catch (error) {
+        console.error('Upload result error:', error);
+        req.session.error = 'Error uploading result. Please try again.';
+        res.redirect('/faculty/upload-result');
     }
 });
 

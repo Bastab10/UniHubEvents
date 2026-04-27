@@ -109,31 +109,11 @@
                                 <p class="text-sm text-gray-500">Faculty's event creation activity</p>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-purple-600">
-                                    <%= facultyEvents.length %>
-                                </div>
-                                <p class="text-sm text-gray-600">Total Events</p>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-purple-600 mb-2">
+                                <%= facultyEvents.length %>
                             </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-green-600">
-                                    <%= facultyEvents.filter(event => event.status === 'approved').length %>
-                                </div>
-                                <p class="text-sm text-gray-600">Approved</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-yellow-600">
-                                    <%= facultyEvents.filter(event => event.status === 'pending').length %>
-                                </div>
-                                <p class="text-sm text-gray-600">Pending</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-red-600">
-                                    <%= facultyEvents.filter(event => event.status === 'rejected').length %>
-                                </div>
-                                <p class="text-sm text-gray-600">Rejected</p>
-                            </div>
+                            <p class="text-gray-600">Total Events Created</p>
                         </div>
                     </div>
                 </div>
@@ -163,9 +143,6 @@
                                         Category
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Registrations
                                     </th>
                                 </tr>
@@ -188,21 +165,6 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <%= event.category %>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    <% if (event.status === 'pending') { %>
-                                                        bg-yellow-100 text-yellow-800
-                                                    <% } else if (event.status === 'approved') { %>
-                                                        bg-green-100 text-green-800
-                                                    <% } else if (event.status === 'rejected') { %>
-                                                        bg-red-100 text-red-800
-                                                    <% } else { %>
-                                                        bg-gray-100 text-gray-800
-                                                    <% } %>
-                                                ">
-                                                    <%= event.status.charAt(0).toUpperCase() + event.status.slice(1) %>
-                                                </span>
-                                            </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <%= event.registrations ? event.registrations.length : 0 %>
                                             </td>
@@ -210,7 +172,7 @@
                                     <% }) %>
                                 <% } else { %>
                                     <tr>
-                                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
                                             <div class="flex flex-col items-center">
                                                 <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
                                                 <p class="text-lg font-medium">No events found</p>
