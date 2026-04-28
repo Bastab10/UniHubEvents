@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
 const User = require('../models/User');
+const Result = require('../models/Result');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 
 // Special middleware for event details - no flash message
@@ -522,10 +523,22 @@ router.get('/past-events', async (req, res) => {
         })
         .populate('organizer', 'profile.firstName profile.lastName')
         .sort({ date: -1 }); // Most recent first
+
+        // Check which events have results
+        const Result = require('../models/Result');
+        const eventsWithResultStatus = await Promise.all(
+            pastEvents.map(async (event) => {
+                const result = await Result.findOne({ event: event._id });
+                return {
+                    ...event.toObject(),
+                    hasResult: !!result
+                };
+            })
+        );
         
         res.render('student/past-events', { 
             title: 'Past Events', 
-            events: pastEvents,
+            events: eventsWithResultStatus,
             isPastEvents: true
         });
     } catch (error) {
