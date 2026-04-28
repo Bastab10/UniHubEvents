@@ -1,2 +1,6 @@
 .env
 node_modules
+
+# Ignore long filename images (keep only short static ones like img1.jpg)
+public/images/177*.jpg
+public/images/download*.jpg
