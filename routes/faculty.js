@@ -9,14 +9,14 @@ const { isAuthenticated, checkRole, isApproved, isActive } = require('../middlew
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Ensure uploads directory exists
+        // Ensure public/images directory exists
         const fs = require('fs');
-        const uploadsDir = path.join(__dirname, '..', 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-            console.log('Created uploads directory:', uploadsDir);
+        const imagesDir = path.join(__dirname, '..', 'public', 'images');
+        if (!fs.existsSync(imagesDir)) {
+            fs.mkdirSync(imagesDir, { recursive: true });
+            console.log('Created images directory:', imagesDir);
         }
-        cb(null, uploadsDir);
+        cb(null, imagesDir);
     },
     filename: function (req, file, cb) {
         // Sanitize filename for mobile compatibility
