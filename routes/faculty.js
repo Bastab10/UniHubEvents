@@ -1,21 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 const Event = require('../models/Event');
 const User = require('../models/User');
+const Result = require('../models/Result');
 const Notification = require('../models/Notification');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 const { upload, uploadImage, deleteImage } = require('../config/cloudinary');
 
-// All faculty routes require authentication and faculty role
 router.use(isAuthenticated, checkRole('faculty'), isApproved, isActive);
 
-// Profile Page
 router.get('/profile', async (req, res) => {
     try {
         const facultyId = req.session.user._id;
         
-        // Calculate faculty statistics
         const stats = await Promise.all([
             Event.countDocuments({ organizer: facultyId }),
             Event.find({ organizer: facultyId })
@@ -34,8 +31,6 @@ router.get('/profile', async (req, res) => {
             title: 'My Profile',
             stats: {
                 totalEvents,
-                approvedEvents,
-                pendingEvents,
                 totalRegistrations: totalRegistrations.length > 0 ? totalRegistrations[0].total : 0
             }
         });
@@ -46,12 +41,10 @@ router.get('/profile', async (req, res) => {
     }
 });
 
-// Styled Dashboard
 router.get('/dashboard', async (req, res) => {
     try {
         const facultyId = req.session.user._id;
 
-        // Get current date at midnight for date comparison
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -62,13 +55,12 @@ router.get('/dashboard', async (req, res) => {
                 { $unwind: '$registrations' },
                 { $count: 'total' }
             ]),
-            // Only fetch current and upcoming events (date >= today)
             Event.find({
                 organizer: facultyId,
                 date: { $gte: today }
             })
                 .populate('organizer', 'profile.firstName profile.lastName')
-                .sort({ date: 1 }) // Sort by event date, soonest first
+                .sort({ date: 1 })
         ]);
 
         const [totalEvents, registrationCount, allEvents] = stats;
@@ -90,22 +82,19 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
-// Past Events Page
 router.get('/past-events', async (req, res) => {
     try {
         const facultyId = req.session.user._id;
 
-        // Get yesterday's date at midnight for filtering past events
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Fetch only past events (date < today)
         const pastEvents = await Event.find({
             organizer: facultyId,
             date: { $lt: today }
         })
             .populate('organizer', 'profile.firstName profile.lastName')
-            .sort({ date: -1 }); // Sort by date descending (newest past event first)
+            .sort({ date: -1 });
 
         res.render('faculty/past-events', {
             title: 'Past Events',
@@ -118,24 +107,13 @@ router.get('/past-events', async (req, res) => {
     }
 });
 
-// Create Event Page
 router.get('/events/create', (req, res) => {
     res.render('faculty/create-event', { title: 'Create Event' });
 });
 
-// Create Event Process
 router.post('/events/create', upload.single('poster'), async (req, res) => {
     try {
-        console.log('=== CREATE EVENT DEBUG ===');
-        console.log('Request body:', req.body);
-        console.log('File uploaded:', req.file);
-        console.log('User session:', req.session.user);
-        console.log('Content-Type:', req.headers['content-type']);
-        console.log('Content-Length:', req.headers['content-length']);
-        
-        // Handle mobile form submission issues
         if (!req.body || Object.keys(req.body).length === 0) {
-            console.log('Empty form data received');
             req.session.error = 'Form data is empty. Please try again.';
             return res.render('faculty/create-event', { 
                 title: 'Create Event',
@@ -161,20 +139,10 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
 
         let posterUrl = null;
         if (req.file) {
-            console.log('File received:', req.file.originalname, 'Size:', req.file.size);
-            
-            // Upload to Cloudinary
             posterUrl = await uploadImage(req.file);
-            console.log('Cloudinary URL:', posterUrl);
-        } else {
-            console.log('No file uploaded');
         }
 
-
-        console.log('Starting validation...');
         if (!title || !description || !category || !date || !startTime || !endTime || !venue) {
-            console.log('Validation failed: Missing required fields');
-            console.log('Title:', !!title, 'Description:', !!description, 'Category:', !!category, 'Date:', !!date, 'StartTime:', !!startTime, 'EndTime:', !!endTime, 'Venue:', !!venue);
             req.session.error = 'All required fields must be filled';
             return res.render('faculty/create-event', { 
                 title: 'Create Event',
@@ -243,8 +211,6 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
                 error: 'Time or venue clash detected. Another event is scheduled at this time and venue.'
             });
         }
-
-        console.log('Creating event object...');
         const newEvent = new Event({
             title,
             description,
@@ -263,32 +229,19 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             organizer: req.session.user._id
         });
 
-        console.log('Event object created:', newEvent);
-        console.log('Saving event to database...');
-        
         try {
             await newEvent.save();
-            console.log('Event saved successfully!');
-            console.log('Poster URL stored:', posterUrl);
-            console.log('Redirecting to dashboard...');
             res.redirect('/faculty/dashboard');
         } catch (saveError) {
             console.error('Error saving event:', saveError);
-            
-            // If event save fails, delete the uploaded image from Cloudinary
             if (req.file && posterUrl) {
                 await deleteImage(posterUrl);
-                console.log('Cleaned up Cloudinary image after save error');
             }
             
             throw saveError;
         }
     } catch (error) {
-        console.error('=== CREATE EVENT ERROR ===');
-        console.error('Error details:', error);
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-        
+        console.error('Error creating event:', error);
         req.session.error = 'Error creating event: ' + error.message;
         return res.render('faculty/create-event', { 
             title: 'Create Event',
@@ -431,7 +384,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             });
         }
 
-        // Update event
         event.title = title;
         event.description = description;
         event.category = category;
@@ -445,21 +397,15 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
         event.endTime = endTime;
         event.venue = venue;
         
-        // Update poster if new one is uploaded
         if (req.file) {
-            // Clean up old poster from Cloudinary if it exists
             if (event.poster && event.poster.trim() !== '') {
                 await deleteImage(event.poster);
-                console.log('Cleaned up old poster from Cloudinary');
             }
-            // Upload new image to Cloudinary
             const newPosterUrl = await uploadImage(req.file);
             event.poster = newPosterUrl;
-            console.log('Updated poster URL:', event.poster);
         }
 
         await event.save();
-        console.log('Event updated successfully');
         res.redirect('/faculty/my-events');
         
     } catch (error) {
@@ -469,7 +415,6 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
     }
 });
 
-// Delete Event
 router.delete('/events/:id/delete', async (req, res) => {
     try {
         const eventId = req.params.id;
@@ -479,19 +424,15 @@ router.delete('/events/:id/delete', async (req, res) => {
             return res.json({ success: false, message: 'Event not found' });
         }
         
-        // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             return res.json({ success: false, message: 'You are not authorized to delete this event' });
         }
         
-        // Clean up poster from Cloudinary if it exists
         if (event.poster && event.poster.trim() !== '') {
             await deleteImage(event.poster);
-            console.log('Cleaned up poster from Cloudinary');
         }
         
         await Event.findByIdAndDelete(eventId);
-        console.log('Event deleted successfully:', eventId);
         res.json({ success: true, message: 'Event deleted successfully' });
         
     } catch (error) {
@@ -500,7 +441,6 @@ router.delete('/events/:id/delete', async (req, res) => {
     }
 });
 
-// View Event Details
 router.get('/events/:id', async (req, res) => {
     try {
         const eventId = req.params.id;
@@ -516,13 +456,11 @@ router.get('/events/:id', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
         
-        // Check if the faculty is the organizer
         if (event.organizer._id.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to view this event';
             return res.redirect('/faculty/dashboard');
         }
         
-        // For team events, group registrations by department
         let departmentGroups = null;
         if (event.eventType === 'team' && event.registrations) {
             const groups = {};
@@ -538,7 +476,7 @@ router.get('/events/:id', async (req, res) => {
                 }
                 groups[dept].teams.push(reg);
                 groups[dept].teamCount++;
-                groups[dept].totalMembers += (reg.teamMembers?.length || 0) + 1; // +1 for team leader
+                groups[dept].totalMembers += (reg.teamMembers?.length || 0) + 1;
             });
             departmentGroups = Object.values(groups);
         }
@@ -555,12 +493,10 @@ router.get('/events/:id', async (req, res) => {
     }
 });
 
-// Faculty Profile
 router.get('/profile', async (req, res) => {
     try {
         const facultyId = req.session.user._id;
         
-        // Get faculty details and statistics
         const faculty = await User.findById(facultyId)
             .populate('createdEvents')
             .populate('registeredEvents');
@@ -570,7 +506,6 @@ router.get('/profile', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
         
-        // Calculate statistics
         const totalEvents = faculty.createdEvents ? faculty.createdEvents.length : 0;
         const totalRegistrations = faculty.createdEvents ? 
             faculty.createdEvents.reduce((sum, event) => sum + (event.registrations ? event.registrations.length : 0), 0) : 0;
@@ -590,7 +525,6 @@ router.get('/profile', async (req, res) => {
     }
 });
 
-// Update Faculty Profile
 router.post('/profile', async (req, res) => {
     try {
         const { fullName, phone } = req.body;
@@ -600,7 +534,6 @@ router.post('/profile', async (req, res) => {
             'profile.phone': phone
         });
 
-        // Update session user data
         req.session.user.profile.fullName = fullName;
         req.session.user.profile.phone = phone;
 
@@ -613,7 +546,6 @@ router.post('/profile', async (req, res) => {
     }
 });
 
-// View Registered Students for Event
 router.get('/events/:id/students', async (req, res) => {
     try {
         const eventId = req.params.id;
@@ -630,7 +562,6 @@ router.get('/events/:id/students', async (req, res) => {
             return res.redirect('/faculty/events');
         }
         
-        // Check if faculty is organizer
         if (event.organizer._id.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to view students for this event';
             return res.redirect('/faculty/events');
@@ -656,7 +587,6 @@ router.get('/events/:id/students', async (req, res) => {
     }
 });
 
-// Registration Management
 router.post('/events/:eventId/registrations/:registrationId/approve', async (req, res) => {
     try {
         const { eventId, registrationId } = req.params;
@@ -713,7 +643,6 @@ router.post('/events/:eventId/registrations/:registrationId/reject', async (req,
     }
 });
 
-// Delete Registration
 router.delete('/events/:eventId/registrations/:registrationId/delete', async (req, res) => {
     try {
         const { eventId, registrationId } = req.params;
@@ -723,7 +652,6 @@ router.delete('/events/:eventId/registrations/:registrationId/delete', async (re
             return res.status(403).json({ success: false, message: 'Unauthorized' });
         }
         
-        // Find and remove registration
         await Event.findOneAndUpdate(
             { _id: eventId, 'registrations._id': registrationId },
             { $pull: { registrations: { _id: registrationId } } }
@@ -736,7 +664,6 @@ router.delete('/events/:eventId/registrations/:registrationId/delete', async (re
     }
 });
 
-// View Student Details
 router.get('/student/:studentId', async (req, res) => {
     try {
         const student = await User.findById(req.params.studentId)
@@ -758,7 +685,6 @@ router.get('/student/:studentId', async (req, res) => {
     }
 });
 
-// Department Teams View (Full Page)
 router.get('/events/:eventId/department/:departmentName', async (req, res) => {
     try {
         const { eventId, departmentName } = req.params;
@@ -771,13 +697,11 @@ router.get('/events/:eventId/department/:departmentName', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
 
-        // Check if the faculty is the organizer
         if (event.organizer._id.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to view this event';
             return res.redirect('/faculty/dashboard');
         }
 
-        // Filter teams by department
         const departmentTeams = event.registrations.filter(
             reg => reg.teamLeaderDepartment && 
                    reg.teamLeaderDepartment.toLowerCase() === decodeURIComponent(departmentName).toLowerCase()
@@ -801,7 +725,6 @@ router.get('/events/:eventId/department/:departmentName', async (req, res) => {
     }
 });
 
-// Delete Department Teams
 router.delete('/events/:eventId/department/:departmentName/delete', async (req, res) => {
     try {
         const { eventId, departmentName } = req.params;
@@ -812,12 +735,10 @@ router.delete('/events/:eventId/department/:departmentName/delete', async (req, 
             return res.json({ success: false, message: 'Event not found' });
         }
 
-        // Check if the faculty is the organizer
         if (event.organizer.toString() !== req.session.user._id.toString()) {
             return res.json({ success: false, message: 'You are not authorized to delete teams from this event' });
         }
 
-        // Filter out teams from the specified department
         const decodedDeptName = decodeURIComponent(departmentName).toLowerCase();
         const originalCount = event.registrations.length;
         
@@ -841,27 +762,22 @@ router.delete('/events/:eventId/department/:departmentName/delete', async (req, 
     }
 });
 
-// Upload Result - GET (Display Form)
 router.get('/upload-result', async (req, res) => {
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Get all past events created by this coordinator
         const events = await Event.find({
             organizer: req.session.user._id,
             date: { $lt: today }
         }).sort({ date: -1 });
 
-        // Check which events already have results
-        const Result = require('../models/Result');
         const existingResults = await Result.find({
             event: { $in: events.map(e => e._id) }
         }).select('event');
         
         const resultEventIds = new Set(existingResults.map(r => r.event.toString()));
         
-        // Add hasResult flag to each event
         const eventsWithResultFlag = events.map(event => ({
             ...event.toObject(),
             hasResult: resultEventIds.has(event._id.toString())
@@ -874,7 +790,6 @@ router.get('/upload-result', async (req, res) => {
             error: req.session.error
         });
         
-        // Clear flash messages
         delete req.session.success;
         delete req.session.error;
     } catch (error) {
@@ -887,12 +802,10 @@ router.get('/upload-result', async (req, res) => {
     }
 });
 
-// Upload Result - POST (Submit Form)
 router.post('/upload-result', async (req, res) => {
     try {
         const { eventId, firstPosition, secondPosition, thirdPosition } = req.body;
         
-        // Validate event exists and belongs to this coordinator
         const event = await Event.findOne({
             _id: eventId,
             organizer: req.session.user._id
@@ -903,8 +816,6 @@ router.post('/upload-result', async (req, res) => {
             return res.redirect('/faculty/upload-result');
         }
         
-        // Check if result already exists for this event
-        const Result = require('../models/Result');
         const existingResult = await Result.findOne({ event: eventId });
         
         if (existingResult) {
@@ -912,7 +823,6 @@ router.post('/upload-result', async (req, res) => {
             return res.redirect('/faculty/upload-result');
         }
         
-        // Create new result
         const result = new Result({
             event: eventId,
             coordinator: req.session.user._id,
@@ -944,7 +854,6 @@ router.post('/upload-result', async (req, res) => {
     }
 });
 
-// POST - Create Match Started Notification
 router.post('/events/:eventId/notifications/match-started', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -977,7 +886,6 @@ router.post('/events/:eventId/notifications/match-started', async (req, res) => 
     }
 });
 
-// POST - Create Winner Declared Notification
 router.post('/events/:eventId/notifications/winner', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -1011,7 +919,6 @@ router.post('/events/:eventId/notifications/winner', async (req, res) => {
     }
 });
 
-// POST - Create Next Match Notification
 router.post('/events/:eventId/notifications/next-match', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -1044,7 +951,6 @@ router.post('/events/:eventId/notifications/next-match', async (req, res) => {
     }
 });
 
-// GET - Get Notifications for an Event
 router.get('/events/:eventId/notifications', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -1060,7 +966,6 @@ router.get('/events/:eventId/notifications', async (req, res) => {
     }
 });
 
-// DELETE - Delete a notification
 router.delete('/notifications/:notificationId', async (req, res) => {
     try {
         const { notificationId } = req.params;
@@ -1071,12 +976,10 @@ router.delete('/notifications/:notificationId', async (req, res) => {
             return res.json({ success: false, message: 'Notification not found' });
         }
         
-        // Check if user owns this notification
         if (notification.createdBy.toString() !== req.session.user._id.toString()) {
             return res.json({ success: false, message: 'Not authorized' });
         }
         
-        // Soft delete - set isActive to false
         notification.isActive = false;
         await notification.save();
         

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
 
-// Public events listing (accessible without login)
 router.get('/', async (req, res) => {
     try {
         const { category, search } = req.query;
@@ -32,7 +31,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Event details (public)
 router.get('/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
@@ -50,7 +48,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Check for time clashes (utility endpoint)
 router.post('/check-clash', async (req, res) => {
     try {
         const { date, startTime, endTime, venue, excludeEventId } = req.body;

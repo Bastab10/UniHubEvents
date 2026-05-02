@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Event = require('../models/Event');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 const { deleteImage } = require('../config/cloudinary');
 
-// 1. Dashboard Overview
 router.get('/', async (req, res) => {
     try {
-        // Redirect to student management page
         res.redirect('/admin/students');
     } catch (error) {
         console.error('Admin redirect error:', error);
@@ -16,10 +15,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Middleware
 router.use(isAuthenticated, checkRole('admin'), isApproved, isActive);
 
-// 1. Dashboard Overview
 router.get('/dashboard', async (req, res) => {
     try {
         const stats = await Promise.all([
@@ -39,7 +36,6 @@ router.get('/dashboard', async (req, res) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Get only active/upcoming events (matching Student Dashboard)
         const allEventsList = await Event.find({
             date: { $gte: today }
         })
@@ -62,7 +58,6 @@ router.get('/dashboard', async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(10);
 
-        // ✅ FIXED aggregate syntax
         const allRegisteredStudents = await Event.aggregate([
             { $unwind: '$registrations' },
             {
@@ -83,13 +78,11 @@ router.get('/dashboard', async (req, res) => {
             { $sort: { _id: 1 } }
         ]);
 
-        // Fetch students and faculty data
         const allStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 });
         const allFaculty = await User.find({ role: 'faculty' }).sort({ createdAt: -1 });
         const pendingFaculty = await User.find({ role: 'faculty', isApproved: false }).sort({ createdAt: -1 });
         const approvedFaculty = await User.find({ role: 'faculty', isApproved: true }).sort({ createdAt: -1 });
         
-        // Fetch pending student event registrations
         const pendingRegistrations = await Event.aggregate([
             { $unwind: '$registrations' },
             {
@@ -130,7 +123,6 @@ router.get('/dashboard', async (req, res) => {
             { $sort: { createdAt: -1 } }
         ]);
 
-        // Fetch total student registrations
         const totalRegistrations = await Event.aggregate([
             { $unwind: '$registrations' },
             {
@@ -170,10 +162,8 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
-// All Events - Show complete list of all events in the system
 router.get('/events', async (req, res) => {
     try {
-        // Get ALL events (past, present, and future)
         const events = await Event.find({})
             .sort({ date: -1 })
             .populate('organizer', 'profile.firstName profile.lastName');
@@ -189,7 +179,6 @@ router.get('/events', async (req, res) => {
     }
 });
 
-// Event Details
 router.get('/events/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
@@ -201,7 +190,6 @@ router.get('/events/:id', async (req, res) => {
             return res.redirect('/admin/dashboard');
         }
 
-        // For team events, group registrations by department
         let departmentGroups = null;
         if (event.eventType === 'team' && event.registrations) {
             const groups = {};
@@ -217,7 +205,7 @@ router.get('/events/:id', async (req, res) => {
                 }
                 groups[dept].teams.push(reg);
                 groups[dept].teamCount++;
-                groups[dept].totalMembers += (reg.teamMembers?.length || 0) + 1; // +1 for team leader
+                groups[dept].totalMembers += (reg.teamMembers?.length || 0) + 1;
             });
             departmentGroups = Object.values(groups);
         }
@@ -233,7 +221,6 @@ router.get('/events/:id', async (req, res) => {
     }
 });
 
-// Event-Specific Registration Management
 router.get('/events/:id/registrations', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
@@ -245,7 +232,6 @@ router.get('/events/:id/registrations', async (req, res) => {
             return res.redirect('/admin/dashboard');
         }
 
-        // Calculate statistics
         const stats = {
             total: event.registrations.length,
             pending: event.registrations.filter(reg => reg.status === 'pending').length,
@@ -267,7 +253,6 @@ router.get('/events/:id/registrations', async (req, res) => {
     }
 });
 
-// Individual Registration Approval
 router.post('/registrations/:id/approve', async (req, res) => {
     try {
         const registrationId = req.params.id;
@@ -295,7 +280,6 @@ router.post('/registrations/:id/approve', async (req, res) => {
     }
 });
 
-// Individual Registration Rejection
 router.post('/registrations/:id/reject', async (req, res) => {
     try {
         const registrationId = req.params.id;
@@ -325,7 +309,6 @@ router.post('/registrations/:id/reject', async (req, res) => {
     }
 });
 
-// Bulk Registration Operations
 router.post('/registrations/bulk-approve', async (req, res) => {
     try {
         const { registrationIds } = req.body;
@@ -395,7 +378,6 @@ router.post('/registrations/bulk-reject', async (req, res) => {
     }
 });
 
-// All Students - Show all registered students
 router.get('/students', async (req, res) => {
     try {
         const students = await User.find({ role: 'student' })
@@ -413,7 +395,6 @@ router.get('/students', async (req, res) => {
     }
 });
 
-// Student Verification Routes
 router.post('/students/:id/verify', async (req, res) => {
     try {
         const { verificationStatus, notes } = req.body;
@@ -441,7 +422,6 @@ router.post('/students/:id/verify', async (req, res) => {
     }
 });
 
-// Delete Student
 router.delete('/students/:id', async (req, res) => {
     try {
         const student = await User.findOneAndDelete({ 
@@ -450,7 +430,6 @@ router.delete('/students/:id', async (req, res) => {
         });
         
         if (student) {
-            // Also remove student registrations from all events
             await Event.updateMany(
                 { 'registrations.student': req.params.id },
                 { $pull: { registrations: { student: req.params.id } } }
@@ -466,7 +445,6 @@ router.delete('/students/:id', async (req, res) => {
     }
 });
 
-// Registration Notes Management
 router.post('/registrations/:id/notes', async (req, res) => {
     try {
         const { notes } = req.body;
@@ -493,7 +471,6 @@ router.post('/registrations/:id/notes', async (req, res) => {
     }
 });
 
-// All Registrations Management
 router.get('/registrations-management', async (req, res) => {
     try {
         const { status, search, eventId } = req.query;
@@ -537,7 +514,6 @@ router.get('/registrations-management', async (req, res) => {
             { $sort: { 'registrations.registeredAt': -1 } }
         ]);
         
-        // Get total count
         const total = await Event.aggregate([
             { $unwind: '$registrations' },
             { $match: matchStage },
@@ -558,7 +534,6 @@ router.get('/registrations-management', async (req, res) => {
     }
 });
 
-// Faculty Approval Routes
 router.get('/faculty-management', async (req, res) => {
     try {
         const pendingFaculty = await User.find({ role: 'faculty', isApproved: false })
@@ -629,59 +604,44 @@ router.post('/faculty/:id/reject', async (req, res) => {
     }
 });
 
-// Delete Faculty Member with Cascade Deletion
 router.delete('/faculty/:id/delete', async (req, res) => {
     try {
         const facultyId = req.params.id;
         
-        // Find faculty member first
         const faculty = await User.findById(facultyId);
         
         if (!faculty) {
             return res.status(404).json({ success: false, message: 'Faculty member not found' });
         }
         
-        // Get all events created by this faculty member
         const facultyEvents = await Event.find({ organizer: facultyId });
         const eventIds = facultyEvents.map(event => event._id);
         
-        // Delete all registrations for these events (to prevent orphaned data)
-        if (eventIds.length > 0) {
-            await Event.updateMany(
-                { _id: { $in: eventIds } },
-                { $pull: { registrations: {} } }
-            );
-        }
+        await Event.updateMany(
+            { _id: { $in: eventIds } },
+            { $pull: { registrations: {} } }
+        );
         
-        // Delete all events created by this faculty member
-        const deletedEvents = await Event.deleteMany({ organizer: facultyId });
+        await Event.deleteMany({ organizer: facultyId });
         
-        // Remove faculty from any student registrations (cleanup)
         await User.updateMany(
             { 'registeredEvents': facultyId },
             { $pull: { registeredEvents: facultyId } }
         );
         
-        // Delete faculty member
         await User.findByIdAndDelete(facultyId);
-        
-        console.log(`Deleted faculty member: ${faculty.profile.firstName} ${faculty.profile.lastName}`);
-        console.log(`Cascade deleted ${deletedEvents.deletedCount} events created by this faculty member`);
-        console.log(`Cleaned up registrations and user references`);
         
         res.json({ 
             success: true, 
             message: 'Faculty member and all associated data deleted successfully',
-            deletedEvents: deletedEvents.deletedCount
+            deletedEvents: await Event.deleteMany({ organizer: facultyId }).then(result => result.deletedCount)
         });
-        
     } catch (error) {
         console.error('Faculty deletion error:', error);
         res.status(500).json({ success: false, message: 'Error deleting faculty member' });
     }
 });
 
-// Approved Registrations
 router.get('/approved-registrations', async (req, res) => {
     try {
         const approvedRegistrations = await Event.aggregate([
@@ -723,9 +683,6 @@ router.get('/approved-registrations', async (req, res) => {
             }
         ]);
 
-        console.log('Approved registrations found:', approvedRegistrations.length);
-
-        // Calculate statistics with null checks
         const uniqueStudents = new Set(
             approvedRegistrations
                 .filter(reg => reg.student && reg.student._id)
@@ -759,14 +716,11 @@ router.get('/approved-registrations', async (req, res) => {
     }
 });
 
-// Past Events - Show only events that have already taken place
 router.get('/past-events', async (req, res) => {
     try {
-        // Get today's date at midnight for comparison
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Fetch only past events (date < today)
         const pastEvents = await Event.find({
             date: { $lt: today }
         })
@@ -784,7 +738,6 @@ router.get('/past-events', async (req, res) => {
     }
 });
 
-// View Past Event Details
 router.get('/past-events/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
@@ -796,7 +749,6 @@ router.get('/past-events/:id', async (req, res) => {
             return res.redirect('/admin/past-events');
         }
 
-        // Verify this is actually a past event
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const eventDate = new Date(event.date);
@@ -817,19 +769,16 @@ router.get('/past-events/:id', async (req, res) => {
     }
 });
 
-// Delete Past Event (Admin Only)
 router.delete('/past-events/:id/delete', async (req, res) => {
     try {
         const eventId = req.params.id;
 
-        // Find the event first
         const event = await Event.findById(eventId);
 
         if (!event) {
             return res.status(404).json({ success: false, message: 'Event not found' });
         }
 
-        // Verify this is a past event
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const eventDate = new Date(event.date);
@@ -839,13 +788,10 @@ router.delete('/past-events/:id/delete', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Cannot delete upcoming or current events from past events section' });
         }
 
-        // Clean up poster from Cloudinary if it exists
         if (event.poster && event.poster.trim() !== '') {
             await deleteImage(event.poster);
-            console.log('Cleaned up poster from Cloudinary');
         }
 
-        // Delete the event
         await Event.findByIdAndDelete(eventId);
 
         res.json({ success: true, message: 'Past event deleted successfully' });
@@ -855,10 +801,8 @@ router.delete('/past-events/:id/delete', async (req, res) => {
     }
 });
 
-// All Coordinator Members - Show only approved faculty coordinators
 router.get('/faculty', async (req, res) => {
     try {
-        // Get only approved faculty coordinators
         const coordinators = await User.find({
             role: 'faculty',
             isApproved: true
@@ -879,7 +823,6 @@ router.get('/faculty', async (req, res) => {
     }
 });
 
-// Faculty Details
 router.get('/faculty/:id', async (req, res) => {
     try {
         const faculty = await User.findById(req.params.id);
@@ -888,7 +831,6 @@ router.get('/faculty/:id', async (req, res) => {
             return res.status(404).send('Faculty not found');
         }
 
-        // Get all events created by this faculty
         const facultyEvents = await Event.find({ organizer: faculty._id })
             .sort({ createdAt: -1 })
             .populate('organizer', 'profile.firstName profile.lastName');
@@ -904,7 +846,6 @@ router.get('/faculty/:id', async (req, res) => {
     }
 });
 
-// All Registrations
 router.get('/registrations/all', async (req, res) => {
     try {
         const allRegistrations = await Event.aggregate([
@@ -928,7 +869,6 @@ router.get('/registrations/all', async (req, res) => {
     }
 });
 
-// Get Student Details for Modal
 router.get('/students/:id/details', async (req, res) => {
     try {
         const { registration } = req.query;
@@ -960,7 +900,6 @@ router.get('/students/:id/details', async (req, res) => {
     }
 });
 
-// Student Approval Route
 router.post('/students/:id/approve', async (req, res) => {
     try {
         const studentId = req.params.id;
@@ -999,7 +938,6 @@ router.get('/students/:id', async (req, res) => {
             .populate('organizer', 'profile.firstName profile.lastName')
             .sort({ date: -1 });
         
-        // Find specific registration if registration ID is provided
         let specificRegistration = null;
         let specificEvent = null;
         if (registration) {
@@ -1024,12 +962,10 @@ router.get('/students/:id', async (req, res) => {
     }
 });
 
-// Registration Management Routes
 router.post('/registrations/:id/approve', async (req, res) => {
     try {
         const registrationId = req.params.id;
         
-        // Update registration status to approved
         const registration = await Event.findOneAndUpdate(
             { 'registrations._id': registrationId },
             { 
@@ -1056,7 +992,6 @@ router.post('/registrations/:id/reject', async (req, res) => {
         const registrationId = req.params.id;
         const { reason } = req.body;
         
-        // Update registration status to rejected
         const registration = await Event.findOneAndUpdate(
             { 'registrations._id': registrationId },
             { 
@@ -1079,7 +1014,6 @@ router.post('/registrations/:id/reject', async (req, res) => {
     }
 });
 
-// User Management - Block/Unblock Users
 router.post('/users/:id/block', async (req, res) => {
     try {
         const userId = req.params.id;
@@ -1128,7 +1062,6 @@ router.post('/users/:id/unblock', async (req, res) => {
     }
 });
 
-// Event Deletion
 router.post('/events/:id/delete', async (req, res) => {
     try {
         const eventId = req.params.id;
@@ -1149,7 +1082,6 @@ router.post('/events/:id/delete', async (req, res) => {
     }
 });
 
-// Department Teams View (Full Page)
 router.get('/events/:eventId/department/:departmentName', async (req, res) => {
     try {
         const { eventId, departmentName } = req.params;
@@ -1162,7 +1094,6 @@ router.get('/events/:eventId/department/:departmentName', async (req, res) => {
             return res.redirect('/admin/dashboard');
         }
 
-        // Filter teams by department
         const departmentTeams = event.registrations.filter(
             reg => reg.teamLeaderDepartment && 
                    reg.teamLeaderDepartment.toLowerCase() === decodeURIComponent(departmentName).toLowerCase()

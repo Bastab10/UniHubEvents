@@ -109,7 +109,6 @@ const eventSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Index for efficient queries
 eventSchema.index({ date: 1, startTime: 1, venue: 1 });
 eventSchema.index({ category: 1 });
 eventSchema.index({ organizer: 1 });

@@ -1,6 +1,5 @@
 const cloudinary = require('cloudinary');
 const multer = require('multer');
-const path = require('path');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -30,7 +29,6 @@ const uploadImage = async (file) => {
                         console.error('Cloudinary upload error:', error);
                         reject(error);
                     } else {
-                        console.log('Cloudinary upload success:', result.secure_url);
                         resolve(result.secure_url);
                     }
                 }
@@ -52,7 +50,6 @@ const deleteImage = async (imageUrl) => {
         const publicId = folder + '/' + filename.split('.')[0];
 
         await cloudinary.v2.uploader.destroy(publicId);
-        console.log('Deleted from Cloudinary:', publicId);
     } catch (error) {
         console.error('Delete error:', error);
     }

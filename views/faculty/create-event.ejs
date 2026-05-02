@@ -428,12 +428,8 @@
                                                 preview.classList.remove('hidden');
                                                 previewImg.src = e.target.result;
                                                 previewImg.onerror = function() {
-                                                    console.log('Preview image failed to load');
                                                     this.style.display = 'none';
                                                     preview.classList.add('hidden');
-                                                };
-                                                previewImg.onload = function() {
-                                                    console.log('Preview image loaded successfully');
                                                 };
                                             }
                                         };

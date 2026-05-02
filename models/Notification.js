@@ -41,7 +41,6 @@ const notificationSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Index for efficient queries
 notificationSchema.index({ event: 1, createdAt: -1 });
 notificationSchema.index({ isActive: 1 });
 

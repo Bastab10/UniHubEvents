@@ -5,51 +5,11 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { isAuthenticated, isApproved, isActive } = require('../middleware/auth');
 
-// Create Admin User (for testing)
-router.get('/create-admin', async (req, res) => {
-    try {
-        const hashedPassword = await bcrypt.hash('098098', 10);
-        
-        const adminUser = new User({
-            username: 'bs',
-            email: 'bs@gmail.com',
-            password: hashedPassword,
-            role: 'admin',
-            profile: {
-                firstName: 'Admin',
-                lastName: 'User',
-                fullName: 'Admin User',
-                email: 'bs@gmail.com',
-                collegeId: 'ADMIN001',
-                verified: true
-            },
-            isActive: true,
-            isApproved: true
-        });
-        
-        await adminUser.save();
-        
-        res.send(`
-            <h1>Admin User Created Successfully!</h1>
-            <p>Email: bs@gmail.com</p>
-            <p>Password: 098098</p>
-            <p>Role: admin</p>
-            <br>
-            <a href="/auth/login">Go to Login</a>
-        `);
-    } catch (error) {
-        console.error('Error creating admin:', error);
-        res.send('Error creating admin user: ' + error.message);
-    }
-});
-
-// Login Page
 router.get('/login', (req, res) => {
     if (req.session.user) {
         return res.redirect('/');
     }
     
-    // Check for error in query parameter (from middleware) or session
     const error = req.query.error || req.session.error || null;
     delete req.session.error;
     
@@ -59,18 +19,14 @@ router.get('/login', (req, res) => {
     });
 });
 
-// Login Process
 router.post('/login', [
     body('username').trim().notEmpty().withMessage('Username is required'),
     body('password').notEmpty().withMessage('Password is required'),
     body('role').isIn(['student', 'faculty', 'admin']).withMessage('Invalid role selected')
 ], async (req, res) => {
     try {
-        console.log('Login attempt:', req.body); // Debug log
-        
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log('Validation errors:', errors.array()); // Debug log
             return res.render('auth/login', { 
                 title: 'Login',
                 errors: errors.array(),
@@ -80,17 +36,13 @@ router.post('/login', [
         }
 
         const { username, password, role } = req.body;
-        console.log('Looking for user:', username, 'as', role); // Debug log
         
         const user = await User.findOne({ 
             $or: [{ username }, { email: username }],
             role: role
         }).populate('createdEvents registeredEvents');
 
-        console.log('Found user:', user ? 'Yes' : 'No'); // Debug log
-
         if (!user) {
-            console.log('User not found'); // Debug log
             req.session.error = 'Invalid username, email, or password';
             return res.render('auth/login', { 
                 title: 'Login',
@@ -100,10 +52,8 @@ router.post('/login', [
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match:', isMatch); // Debug log
 
         if (!isMatch) {
-            console.log('Password incorrect'); // Debug log
             req.session.error = 'Invalid username, email, or password';
             return res.render('auth/login', { 
                 title: 'Login',
@@ -113,7 +63,6 @@ router.post('/login', [
         }
 
         if (!user.isActive) {
-            console.log('User not active'); // Debug log
             req.session.error = 'Your account has been deactivated. Please contact the administrator.';
             return res.render('auth/login', { 
                 title: 'Login',
@@ -123,7 +72,6 @@ router.post('/login', [
         }
 
         if (!user.isApproved && user.role !== 'admin') {
-            console.log('User not approved'); // Debug log
             if (user.role === 'student') {
                 req.session.error = 'Your account is pending approval. Please contact the administrator.';
                 return res.render('auth/login', { 
@@ -132,7 +80,6 @@ router.post('/login', [
                     selectedRole: role
                 });
             } else {
-                // For faculty, don't show error message - let success message from registration handle it
                 return res.render('auth/login', { 
                     title: 'Login',
                     username,
@@ -141,7 +88,6 @@ router.post('/login', [
             }
         }
 
-        console.log('Login successful for:', user.username, 'as', user.role); // Debug log
         req.session.user = user;
 
         switch(user.role) {
@@ -169,20 +115,17 @@ router.post('/login', [
     }
 });
 
-// Register Page
 router.get('/register', (req, res) => {
     if (req.session.user) {
         return res.redirect('/');
     }
     
-    // Clear any existing session messages to prevent showing them on register page
     delete req.session.error;
     delete req.session.success;
     
     res.render('auth/register', { title: 'Register' });
 });
 
-// Register Process
 router.post('/register', [
     body('fullName').trim().notEmpty().withMessage('Full name is required'),
     body('email').isEmail().withMessage('Please enter a valid email'),
@@ -198,14 +141,12 @@ router.post('/register', [
     }),
     body('collegeId').custom((value, { req }) => {
         if (req.body.role === 'student') {
-            // Validate College ID format for students: YEAR + COURSE + 3 digit number
             const pattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
             if (!pattern.test(value.toUpperCase())) {
                 throw new Error('Invalid College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)');
             }
         }
         if (req.body.role === 'faculty') {
-            // Validate College ID format for coordinator: FAC + 3 digits OR DEPT + 3 digits
             const facultyPattern = /^(FAC\d{3}|DEPT\d{3})$/;
             if (!facultyPattern.test(value.toUpperCase())) {
                 throw new Error('Invalid Coordinator ID format. Use format: FAC001 or DEPT123');
@@ -215,11 +156,8 @@ router.post('/register', [
     })
 ], async (req, res) => {
     try {
-        console.log('Registration attempt:', req.body); // Debug log
-        
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log('Validation errors:', errors.array()); // Debug log
             return res.render('auth/register', { 
                 title: 'Register',
                 errors: errors.array(),
@@ -228,18 +166,14 @@ router.post('/register', [
         }
 
         const { fullName, email, password, collegeId, role, department, designation } = req.body;
-        console.log('Processing registration for:', fullName, email, role); // Debug log
 
-        // Generate username from email or full name
         const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
 
-        // Check if user already exists
         const existingUser = await User.findOne({ 
             $or: [{ username }, { email }, { 'profile.collegeId': collegeId }] 
         });
 
         if (existingUser) {
-            console.log('User already exists:', existingUser.username); // Debug log
             req.session.error = 'Email or College ID already exists';
             return res.render('auth/register', { 
                 title: 'Register',
@@ -247,23 +181,19 @@ router.post('/register', [
             });
         }
 
-        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        console.log('Password hashed successfully'); // Debug log
 
-        // Split full name into first and last name for database compatibility
         const nameParts = fullName.trim().split(' ');
         const firstName = nameParts[0] || '';
         const lastName = nameParts.slice(1).join(' ') || '';
 
-        // Create new user with proper approval status
         const newUser = new User({
             username,
             email,
             password: hashedPassword,
             role,
-            isApproved: role === 'student' || role === 'admin', // Students auto-approved, coordinators need approval
+            isApproved: role === 'student' || role === 'admin',
             profile: {
                 firstName,
                 lastName,
@@ -276,11 +206,8 @@ router.post('/register', [
             }
         });
 
-        console.log('Creating user:', newUser); // Debug log
         await newUser.save();
-        console.log('User saved successfully:', newUser._id); // Debug log
         
-        // Set appropriate success message based on role
         if (role === 'student') {
             req.session.success = 'Registration successful! Your account has been activated and you can now login.';
         } else if (role === 'faculty') {
@@ -289,11 +216,10 @@ router.post('/register', [
             req.session.success = 'Registration successful! You can now login to your account.';
         }
         
-        console.log('Redirecting to login'); // Debug log
         res.redirect('/auth/login');
 
     } catch (error) {
-        console.error('Registration error:', error); // Debug log
+        console.error('Registration error:', error);
         req.session.error = 'Server error occurred during registration: ' + error.message;
         res.render('auth/register', { 
             title: 'Register',
@@ -302,31 +228,6 @@ router.post('/register', [
     }
 });
 
-// Debug route to check existing users
-router.get('/debug-users', async (req, res) => {
-    try {
-        const users = await User.find({});
-        res.json({
-            totalUsers: users.length,
-            users: users.map(user => ({
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                isApproved: user.isApproved,
-                isActive: user.isActive,
-                profile: {
-                    firstName: user.profile.firstName,
-                    lastName: user.profile.lastName,
-                    collegeId: user.profile.collegeId
-                }
-            }))
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Logout
 router.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {

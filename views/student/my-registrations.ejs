@@ -136,14 +136,10 @@
 <script>
     // Control flash message display duration
     window.addEventListener('load', function() {
-        console.log('Flash message script loaded'); // Debug log
-        
         // Auto-hide success message after 3 seconds
         const successMessage = document.getElementById('successMessage');
-        console.log('Success message element:', successMessage); // Debug log
         
         if (successMessage) {
-            console.log('Hiding success message after 3 seconds'); // Debug log
             setTimeout(function() {
                 successMessage.style.transition = 'opacity 0.5s ease';
                 successMessage.style.opacity = '0';
@@ -155,10 +151,8 @@
         
         // Auto-hide error message after 5 seconds
         const errorMessage = document.getElementById('errorMessage');
-        console.log('Error message element:', errorMessage); // Debug log
         
         if (errorMessage) {
-            console.log('Hiding error message after 5 seconds'); // Debug log
             setTimeout(function() {
                 errorMessage.style.transition = 'opacity 0.5s ease';
                 errorMessage.style.opacity = '0';

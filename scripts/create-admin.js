@@ -5,11 +5,9 @@ require('dotenv').config();
 
 async function createAdmin() {
     try {
-        // Connect to MongoDB
         await mongoose.connect(process.env.MONGODB_URI);
         console.log('MongoDB connected successfully');
 
-        // Check if admin user already exists
         const existingAdmin = await User.findOne({ role: 'admin' });
         
         if (existingAdmin) {
@@ -19,7 +17,6 @@ async function createAdmin() {
             return;
         }
 
-        // Create admin user
         const hashedPassword = await bcrypt.hash('admin123', 10);
         
         const admin = new User({
@@ -53,5 +50,4 @@ async function createAdmin() {
     }
 }
 
-// Run the function
 createAdmin();

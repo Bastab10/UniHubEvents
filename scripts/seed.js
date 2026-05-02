@@ -6,16 +6,13 @@ require('dotenv').config();
 
 async function seedDatabase() {
     try {
-        // Connect to MongoDB
         await mongoose.connect(process.env.MONGODB_URI);
         console.log('Connected to MongoDB');
 
-        // Clear existing data
         await User.deleteMany({});
         await Event.deleteMany({});
         console.log('Cleared existing data');
 
-        // Create admin user
         const adminPassword = await bcrypt.hash('admin123', 10);
         const admin = new User({
             username: 'admin',
@@ -34,7 +31,6 @@ async function seedDatabase() {
         await admin.save();
         console.log('Created admin user');
 
-        // Create faculty users
         const facultyPassword = await bcrypt.hash('faculty123', 10);
         const faculty1 = new User({
             username: 'john.smith',
@@ -71,7 +67,6 @@ async function seedDatabase() {
         await faculty2.save();
         console.log('Created faculty users');
 
-        // Create student users
         const studentPassword = await bcrypt.hash('student123', 10);
         const students = [
             {
@@ -121,7 +116,6 @@ async function seedDatabase() {
         }
         console.log('Created student users');
 
-        // Create sample events
         const events = [
             {
                 title: 'Web Development Workshop',
@@ -170,7 +164,7 @@ async function seedDatabase() {
                 startTime: '08:00',
                 endTime: '17:00',
                 venue: 'Sports Ground',
-                maxParticipants: 88, // 8 teams
+                maxParticipants: 88,
                 organizer: faculty2._id,
                 status: 'approved'
             },
@@ -212,5 +206,4 @@ async function seedDatabase() {
     }
 }
 
-// Run the seed function
 seedDatabase();
