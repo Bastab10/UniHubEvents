@@ -49,13 +49,13 @@ router.get('/login', (req, res) => {
         return res.redirect('/');
     }
     
-    // Clear only error messages when login page loads
-    const error = req.session.error;
+    // Check for error in query parameter (from middleware) or session
+    const error = req.query.error || req.session.error || null;
     delete req.session.error;
     
     res.render('auth/login', { 
         title: 'Login',
-        error: error || null
+        error: error
     });
 });
 

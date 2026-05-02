@@ -26,6 +26,13 @@ const eventSchema = new mongoose.Schema({
         enum: ['individual', 'team'],
         default: 'individual'
     },
+    eventFormat: {
+        type: String,
+        enum: ['knockout', 'ranking'],
+        required: function() {
+            return this.eventType === 'team';
+        }
+    },
     maxParticipants: {
         type: Number,
         default: null

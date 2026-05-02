@@ -3,6 +3,7 @@ const router = express.Router();
 const Event = require('../models/Event');
 const User = require('../models/User');
 const Result = require('../models/Result');
+const Notification = require('../models/Notification');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 
 // Special middleware for event details - no flash message
@@ -273,11 +274,6 @@ router.post('/events/:id/register', async (req, res) => {
                     return res.redirect(`/student/events/${req.params.id}`);
                 }
 
-                if (!team.teamLeaderDepartment || team.teamLeaderDepartment.trim() === '') {
-                    req.session.error = `Team ${i + 1}: Team leader department is required`;
-                    return res.redirect(`/student/events/${req.params.id}`);
-                }
-
                 // Validate formats
                 if (!studentPattern.test(team.teamLeaderCollegeId.trim().toUpperCase())) {
                     req.session.error = `Team ${i + 1}: Invalid Team Leader College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)`;
@@ -324,12 +320,15 @@ router.post('/events/:id/register', async (req, res) => {
                     }
                 }
 
+                // Use the user's department from session instead of form value
+                const userDepartment = req.session.user.profile?.department || req.session.user.department || '';
+
                 teamsToRegister.push({
                     teamName: team.teamName.trim(),
                     teamLeaderName: team.teamLeaderName.trim(),
                     teamLeaderCollegeId: team.teamLeaderCollegeId.trim(),
                     teamLeaderEmail: team.teamLeaderEmail.trim(),
-                    teamLeaderDepartment: team.teamLeaderDepartment.trim(),
+                    teamLeaderDepartment: userDepartment,
                     teamMembers: teamMembers
                 });
             }
@@ -601,6 +600,93 @@ router.post('/profile', async (req, res) => {
         console.error('Update profile error:', error);
         req.session.error = 'Error updating profile';
         res.redirect('/student/profile');
+    }
+});
+
+// GET - Get Notifications for registered events
+router.get('/notifications', async (req, res) => {
+    try {
+        const userId = req.session.user._id;
+        
+        // Find events where student is registered (from user.registeredEvents)
+        const user = await User.findById(userId);
+        const registeredEventIds = user.registeredEvents || [];
+        
+        // Also find team events where student is registered (from event.registrations)
+        const teamEvents = await Event.find({
+            'registrations.student': userId,
+            eventType: 'team'
+        }).select('_id');
+        
+        const teamEventIds = teamEvents.map(e => e._id.toString());
+        
+        // Combine both individual and team event IDs
+        const allEventIds = [...new Set([...registeredEventIds.map(id => id.toString()), ...teamEventIds])];
+        
+        console.log('Individual registered events:', registeredEventIds);
+        console.log('Team registered events:', teamEventIds);
+        console.log('All event IDs for notifications:', allEventIds);
+        
+        if (allEventIds.length === 0) {
+            return res.json({ success: true, notifications: [] });
+        }
+        
+        // Get notifications for these events - only latest per event
+        const notifications = await Notification.find({
+            event: { $in: allEventIds },
+            isActive: true
+        })
+        .sort({ createdAt: -1 })
+        .populate('event', 'title category');
+        
+        // Keep only the most recent notification per type per event
+        const latestPerEventType = new Map();
+        notifications.forEach(n => {
+            const eventId = n.event?._id?.toString() || n.event?.toString();
+            const type = n.type || 'general';
+            const key = `${eventId}_${type}`;
+            if (eventId && !latestPerEventType.has(key)) {
+                latestPerEventType.set(key, n);
+            }
+        });
+        
+        const latestNotifications = Array.from(latestPerEventType.values());
+        
+        console.log('Found notifications:', notifications.length);
+        console.log('Latest per event:', latestNotifications.length);
+        
+        res.json({ success: true, notifications: latestNotifications });
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+        res.json({ success: false, message: 'Error fetching notifications' });
+    }
+});
+
+// GET - Get notifications for specific event
+router.get('/events/:eventId/notifications', async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const userId = req.session.user._id;
+        
+        // Verify student is registered for this event
+        const user = await User.findById(userId);
+        const isRegistered = user.registeredEvents && user.registeredEvents.includes(eventId);
+        
+        if (!isRegistered) {
+            return res.json({ success: false, message: 'Not registered for this event' });
+        }
+        
+        const notifications = await Notification.find({
+            event: eventId,
+            isActive: true
+        })
+        .sort({ createdAt: -1 })
+        .limit(50);
+        
+        res.json({ success: true, notifications });
+    } catch (error) {
+        console.error('Error fetching event notifications:', error);
+        res.json({ success: false, message: 'Error fetching notifications' });
     }
 });
 

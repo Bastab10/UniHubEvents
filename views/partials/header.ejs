@@ -666,7 +666,7 @@
                 <!-- Left Section: Mobile Menu Button + Logo -->
                 <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
                     <!-- Mobile Menu Button -->
-                    <button onclick="toggleMobileMenu()" 
+                    <button onclick="handleMobileMenuClick()" 
                             class="mobile-menu-btn nav-button text-black hover:bg-black/10 p-2 sm:p-2.5 rounded-lg sm:rounded-xl"
                             title="Mobile Menu">
                         <i class="fa-solid fa-bars"></i>
@@ -897,6 +897,20 @@
             mobileMenu.classList.remove('active');
             overlay.classList.remove('active');
             document.body.style.overflow = '';
+        }
+
+        // Handle mobile menu click - faculty uses sidebar, others use mobile menu
+        function handleMobileMenuClick() {
+            const currentPath = window.location.pathname;
+            if (currentPath.startsWith('/faculty')) {
+                // Faculty users use sidebar
+                if (typeof openSidebar === 'function') {
+                    openSidebar();
+                }
+            } else {
+                // Others use mobile menu
+                toggleMobileMenu();
+            }
         }
 
         // Highlight active navigation link

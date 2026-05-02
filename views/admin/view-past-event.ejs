@@ -32,7 +32,6 @@
     /* Event Poster */
     .event-poster {
         width: 100%;
-        max-width: 300px;
         height: 200px;
         object-fit: cover;
         border-radius: 12px;
@@ -40,7 +39,6 @@
 
     .event-poster-placeholder {
         width: 100%;
-        max-width: 300px;
         height: 200px;
         border-radius: 12px;
         background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
@@ -74,7 +72,7 @@
                     <div class="lg:col-span-1">
                         <div class="bg-white p-6 rounded-lg shadow">
                             <% if (event.poster && event.poster.trim() !== '') { %>
-                                <img src="/images/<%= event.poster %>" alt="<%= event.title %>" class="event-poster mb-4">
+                                <img src="<%= event.poster %>" alt="<%= event.title %>" class="event-poster mb-4">
                             <% } else { %>
                                 <div class="event-poster-placeholder mb-4">
                                     <i class="fas fa-calendar-alt text-gray-400 text-4xl"></i>

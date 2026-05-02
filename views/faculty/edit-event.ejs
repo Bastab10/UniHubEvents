@@ -522,10 +522,10 @@
                             <% if (event.poster && event.poster.trim() !== '') { %>
                                 <div>
                                     <label class="block text-sm font-semibold mb-2 text-gray-700">Current Poster</label>
-                                    <div class="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
-                                        <img src="/images/<%= event.poster %>" 
+                                    <div class="border-2 border-gray-200 rounded-xl p-4 bg-gray-50">
+                                        <img src="<%= event.poster %>" 
                                              alt="Current Event Poster" 
-                                             class="w-full max-w-md h-48 object-cover rounded-lg shadow-md mx-auto">
+                                             class="w-full h-56 object-cover rounded-xl shadow-md">
                                         <p class="text-sm text-gray-500 text-center mt-2">Current event poster</p>
                                     </div>
                                 </div>

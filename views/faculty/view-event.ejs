@@ -236,8 +236,9 @@
         <div class="p-6">
             <!-- Centered Container -->
             <div class="max-w-6xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
                 <!-- Page Header -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-l-4 border-blue-500">
+                <div class="p-6 border-b border-gray-200 border-l-4 border-blue-500">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                         <div>
                             <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Event Details</h1>
@@ -246,157 +247,348 @@
                     </div>
                 </div>
 
-                <!-- Event Details Card -->
-                <div class="bg-white rounded-xl shadow-xl p-8 mb-6 border border-gray-200">
-                    <!-- Event Banner -->
-                    <div class="mb-8">
-                        <% if (event.poster) { %>
-                            <img src="/images/<%= event.poster %>" alt="<%= event.title %>" class="w-full h-64 object-cover rounded-lg shadow-md">
-                        <% } else { %>
-                            <div class="w-full h-64 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg shadow-md flex items-center justify-center">
-                                <div class="text-center text-white">
-                                    <i class="fas fa-calendar-alt text-5xl mb-3"></i>
-                                    <p class="text-xl font-semibold">Event Banner</p>
+                <!-- Event Information Grid (like admin view-past-event) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+                    <!-- Event Poster & Quick Info -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-gray-50 rounded-2xl p-4">
+                            <% if (event.poster && event.poster.trim() !== '') { %>
+                                <img src="<%= event.poster %>" alt="<%= event.title %>" class="w-full h-64 object-cover rounded-2xl mb-4 shadow-lg">
+                            <% } else { %>
+                                <div class="w-full h-64 bg-gradient-to-br from-blue-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                                    <div class="text-center text-white">
+                                        <i class="fas fa-calendar-alt text-4xl mb-2"></i>
+                                        <p class="text-sm font-semibold">No Poster</p>
+                                    </div>
                                 </div>
+                            <% } %>
+                            <div class="text-center">
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full 
+                                    <% if (event.category === 'seminar') { %>bg-blue-100 text-blue-800<% } 
+                                       else if (event.category === 'workshop') { %>bg-green-100 text-green-800<% } 
+                                       else if (event.category === 'cultural') { %>bg-purple-100 text-purple-800<% } 
+                                       else if (event.category === 'sports') { %>bg-orange-100 text-orange-800<%}
+                                       else { %>bg-gray-100 text-gray-800<% } %>">
+                                    <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
+                                </span>
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800 ml-1">
+                                    <%= event.eventType === 'team' ? 'Team' : 'Individual' %>
+                                </span>
                             </div>
-                        <% } %>
+                            <div class="mt-4 text-center">
+                                <p class="text-sm text-gray-500">Registrations</p>
+                                <p class="text-2xl font-bold text-gray-800"><%= event.registrations ? event.registrations.length : 0 %></p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Event Information -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Main Event Details -->
-                        <div class="lg:col-span-2 space-y-6">
-                            <!-- Title and Category -->
-                            <div>
-                                <h2 class="text-3xl font-bold text-gray-800 mb-3"><%= event.title %></h2>
-                                <div class="flex items-center gap-3 mb-4">
-                                    <span class="px-4 py-2 text-sm font-semibold rounded-full 
-                                        <% if (event.category === 'seminar') { %>bg-blue-100 text-blue-800<% } 
-                                           else if (event.category === 'workshop') { %>bg-green-100 text-green-800<% } 
-                                           else if (event.category === 'cultural') { %>bg-purple-100 text-purple-800<% } 
-                                           else if (event.category === 'sports') { %>bg-orange-100 text-orange-800<% }
-                                           else { %>bg-gray-100 text-gray-800<% } %>">
-                                        <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
-                                    </span>
-                                    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                        <%= event.eventType === 'team' ? 'Team Event' : 'Individual Event' %>
-                                    </span>
-                                </div>
+                    <!-- Event Details -->
+                    <div class="lg:col-span-2 bg-gray-50 rounded-xl p-5">
+                        <div class="flex items-center mb-4">
+                            <div class="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-calendar text-blue-600 text-xl"></i>
                             </div>
-
-                            <!-- Description -->
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-800 mb-2">Description</h3>
-                                <p class="text-gray-600 leading-relaxed"><%= event.description || 'No description available' %></p>
-                            </div>
-
-                            <!-- Event Details Grid -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Date and Time -->
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex items-center mb-2">
-                                        <i class="fas fa-calendar-alt text-blue-500 text-xl mr-3"></i>
-                                        <h4 class="font-semibold text-gray-800">Date & Time</h4>
-                                    </div>
-                                    <p class="text-gray-600 ml-8">
-                                        <%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %><br>
-                                        <strong>Time:</strong> <%= event.startTime %> - <%= event.endTime %>
-                                    </p>
-                                </div>
-
-                                <!-- Venue -->
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex items-center mb-2">
-                                        <i class="fas fa-map-marker-alt text-red-500 text-xl mr-3"></i>
-                                        <h4 class="font-semibold text-gray-800">Venue</h4>
-                                    </div>
-                                    <p class="text-gray-600 ml-8"><%= event.venue %></p>
-                                </div>
-
-                                <!-- Max Participants -->
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex items-center mb-2">
-                                        <i class="fas fa-users text-green-500 text-xl mr-3"></i>
-                                        <h4 class="font-semibold text-gray-800">Capacity</h4>
-                                    </div>
-                                    <p class="text-gray-600 ml-8">
-                                        <% if (event.maxParticipants) { %>
-                                            <%= event.maxParticipants %> Maximum Participants
-                                        <% } else { %>
-                                            Unlimited Participants
-                                        <% } %>
-                                    </p>
-                                </div>
-
-                                <!-- Team Size (if team event) -->
-                                <% if (event.eventType === 'team') { %>
-                                    <div class="bg-gray-50 rounded-lg p-4">
-                                        <div class="flex items-center mb-2">
-                                            <i class="fas fa-users text-purple-500 text-xl mr-3"></i>
-                                            <h4 class="font-semibold text-gray-800">Team Size</h4>
-                                        </div>
-                                        <p class="text-gray-600 ml-8"><%= event.teamSize %> Members per Team</p>
-                                    </div>
-                                <% } %>
+                            <div class="ml-4">
+                                <h2 class="text-2xl font-bold text-gray-900"><%= event.title %></h2>
+                                <p class="text-sm text-gray-500"><%= event.description ? event.description.substring(0, 80) + (event.description.length > 80 ? '...' : '') : 'No description' %></p>
                             </div>
                         </div>
 
-                        <!-- Registration Stats -->
-                        <div class="space-y-6">
-                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-4">Registration Statistics</h3>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">Total Registered</span>
-                                        <span class="text-2xl font-bold text-blue-600"><%= event.registrations ? event.registrations.length : 0 %></span>
-                                    </div>
-                                    <% if (event.maxParticipants) { %>
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-gray-600">Available Spots</span>
-                                            <span class="text-xl font-semibold text-green-600">
-                                                <%= Math.max(0, event.maxParticipants - (event.registrations ? event.registrations.length : 0)) %>
-                                            </span>
-                                        </div>
-                                        <!-- Progress Bar -->
-                                        <div class="mt-3">
-                                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                                <% 
-                                                const registeredCount = event.registrations ? event.registrations.length : 0;
-                                                const percentage = (registeredCount / event.maxParticipants) * 100;
-                                                %>
-                                                <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%;"></div>
-                                                <script>
-                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                        const progressBar = document.getElementById('progress-bar');
-                                                        if (progressBar) {
-                                                            progressBar.style.width = '<%= Math.min(100, percentage) %>%';
-                                                        }
-                                                    });
-                                                </script>
-                                            </div>
-                                            <p class="text-xs text-gray-500 mt-1"><%= Math.round(percentage) %>% filled</p>
-                                        </div>
-                                    <% } %>
+                        <!-- Event Details Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Date and Time -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-calendar-alt text-blue-500 text-xl mr-3"></i>
+                                    <h4 class="font-semibold text-gray-800">Date & Time</h4>
                                 </div>
+                                <p class="text-gray-600 ml-8">
+                                    <%= new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %><br>
+                                    <strong>Time:</strong> <%= event.startTime %> - <%= event.endTime %>
+                                </p>
                             </div>
 
-                            <!-- Quick Actions -->
-                            <div class="space-y-3">
-                                <a href="/faculty/events/<%= event._id %>/edit" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-center block">
-                                    <i class="fas fa-edit mr-2"></i>Edit Event
-                                </a>
+                            <!-- Venue -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-map-marker-alt text-red-500 text-xl mr-3"></i>
+                                    <h4 class="font-semibold text-gray-800">Venue</h4>
+                                </div>
+                                <p class="text-gray-600 ml-8"><%= event.venue %></p>
                             </div>
+
+                            <!-- Max Participants -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-users text-green-500 text-xl mr-3"></i>
+                                    <h4 class="font-semibold text-gray-800">Capacity</h4>
+                                </div>
+                                <p class="text-gray-600 ml-8">
+                                    <% if (event.maxParticipants) { %>
+                                        <%= event.maxParticipants %> Maximum Participants
+                                    <% } else { %>
+                                        Unlimited Participants
+                                    <% } %>
+                                </p>
+                            </div>
+
+                            <!-- Team Size (if team event) -->
+                            <% if (event.eventType === 'team') { %>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-users text-purple-500 text-xl mr-3"></i>
+                                        <h4 class="font-semibold text-gray-800">Team Size</h4>
+                                    </div>
+                                    <p class="text-gray-600 ml-8"><%= event.teamSize %> Members per Team</p>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <% if (event.eventType === 'team' && event.eventFormat) { %>
+                            <div class="bg-gray-50 rounded-lg p-4 mt-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-trophy text-amber-500 text-xl mr-3"></i>
+                                    <h4 class="font-semibold text-gray-800">Event Format</h4>
+                                </div>
+                                <p class="text-gray-600 ml-8 capitalize"><%= event.eventFormat %></p>
+                            </div>
+                        <% } %>
+
+                        <!-- Description -->
+                        <div class="mt-4">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Description</h3>
+                            <p class="text-gray-600 leading-relaxed"><%= event.description || 'No description available' %></p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Live Match Updates (for team events) -->
+                <% if (event.eventType === 'team') { %>
+                <div class="p-6 border-t border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-broadcast-tower text-red-500 mr-2"></i>Live Match Updates
+                    </h3>
+
+                    <!-- Row 1: Start Match -->
+                    <div class="flex flex-wrap items-center gap-3 py-3 border-b border-gray-100">
+                        <span class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md whitespace-nowrap">
+                            <i class="fas fa-play text-xs"></i>Start Match
+                        </span>
+                        <input type="text" id="matchStartTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-28">
+                        <span class="text-gray-400 text-sm">vs</span>
+                        <input type="text" id="matchStartTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-28">
+                        <input type="text" id="matchStartMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 flex-1 min-w-[120px]">
+                        <button onclick="createMatchNotification('match-started')" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap">
+                            <i class="fas fa-play mr-1"></i>Go
+                        </button>
+                    </div>
+
+                    <!-- Row 2: Declare Winner -->
+                    <div class="flex flex-wrap items-center gap-3 py-3 border-b border-gray-100">
+                        <span class="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 bg-green-50 px-2.5 py-1 rounded-md whitespace-nowrap">
+                            <i class="fas fa-trophy text-xs"></i>Winner
+                        </span>
+                        <input type="text" id="winnerTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-28">
+                        <span class="text-gray-400 text-sm">vs</span>
+                        <input type="text" id="winnerTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-28">
+                        <input type="text" id="winnerTeam" placeholder="Winner" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-28">
+                        <input type="text" id="winnerMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 flex-1 min-w-[100px]">
+                        <button onclick="createWinnerNotification()" class="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap">
+                            <i class="fas fa-trophy mr-1"></i>Go
+                        </button>
+                    </div>
+
+                    <!-- Row 3: Next Match -->
+                    <div class="flex flex-wrap items-center gap-3 py-3">
+                        <span class="inline-flex items-center gap-1.5 text-sm font-medium text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md whitespace-nowrap">
+                            <i class="fas fa-forward text-xs"></i>Next Match
+                        </span>
+                        <input type="text" id="nextMatchTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 w-28">
+                        <span class="text-gray-400 text-sm">vs</span>
+                        <input type="text" id="nextMatchTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 w-28">
+                        <input type="text" id="nextMatchMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 flex-1 min-w-[120px]">
+                        <button onclick="createMatchNotification('next-match')" class="bg-purple-600 text-white px-4 py-1.5 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium whitespace-nowrap">
+                            <i class="fas fa-forward mr-1"></i>Go
+                        </button>
+                    </div>
+
+                    <!-- Recent Notifications -->
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <h4 class="font-medium text-gray-700 mb-3">Recent Updates</h4>
+                        <div id="notificationsList" class="space-y-2 max-h-60 overflow-y-auto">
+                            <p class="text-gray-500 text-sm">Loading notifications...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    async function createMatchNotification(type) {
+                        let teamA, teamB, message;
+                        
+                        if (type === 'match-started') {
+                            teamA = document.getElementById('matchStartTeamA').value;
+                            teamB = document.getElementById('matchStartTeamB').value;
+                            message = document.getElementById('matchStartMessage').value;
+                        } else {
+                            teamA = document.getElementById('nextMatchTeamA').value;
+                            teamB = document.getElementById('nextMatchTeamB').value;
+                            message = document.getElementById('nextMatchMessage').value;
+                        }
+                        
+                        if (!teamA || !teamB) {
+                            alert('Please enter both team names');
+                            return;
+                        }
+                        
+                        try {
+                            const response = await fetch(`/faculty/events/<%= event._id %>/notifications/${type}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ teamA, teamB, message })
+                            });
+                            
+                            const result = await response.json();
+                            if (result.success) {
+                                alert('Notification created successfully!');
+                                loadNotifications();
+                                if (type === 'match-started') {
+                                    document.getElementById('matchStartTeamA').value = '';
+                                    document.getElementById('matchStartTeamB').value = '';
+                                    document.getElementById('matchStartMessage').value = '';
+                                } else {
+                                    document.getElementById('nextMatchTeamA').value = '';
+                                    document.getElementById('nextMatchTeamB').value = '';
+                                    document.getElementById('nextMatchMessage').value = '';
+                                }
+                            } else {
+                                alert('Error: ' + result.message);
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('Failed to create notification');
+                        }
+                    }
+                    
+                    async function createWinnerNotification() {
+                        const teamA = document.getElementById('winnerTeamA').value;
+                        const teamB = document.getElementById('winnerTeamB').value;
+                        const winner = document.getElementById('winnerTeam').value;
+                        const message = document.getElementById('winnerMessage').value;
+                        
+                        if (!teamA || !teamB || !winner) {
+                            alert('Please enter both teams and the winner');
+                            return;
+                        }
+                        
+                        try {
+                            const response = await fetch(`/faculty/events/<%= event._id %>/notifications/winner`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ teamA, teamB, winner, message })
+                            });
+                            
+                            const result = await response.json();
+                            if (result.success) {
+                                alert('Winner declared successfully!');
+                                loadNotifications();
+                                document.getElementById('winnerTeamA').value = '';
+                                document.getElementById('winnerTeamB').value = '';
+                                document.getElementById('winnerTeam').value = '';
+                                document.getElementById('winnerMessage').value = '';
+                            } else {
+                                alert('Error: ' + result.message);
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('Failed to declare winner');
+                        }
+                    }
+                    
+                    async function loadNotifications() {
+                        try {
+                            const response = await fetch(`/faculty/events/<%= event._id %>/notifications`);
+                            const result = await response.json();
+                            
+                            if (result.success && result.notifications.length > 0) {
+                                const html = result.notifications.map(n => {
+                                    let icon = 'bell';
+                                    let color = 'gray';
+                                    if (n.type === 'match_started') { icon = 'play'; color = 'blue'; }
+                                    if (n.type === 'winner_declared') { icon = 'trophy'; color = 'green'; }
+                                    if (n.type === 'next_match') { icon = 'forward'; color = 'purple'; }
+                                    
+                                    return `
+                                        <div class="p-3 bg-${color}-50 border-l-4 border-${color}-400 rounded" id="notification-${n._id}">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex items-start">
+                                                    <i class="fas fa-${icon} text-${color}-500 mt-1 mr-2"></i>
+                                                    <div>
+                                                        <p class="text-sm text-gray-800">${n.message}</p>
+                                                        <p class="text-xs text-gray-500 mt-1">${new Date(n.createdAt).toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                                <button onclick="deleteNotification('${n._id}')" class="text-red-500 hover:text-red-700 text-xs ml-2" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                                document.getElementById('notificationsList').innerHTML = html;
+                            } else {
+                                document.getElementById('notificationsList').innerHTML = '<p class="text-gray-500 text-sm">No notifications yet</p>';
+                            }
+                        } catch (error) {
+                            console.error('Error loading notifications:', error);
+                        }
+                    }
+                    
+                    async function deleteNotification(notificationId) {
+                        if (!confirm('Are you sure you want to delete this update?')) {
+                            return;
+                        }
+                        
+                        try {
+                            const response = await fetch(`/faculty/notifications/${notificationId}`, {
+                                method: 'DELETE',
+                                headers: { 'Content-Type': 'application/json' }
+                            });
+                            
+                            const result = await response.json();
+                            if (result.success) {
+                                const element = document.getElementById(`notification-${notificationId}`);
+                                if (element) {
+                                    element.remove();
+                                }
+                                alert('Update deleted successfully!');
+                            } else {
+                                alert('Failed to delete update: ' + result.message);
+                            }
+                        } catch (error) {
+                            console.error('Error deleting notification:', error);
+                            alert('Error deleting update');
+                        }
+                    }
+                    
+                    loadNotifications();
+                    setInterval(loadNotifications, 30000);
+                </script>
+                <% } %>
+
+                <!-- Quick Actions -->
+                <div class="p-6 border-t border-gray-200">
+                    <a href="/faculty/events/<%= event._id %>/edit" class="w-full bg-teal-500 text-white px-4 py-3 rounded-lg hover:bg-teal-600 transition-colors font-medium text-center block">
+                        <i class="fas fa-edit mr-2"></i>Edit Event
+                    </a>
+                </div>
+
                 <!-- Registered Students Section -->
-                <div class="bg-white rounded-xl shadow-xl p-8 border border-gray-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Registered Students</h2>
-                        <div class="flex items-center gap-4">
+                <div class="p-6 border-t border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Registered Students</h2>
+                        <div class="flex items-center gap-3">
                             <span class="text-sm text-gray-600">
-                                <%= event.registrations ? event.registrations.length : 0 %> Total Registrations
+                                <%= event.registrations ? event.registrations.length : 0 %> Total
                             </span>
                             <% if (event.registrations && event.registrations.length > 0) { %>
                                 <button onclick="exportRegistrations()" class="compact-action-btn">
@@ -414,16 +606,16 @@
                                 <thead>
                                     <tr class="bg-gray-50 border-b border-gray-200">
                                         <% if (event.eventType === 'team') { %>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teams Count</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Members</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Teams</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Members</th>
                                         <% } else { %>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID / Roll Number</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Student Name</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Student ID</th>
                                         <% } %>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Registered</th>
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -431,7 +623,7 @@
                                         <% departmentGroups.forEach(deptGroup => { %>
                                             <tr class="hover:bg-gray-50 transition-colors">
                                                 <!-- Team Event: Show Department Group -->
-                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                <td class="px-3 py-3 whitespace-nowrap">
                                                     <div class="flex items-center">
                                                         <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                                                             <i class="fas fa-building text-blue-600 text-sm"></i>
@@ -439,18 +631,18 @@
                                                         <span class="text-sm font-semibold text-gray-900"><%= deptGroup.department %></span>
                                                     </div>
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                <td class="px-3 py-3 whitespace-nowrap">
                                                     <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium">
                                                         <%= deptGroup.teamCount %> team<%= deptGroup.teamCount > 1 ? 's' : '' %>
                                                     </span>
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                                                     <%= deptGroup.totalMembers %> members
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-600">
                                                     <%= new Date(deptGroup.teams[0].registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                                <td class="px-3 py-3 whitespace-nowrap text-sm font-medium">
                                                     <div class="flex items-center gap-2">
                                                         <a href="/faculty/events/<%= event._id %>/department/<%= encodeURIComponent(deptGroup.department) %>" class="inline-flex items-center gap-1 bg-teal-500 hover:bg-teal-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">
                                                             <i class="fas fa-eye"></i>
@@ -467,7 +659,7 @@
                                     <% } else { %>
                                         <% event.registrations.forEach((registration, index) => { %>
                                             <tr class="hover:bg-gray-50 transition-colors">
-                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                <td class="px-3 py-3 whitespace-nowrap">
                                                     <% if (registration.student) { %>
                                                         <div class="flex items-center">
                                                             <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
@@ -481,37 +673,33 @@
                                                         <span class="text-gray-400">Student not found</span>
                                                     <% } %>
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-600">
                                                     <% if (registration.student) { %>
                                                         <%= registration.student.email %>
                                                     <% } else { %>
                                                         N/A
                                                     <% } %>
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-600">
                                                     <% if (registration.student) { %>
                                                         <%= registration.student.profile.collegeId %>
                                                     <% } else { %>
                                                         N/A
                                                     <% } %>
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-600">
                                                     <%= new Date(registration.registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
                                                 </td>
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                                <td class="px-3 py-3 whitespace-nowrap text-sm font-medium">
                                                     <% if (registration.student) { %>
-                                                        <button onclick="viewStudentDetails('<%= registration.student._id %>')" 
-                class="compact-action-btn mr-2"
-                title="View Student Details">
-            <i class="fas fa-eye text-sm"></i>
-            <span class="text-xs">View</span>
-        </button>
-    <button onclick="deleteRegistration('<%= registration._id %>')" 
-                class="compact-action-btn"
-                title="Cancel Registration">
-            <i class="fas fa-trash text-sm"></i>
-            <span class="text-xs">Delete</span>
-        </button>
+                                                        <button onclick="viewStudentDetails('<%= registration.student._id %>')" class="compact-action-btn mr-2" title="View Student Details">
+                                                            <i class="fas fa-eye text-sm"></i>
+                                                            <span class="text-xs">View</span>
+                                                        </button>
+                                                        <button onclick="deleteRegistration('<%= registration._id %>')" class="compact-action-btn" title="Cancel Registration">
+                                                            <i class="fas fa-trash text-sm"></i>
+                                                            <span class="text-xs">Delete</span>
+                                                        </button>
                                                     <% } else { %>
                                                         <span class="text-gray-400">N/A</span>
                                                     <% } %>
@@ -620,6 +808,7 @@
                             <h3 class="text-xl font-semibold text-gray-600 mb-2">No students have registered for this event yet.</h3>
                         </div>
                     <% } %>
+                </div>
                 </div>
             </div>
         </div>

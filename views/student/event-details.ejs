@@ -58,26 +58,22 @@
                 }
             </style>
             
-            <!-- Event Banner -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4 mx-auto max-w-3xl">
-                <% if (event.poster && event.poster.trim() !== '') { %>
-                    <img src="/images/<%= event.poster %>" 
-                         alt="<%= event.title %>" 
-                         class="w-full h-48 object-cover">
-                <% } else { %>
-                    <div class="w-full h-48 bg-gradient-to-br text-black flex items-center justify-center">
-                        <div class="text-center text-black">
-                            <i class="fas fa-calendar-alt text-4xl mb-2"></i>
-                            <p class="text-lg font-semibold">Event Banner</p>
-                        </div>
-                    </div>
-                <% } %>
-                
-                <!-- Event Info Card -->
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <h1 class="text-2xl font-bold text-gray-800 mr-3"><%= event.title %></h1>
+            <!-- Event Information Grid (like admin view-past-event) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4 mx-auto max-w-4xl">
+                <!-- Event Poster & Quick Info -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-lg p-5 border border-gray-200">
+                        <% if (event.poster && event.poster.trim() !== '') { %>
+                            <img src="<%= event.poster %>" alt="<%= event.title %>" class="w-full h-64 object-cover rounded-2xl mb-4 shadow-lg">
+                        <% } else { %>
+                            <div class="w-full h-64 bg-gradient-to-br from-blue-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                                <div class="text-center text-white">
+                                    <i class="fas fa-calendar-alt text-4xl mb-2"></i>
+                                    <p class="text-sm font-semibold">No Poster</p>
+                                </div>
+                            </div>
+                        <% } %>
+                        <div class="text-center">
                             <span class="px-3 py-1 text-sm font-semibold rounded-full
                                 <% if (event.category === 'seminar') { %>bg-blue-100 text-blue-800<% } 
                                    else if (event.category === 'workshop') { %>bg-green-100 text-green-800<% } 
@@ -86,19 +82,40 @@
                                    else { %>bg-gray-100 text-gray-800<% } %>">
                                 <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
                             </span>
-                        </div>
-                        
-                        <% if (event.subCategory) { %>
-                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                                <i class="fas fa-football-ball mr-1"></i><%= event.subCategory %>
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800 ml-1">
+                                <%= event.eventType === 'team' ? 'Team' : 'Individual' %>
                             </span>
+                        </div>
+                        <% if (event.subCategory) { %>
+                            <div class="text-center mt-2">
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                                    <i class="fas fa-football-ball mr-1"></i><%= event.subCategory %>
+                                </span>
+                            </div>
                         <% } %>
+                        <div class="mt-4 text-center">
+                            <p class="text-sm text-gray-500">Registrations</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= event.registrations ? event.registrations.length : 0 %></p>
+                        </div>
                     </div>
-                    
+                </div>
+
+                <!-- Event Details -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-2xl font-bold text-gray-900"><%= event.title %></h2>
+                            <p class="text-sm text-gray-500"><%= event.description ? event.description.substring(0, 80) + (event.description.length > 80 ? '...' : '') : 'No description' %></p>
+                        </div>
+                    </div>
+
                     <div class="prose max-w-none text-gray-600 mb-4">
                         <p class="text-base leading-relaxed"><%= event.description %></p>
                     </div>
-                    
+
                     <!-- Compact Event Details Grid -->
                     <div class="grid grid-cols-2 md:grid-cols-2 gap-3 mb-4">
                         <div class="bg-blue-50 rounded-lg p-3">
@@ -412,7 +429,7 @@ function addTeamSection() {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
-                <input type="text" name="teams[${teamIndex}][teamName]" required value="${autoTeamName}"
+                <input type="text" name="teams[${teamIndex}][teamName]" required
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 team-name-input"
                        placeholder="Enter team name" onchange="validateTeamName(this)">
             </div>
@@ -439,21 +456,12 @@ function addTeamSection() {
             </div>
             
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Department (Leader) *</label>
-                <select name="teams[${teamIndex}][teamLeaderDepartment]" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 department-select">
-                    <option value="">Select Department</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Information Technology">Information Technology</option>
-                    <option value="Electronics & Communication">Electronics & Communication</option>
-                    <option value="Electrical Engineering">Electrical Engineering</option>
-                    <option value="Mechanical Engineering">Mechanical Engineering</option>
-                    <option value="Civil Engineering">Civil Engineering</option>
-                    <option value="Chemical Engineering">Chemical Engineering</option>
-                    <option value="Biotechnology">Biotechnology</option>
-                    <option value="Business Administration">Business Administration</option>
-                    <option value="Applied Sciences">Applied Sciences</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Department (Leader)</label>
+                <input type="text" readonly
+                       value="<%= currentUser.profile.department %>"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-900 cursor-not-allowed">
+                <input type="hidden" name="teams[${teamIndex}][teamLeaderDepartment]" value="<%= currentUser.profile.department %>">
+                <p class="text-xs text-gray-500 mt-1">Auto-filled from your profile</p>
             </div>
         </div>
         
@@ -685,16 +693,6 @@ document.getElementById('teamRegistrationForm').addEventListener('submit', funct
             }
         }
         
-        // Validate department selection
-        const deptSelects = document.querySelectorAll('.department-select');
-        for (const select of deptSelects) {
-            if (!select.value) {
-                e.preventDefault();
-                alert('Please select a department for all teams');
-                select.focus();
-                return;
-            }
-        }
     }
 });
 </script>

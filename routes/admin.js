@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Event = require('../models/Event');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
+const { deleteImage } = require('../config/cloudinary');
 
 // 1. Dashboard Overview
 router.get('/', async (req, res) => {
@@ -838,15 +839,10 @@ router.delete('/past-events/:id/delete', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Cannot delete upcoming or current events from past events section' });
         }
 
-        // Clean up poster file if it exists
+        // Clean up poster from Cloudinary if it exists
         if (event.poster && event.poster.trim() !== '') {
-            const path = require('path');
-            const fs = require('fs');
-            const posterPath = path.join(__dirname, '..', 'uploads', event.poster);
-            if (fs.existsSync(posterPath)) {
-                fs.unlinkSync(posterPath);
-                console.log('Cleaned up poster file:', posterPath);
-            }
+            await deleteImage(event.poster);
+            console.log('Cleaned up poster from Cloudinary');
         }
 
         // Delete the event

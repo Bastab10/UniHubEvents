@@ -1,63 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
 const path = require('path');
 const Event = require('../models/Event');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        // Ensure public/images directory exists
-        const fs = require('fs');
-        const imagesDir = path.join(__dirname, '..', 'public', 'images');
-        if (!fs.existsSync(imagesDir)) {
-            fs.mkdirSync(imagesDir, { recursive: true });
-            console.log('Created images directory:', imagesDir);
-        }
-        cb(null, imagesDir);
-    },
-    filename: function (req, file, cb) {
-        // Sanitize filename for mobile compatibility
-        const originalName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const timestamp = Date.now();
-        const filename = timestamp + '-' + originalName;
-        console.log('Generated filename:', filename);
-        cb(null, filename);
-    }
-});
-
-const upload = multer({ 
-    storage: storage,
-    limits: { 
-        fileSize: 5 * 1024 * 1024, // 5MB limit
-        files: 1, // Limit to 1 file at a time
-        fieldSize: 1024 * 1024 // 1MB field size limit for mobile
-    },
-    fileFilter: function (req, file, cb) {
-        // Enhanced file type validation for mobile
-        const allowedTypes = /jpeg|jpg|png|gif|webp/;
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = allowedTypes.test(file.mimetype);
-        
-        console.log('File upload debug:', {
-            originalname: file.originalname,
-            mimetype: file.mimetype,
-            extname: path.extname(file.originalname).toLowerCase(),
-            extnameValid: extname,
-            mimetypeValid: mimetype
-        });
-        
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            const errorMsg = 'Only image files (JPEG, JPG, PNG, GIF, WEBP) are allowed';
-            console.log('File rejected:', errorMsg);
-            cb(new Error(errorMsg));
-        }
-    }
-});
+const { upload, uploadImage, deleteImage } = require('../config/cloudinary');
 
 // All faculty routes require authentication and faculty role
 router.use(isAuthenticated, checkRole('faculty'), isApproved, isActive);
@@ -204,55 +152,22 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             maxParticipants,
             teamSize,
             maxTeamsPerDepartment,
+            eventFormat,
             date,
             startTime,
             endTime,
             venue
         } = req.body;
 
-        let posterPath = null;
+        let posterUrl = null;
         if (req.file) {
-            console.log('File details:', {
-                originalname: req.file.originalname,
-                mimetype: req.file.mimetype,
-                size: req.file.size,
-                path: req.file.path,
-                filename: req.file.filename
-            });
-
-            if (req.file.size > 5 * 1024 * 1024) {
-
-                const fs = require('fs');
-                if (fs.existsSync(req.file.path)) {
-                    fs.unlinkSync(req.file.path);
-                    console.log('Cleaned up oversized file:', req.file.path);
-                }
-                req.session.error = 'File size exceeds 5MB limit';
-                return res.render('faculty/create-event', { 
-                    title: 'Create Event',
-                    formData: req.body,
-                    error: 'File size exceeds 5MB limit'
-                });
-            }
- 
-            const fs = require('fs');
-            if (fs.existsSync(req.file.path)) {
-                posterPath = req.file.filename; 
-                console.log(' File saved successfully at:', posterPath);
-                console.log(' File size:', (req.file.size / 1024 / 1024).toFixed(2) + 'MB');
-                console.log(' Full file path:', req.file.path);
-                console.log(' Database path:', '/uploads/' + posterPath);
-            } else {
-                console.log(' File not found at path:', req.file.path);
-                req.session.error = 'File was uploaded but could not be saved. Please try again.';
-                return res.render('faculty/create-event', { 
-                    title: 'Create Event',
-                    formData: req.body,
-                    error: 'File was uploaded but could not be saved. Please try again.'
-                });
-            }
+            console.log('File received:', req.file.originalname, 'Size:', req.file.size);
+            
+            // Upload to Cloudinary
+            posterUrl = await uploadImage(req.file);
+            console.log('Cloudinary URL:', posterUrl);
         } else {
-            console.log('ℹ No file uploaded');
+            console.log('No file uploaded');
         }
 
 
@@ -339,11 +254,12 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
             teamSize: eventType === 'team' ? parseInt(teamSize) : 1,
             maxTeamsPerDepartment: eventType === 'team' && maxTeamsPerDepartment ? parseInt(maxTeamsPerDepartment) : null,
+            eventFormat: eventType === 'team' ? eventFormat : undefined,
             date: new Date(date),
             startTime,
             endTime,
             venue,
-            poster: posterPath, 
+            poster: posterUrl,
             organizer: req.session.user._id
         });
 
@@ -353,19 +269,16 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
         try {
             await newEvent.save();
             console.log('Event saved successfully!');
-            console.log('Poster path stored:', posterPath);
+            console.log('Poster URL stored:', posterUrl);
             console.log('Redirecting to dashboard...');
             res.redirect('/faculty/dashboard');
         } catch (saveError) {
             console.error('Error saving event:', saveError);
             
-            if (req.file && posterPath) {
-                const fs = require('fs');
-                const filePath = req.file.path;
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                    console.log('Cleaned up file after save error:', filePath);
-                }
+            // If event save fails, delete the uploaded image from Cloudinary
+            if (req.file && posterUrl) {
+                await deleteImage(posterUrl);
+                console.log('Cleaned up Cloudinary image after save error');
             }
             
             throw saveError;
@@ -437,6 +350,7 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             maxParticipants,
             teamSize,
             maxTeamsPerDepartment,
+            eventFormat,
             date,
             startTime,
             endTime,
@@ -533,18 +447,15 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
         
         // Update poster if new one is uploaded
         if (req.file) {
-            // Clean up old poster if it exists
+            // Clean up old poster from Cloudinary if it exists
             if (event.poster && event.poster.trim() !== '') {
-                const oldPosterPath = path.join(__dirname, '..', 'uploads', event.poster);
-                const fs = require('fs');
-                if (fs.existsSync(oldPosterPath)) {
-                    fs.unlinkSync(oldPosterPath);
-                    console.log('Cleaned up old poster:', oldPosterPath);
-                }
+                await deleteImage(event.poster);
+                console.log('Cleaned up old poster from Cloudinary');
             }
-            event.poster = req.file.filename; // Store only filename, not full path
-            console.log('Updated poster path:', event.poster);
-            console.log('Full image URL:', '/uploads/' + event.poster);
+            // Upload new image to Cloudinary
+            const newPosterUrl = await uploadImage(req.file);
+            event.poster = newPosterUrl;
+            console.log('Updated poster URL:', event.poster);
         }
 
         await event.save();
@@ -573,14 +484,10 @@ router.delete('/events/:id/delete', async (req, res) => {
             return res.json({ success: false, message: 'You are not authorized to delete this event' });
         }
         
-        // Clean up poster file if it exists
+        // Clean up poster from Cloudinary if it exists
         if (event.poster && event.poster.trim() !== '') {
-            const posterPath = path.join(__dirname, '..', 'uploads', event.poster);
-            const fs = require('fs');
-            if (fs.existsSync(posterPath)) {
-                fs.unlinkSync(posterPath);
-                console.log('Cleaned up poster file:', posterPath);
-            }
+            await deleteImage(event.poster);
+            console.log('Cleaned up poster from Cloudinary');
         }
         
         await Event.findByIdAndDelete(eventId);
@@ -1034,6 +941,149 @@ router.post('/upload-result', async (req, res) => {
         console.error('Upload result error:', error);
         req.session.error = 'Error uploading result. Please try again.';
         res.redirect('/faculty/upload-result');
+    }
+});
+
+// POST - Create Match Started Notification
+router.post('/events/:eventId/notifications/match-started', async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const { teamA, teamB, message } = req.body;
+        
+        const event = await Event.findOne({
+            _id: eventId,
+            organizer: req.session.user._id
+        });
+        
+        if (!event) {
+            return res.json({ success: false, message: 'Event not found' });
+        }
+        
+        const notification = new Notification({
+            event: eventId,
+            type: 'match_started',
+            message: message || `${teamA} vs ${teamB} match has started!`,
+            teamA,
+            teamB,
+            createdBy: req.session.user._id
+        });
+        
+        await notification.save();
+        
+        res.json({ success: true, message: 'Match started notification created' });
+    } catch (error) {
+        console.error('Error creating match notification:', error);
+        res.json({ success: false, message: 'Error creating notification' });
+    }
+});
+
+// POST - Create Winner Declared Notification
+router.post('/events/:eventId/notifications/winner', async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const { teamA, teamB, winner, message } = req.body;
+        
+        const event = await Event.findOne({
+            _id: eventId,
+            organizer: req.session.user._id
+        });
+        
+        if (!event) {
+            return res.json({ success: false, message: 'Event not found' });
+        }
+        
+        const notification = new Notification({
+            event: eventId,
+            type: 'winner_declared',
+            message: message || `${winner} won against ${winner === teamA ? teamB : teamA}!`,
+            teamA,
+            teamB,
+            winner,
+            createdBy: req.session.user._id
+        });
+        
+        await notification.save();
+        
+        res.json({ success: true, message: 'Winner notification created' });
+    } catch (error) {
+        console.error('Error creating winner notification:', error);
+        res.json({ success: false, message: 'Error creating notification' });
+    }
+});
+
+// POST - Create Next Match Notification
+router.post('/events/:eventId/notifications/next-match', async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const { teamA, teamB, message } = req.body;
+        
+        const event = await Event.findOne({
+            _id: eventId,
+            organizer: req.session.user._id
+        });
+        
+        if (!event) {
+            return res.json({ success: false, message: 'Event not found' });
+        }
+        
+        const notification = new Notification({
+            event: eventId,
+            type: 'next_match',
+            message: message || `Next match: ${teamA} vs ${teamB}`,
+            teamA,
+            teamB,
+            createdBy: req.session.user._id
+        });
+        
+        await notification.save();
+        
+        res.json({ success: true, message: 'Next match notification created' });
+    } catch (error) {
+        console.error('Error creating next match notification:', error);
+        res.json({ success: false, message: 'Error creating notification' });
+    }
+});
+
+// GET - Get Notifications for an Event
+router.get('/events/:eventId/notifications', async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        
+        const notifications = await Notification.find({ event: eventId })
+            .sort({ createdAt: -1 })
+            .limit(50);
+        
+        res.json({ success: true, notifications });
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+        res.json({ success: false, message: 'Error fetching notifications' });
+    }
+});
+
+// DELETE - Delete a notification
+router.delete('/notifications/:notificationId', async (req, res) => {
+    try {
+        const { notificationId } = req.params;
+        
+        const notification = await Notification.findById(notificationId);
+        
+        if (!notification) {
+            return res.json({ success: false, message: 'Notification not found' });
+        }
+        
+        // Check if user owns this notification
+        if (notification.createdBy.toString() !== req.session.user._id.toString()) {
+            return res.json({ success: false, message: 'Not authorized' });
+        }
+        
+        // Soft delete - set isActive to false
+        notification.isActive = false;
+        await notification.save();
+        
+        res.json({ success: true, message: 'Notification deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+        res.json({ success: false, message: 'Error deleting notification' });
     }
 });
 
