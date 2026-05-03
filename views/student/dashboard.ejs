@@ -1,35 +1,25 @@
 <%- include('../partials/header') %>
 
-<!-- Dashboard Styles -->
 <link rel="stylesheet" href="/css/dashboard.css">
 
-<!-- Hero Section - Full Width -->
     <div class="hero-section">
-        <!-- Floating Event Images - Left Side -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <!-- Top Left - Large -->
             <div class="absolute top-20 left-8 floating-card-left-1 animate-float-slow">
                 <img src="/images/img1.jpg" alt="Event 1" class="w-full h-full object-cover rounded-2xl shadow-2xl">
             </div>
-            <!-- Middle Left - Medium -->
             <div class="absolute top-1/3 left-4 floating-card-left-2 animate-float-medium">
                 <img src="/images/img2.jpg" alt="Event 2" class="w-full h-full object-cover rounded-2xl shadow-xl">
             </div>
-            <!-- Bottom Left - Small -->
             <div class="absolute bottom-20 left-12 floating-card-left-3 animate-float-fast">
                 <img src="/images/img3.jpg" alt="Event 3" class="w-full h-full object-cover rounded-3xl shadow-lg">
             </div>
             
-            <!-- Floating Event Images - Right Side -->
-            <!-- Top Right - Large -->
             <div class="absolute top-20 right-8 floating-card-right-1 animate-float-slow-reverse">
                 <img src="/images/img4.jpg" alt="Event 4" class="w-full h-full object-cover rounded-3xl shadow-2xl">
             </div>
-            <!-- Middle Right - Medium -->
             <div class="absolute top-1/3 right-4 floating-card-right-2 animate-float-medium-reverse">
                 <img src="/images/img5.jpg" alt="Event 5" class="w-full h-full object-cover rounded-3xl shadow-xl">
             </div>
-            <!-- Bottom Right - Small -->
             <div class="absolute bottom-20 right-12 floating-card-right-3 animate-float-fast-reverse">
                 <img src="/images/img8.jpg" alt="Event 6" class="w-full h-full object-cover rounded-3xl shadow-lg">
             </div>
@@ -44,7 +34,6 @@
                     Explore exciting campus events, seminars, workshops, and cultural activities at NLU
                 </p>
                 
-                <!-- Search Bar -->
                 <div class="max-w-2xl mx-auto mb-8 animate-slide-up">
                     <div class="search-container">
                         <div class="search-input-wrapper">
@@ -67,7 +56,6 @@
                     </div>
                 </div>
                 
-                <!-- Get Started Button -->
                 <div class="animate-fade-in-delay-2">
                     <button 
                         onclick="scrollToEvents()"
@@ -85,27 +73,37 @@
     <%- include('../partials/sidebar') %>
     
     <main class="flex-1">
-        <!-- Existing Content -->
         <div class="p-4 sm:p-6">
-            <!-- Welcome Section -->
             <h2 class="responsive-text-3xl font-bold mb-2 text-gray-800">Welcome back, <%= currentUser.profile.fullName %>!</h2>
             <p class="text-gray-700 sm:text-gray-600 text-base sm:text-lg mb-6 sm:mb-8">Here's your personalized dashboard overview</p>
 
-            <!-- Live Updates / Notifications Section -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 mb-4">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-3.5 mb-4">
                 <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-sm font-bold text-gray-800 flex items-center">
-                        <i class="fas fa-broadcast-tower text-red-500 mr-1 text-xs"></i>Live Updates
+                    <h2 class="text-xs font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-broadcast-tower text-gray-400 mr-1.5 text-[10px]"></i>Live Updates
                     </h2>
-                    <span class="text-xs text-gray-400">Auto: 30s</span>
+                    <span class="text-[10px] text-gray-400">Auto: 30s</span>
                 </div>
-                <div id="liveUpdatesContainer" class="max-h-48 overflow-y-auto space-y-1">
-                    <p class="text-gray-400 text-xs text-center py-2">Loading...</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="border border-gray-100 rounded-md p-2.5">
+                        <h3 class="text-[11px] font-semibold text-gray-500 mb-1.5 flex items-center">
+                            <i class="fas fa-flag text-gray-300 mr-1.5 text-[9px]"></i>Match Updates
+                        </h3>
+                        <div id="matchUpdatesContainer" class="space-y-1.5">
+                            <p class="text-gray-300 text-[10px] text-center py-2">Loading...</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-100 rounded-md p-2.5">
+                        <h3 class="text-[11px] font-semibold text-gray-500 mb-1.5 flex items-center">
+                            <i class="fas fa-trophy text-gray-300 mr-1.5 text-[9px]"></i>Winners
+                        </h3>
+                        <div id="winnerUpdatesContainer" class="space-y-1.5">
+                            <p class="text-gray-300 text-[10px] text-center py-2">Loading...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Events Section -->
-            <!-- Category Filter Buttons -->
             <div class="flex flex-wrap gap-2 mb-6">
                 <button onclick="filterEvents('all')" class="category-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-[#0ea5a4] text-white border border-[#0ea5a4]">
                     All Events
@@ -138,7 +136,6 @@
 
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <h2 class="responsive-text-2xl font-bold text-gray-800 flex items-center">
-                    <!-- <i class="fas fa-calendar-alt mr-3 text-blue-600"></i> -->
                     Available <span id="category-title">ALL</span> Events
                 </h2>
                 <div class="flex items-center space-x-2 sm:space-x-4">
@@ -151,7 +148,6 @@
                 <div class="events-grid">
                         <% allEvents.forEach((event, index) => { %>
                             <div class="event-card group" data-category="<%= event.category || 'other' %>">
-                                <!-- Event Image -->
                                 <div class="event-image">
                                     <% if (event.poster && event.poster.trim() !== '') { %>
                                         <img src="<%= event.poster %>" 
@@ -168,9 +164,7 @@
                                     <% } %>
                                 </div>
                                 
-                                <!-- Event Content -->
                                 <div class="event-content">
-                                    <!-- Title and Category Badge -->
                                     <div class="event-title-row">
                                         <h3 class="event-title">
                                             <%= event.title %>
@@ -194,14 +188,11 @@
                                         <% } %>
                                     </div>
                                     
-                                    <!-- Description -->
                                     <p class="event-description mb-3">
                                         <%= event.description || 'No description available' %>
                                     </p>
                                     
-                                    <!-- Event Details -->
                                     <div class="event-details mb-4">
-                                        <!-- First row: Date and Time -->
                                         <div class="detail-row">
                                             <div class="detail-item">
                                                 <i class="fas fa-calendar text-gray-400"></i>
@@ -212,7 +203,6 @@
                                                 <span><%= event.startTime %> - <%= event.endTime %></span>
                                             </div>
                                         </div>
-                                        <!-- Second row: Organized By -->
                                         <div class="detail-row full-width">
                                             <div class="detail-item">
                                                 <i class="fas fa-user text-gray-400"></i>
@@ -221,7 +211,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- View Details Button -->
                                     <div class="flex justify-end">
                                         <a href="/student/events/<%= event._id %>" class="view-details-btn">
                                             View Details
@@ -244,7 +233,6 @@
 </div>
 
 <script>
-// Hero Section Functions
 function handleHeroSearch(event) {
     if (event.key === 'Enter') {
         performHeroSearch();
@@ -256,18 +244,15 @@ function performHeroSearch() {
     const searchTerm = searchInput.value.trim();
     
     if (searchTerm) {
-        // Trigger existing search functionality
         if (typeof searchEventsOnDashboard === 'function') {
             searchEventsOnDashboard(searchTerm);
         }
         
-        // Scroll to events section
         scrollToEvents();
     }
 }
 
 function scrollToEvents() {
-    // Scroll to the events section
     const eventsSection = document.querySelector('.p-4.sm\\:p-6');
     if (eventsSection) {
         eventsSection.scrollIntoView({ 
@@ -277,20 +262,16 @@ function scrollToEvents() {
     }
 }
 
-// Category filtering functionality
 function filterEvents(category) {
     const eventCards = document.querySelectorAll('.event-card');
     const categoryButtons = document.querySelectorAll('.category-btn');
     const categoryTitle = document.getElementById('category-title');
     const eventCount = document.getElementById('event-count');
     
-    // Update active button styling - ensure only one active button
     categoryButtons.forEach(btn => {
-        // Remove all active classes and styles
         btn.classList.remove('bg-[#0ea5a4]', 'text-white', 'active');
         btn.classList.add('bg-gray-200', 'text-gray-700');
         
-        // Apply inactive button styles
         btn.style.opacity = '0.7';
         btn.style.transform = 'scale(0.95)';
         btn.style.color = '#000000';
@@ -298,48 +279,38 @@ function filterEvents(category) {
         btn.style.backgroundColor = '#f3f4f6';
     });
     
-    // Find and activate the clicked button
     let activeButton = null;
     
-    // More reliable selector method
     categoryButtons.forEach(btn => {
         const onclickAttr = btn.getAttribute('onclick');
         if (onclickAttr && onclickAttr.includes(`filterEvents('${category}')`)) {
             activeButton = btn;
-            return false; // Exit the loop
-        }
+            return false;        }
     });
     
-    // Apply active button styles
     if (activeButton) {
-        // Remove inactive classes
         activeButton.classList.remove('bg-gray-200', 'text-gray-700');
         
-        // Add active classes
         activeButton.classList.add('bg-[#0ea5a4]', 'text-white', 'active');
         
-        // Apply active button styles
         activeButton.style.opacity = '1';
         activeButton.style.transform = 'scale(1)';
         activeButton.style.color = '#ffffff';
         activeButton.style.boxShadow = '0 4px 12px rgba(14, 165, 164, 0.3)';
         activeButton.style.backgroundColor = '#0ea5a4';
         
-        // Force mobile styles
         if (window.innerWidth <= 640) {
             activeButton.style.backgroundColor = '#0ea5a4';
             activeButton.style.color = '#ffffff';
         }
     }
     
-    // Update category title
     if (category === 'all') {
         categoryTitle.textContent = 'ALL';
     } else {
         categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
     }
     
-    // Filter events
     let visibleCount = 0;
     eventCards.forEach(card => {
         const eventCategory = card.getAttribute('data-category');
@@ -352,10 +323,8 @@ function filterEvents(category) {
         }
     });
     
-    // Update event count
     eventCount.textContent = visibleCount;
     
-    // Show/hide no events message
     const eventsGrid = document.querySelector('.events-grid');
     const noEventsMessage = document.querySelector('.no-events');
     
@@ -373,7 +342,6 @@ function filterEvents(category) {
     }
 }
 
-// Search functionality for events
 function searchEventsOnDashboard(searchTerm) {
     const eventCards = document.querySelectorAll('.event-card');
     const eventCount = document.getElementById('event-count');
@@ -381,38 +349,31 @@ function searchEventsOnDashboard(searchTerm) {
     const noEventsMessage = document.querySelector('.no-events');
     const allEventsBtn = document.querySelector('.category-btn[onclick="filterEvents(\'all\')"]');
     
-    // Reset category filters
     const categoryButtons = document.querySelectorAll('.category-btn');
     categoryButtons.forEach(btn => {
         btn.classList.remove('active', 'bg-[#0ea5a4]', 'text-white');
     });
     
-    // Reset all events button to active state
     if (allEventsBtn) {
         allEventsBtn.classList.add('active', 'bg-[#0ea5a4]', 'text-white');
     }
     
-    // Keep title as "ALL Events" instead of changing to "SEARCH RESULTS"
     categoryTitle.textContent = 'ALL';
     
     if (!searchTerm) {
-        // Show all events if search is empty
         eventCards.forEach(card => {
             card.style.display = 'block';
         });
         
-        // Update event count
         const visibleCards = Array.from(eventCards).filter(card => card.style.display !== 'none');
         eventCount.textContent = visibleCards.length;
         
-        // Hide no events message
         if (noEventsMessage) {
             noEventsMessage.style.display = 'none';
         }
         return;
     }
     
-    // Convert search term to lowercase for case-insensitive search
     const searchLower = searchTerm.toLowerCase();
     let visibleCount = 0;
     
@@ -422,7 +383,6 @@ function searchEventsOnDashboard(searchTerm) {
         const venue = card.querySelector('.event-venue')?.textContent.toLowerCase() || '';
         const category = card.getAttribute('data-category')?.toLowerCase() || '';
         
-        // Check if search term matches any field
         if (title.includes(searchLower) || 
             description.includes(searchLower) || 
             venue.includes(searchLower) || 
@@ -434,10 +394,8 @@ function searchEventsOnDashboard(searchTerm) {
         }
     });
     
-    // Update event count
     eventCount.textContent = visibleCount;
     
-    // Show no events message if no results
     if (visibleCount === 0) {
         if (noEventsMessage) {
             noEventsMessage.style.display = 'block';
@@ -452,113 +410,102 @@ function searchEventsOnDashboard(searchTerm) {
     }
 }
 
-// Check for search parameter in URL and perform search on page load
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const searchParam = urlParams.get('search');
     
     if (searchParam) {
-        // Perform search
         searchEventsOnDashboard(searchParam);
     }
 });
 
-// Make searchEventsOnDashboard function globally accessible
 window.searchEventsOnDashboard = searchEventsOnDashboard;
 
-// Live Updates / Notifications for registered events
 async function loadLiveUpdates() {
     try {
         const response = await fetch('/student/notifications');
         const result = await response.json();
         
-        const container = document.getElementById('liveUpdatesContainer');
-        if (!container) return;
+        const matchContainer = document.getElementById('matchUpdatesContainer');
+        const winnerContainer = document.getElementById('winnerUpdatesContainer');
+        if (!matchContainer || !winnerContainer) return;
         
         if (result.success && result.notifications.length > 0) {
-            const html = result.notifications.map(n => {
-                let icon = 'bell';
-                let colorClass = 'gray';
-                let bgClass = 'bg-gray-50';
-                let borderClass = 'border-gray-200';
-                let typeLabel = 'Update';
-                let content = '';
-                
-                // Format content based on notification type
-                if (n.type === 'match_started') {
-                    icon = 'play-circle';
-                    colorClass = 'blue';
-                    bgClass = 'bg-blue-50';
-                    borderClass = 'border-blue-200';
-                    typeLabel = 'Match Started';
-                    content = `
-                        <div class="flex items-center justify-center py-1 px-2 bg-white rounded border border-${colorClass}-200 text-xs">
-                            <span class="font-medium text-${colorClass}-700">${n.teamA || 'Team A'}</span>
-                            <span class="mx-2 text-gray-400">VS</span>
-                            <span class="font-medium text-${colorClass}-700">${n.teamB || 'Team B'}</span>
+            const matchNotifications = result.notifications.filter(n => n.type === 'next_match' || n.type === 'match_started')
+                .sort((a, b) => {
+                    const order = { match_started: 0, next_match: 1 };
+                    return (order[a.type] ?? 2) - (order[b.type] ?? 2);
+                }).slice(0, 3);
+            const winnerNotifications = result.notifications.filter(n => n.type === 'winner_declared').slice(0, 3);
+            
+            if (matchNotifications.length > 0) {
+                matchContainer.innerHTML = matchNotifications.map(n => {
+                    let statusColor, statusLabel, statusIcon;
+                    if (n.type === 'next_match') {
+                        statusColor = 'text-purple-500';
+                        statusLabel = 'Next Match';
+                        statusIcon = 'fa-clock';
+                    } else {
+                        statusColor = 'text-blue-600';
+                        statusLabel = 'Match Started';
+                        statusIcon = 'fa-play-circle';
+                    }
+                    
+                    return `
+                        <div class="border border-gray-100 rounded-md p-2 hover:shadow-sm transition-shadow">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold ${statusColor}">
+                                    <i class="fas ${statusIcon} text-[8px]"></i>${statusLabel}
+                                </span>
+                                <span class="text-[9px] text-gray-400">${new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <p class="text-[11px] font-semibold text-gray-800 mb-0.5">${n.event?.title || 'Event'}</p>
+                            <div class="flex items-center gap-1.5 text-[10px]">
+                                <span class="font-medium text-gray-600">${n.teamA || 'TBD'}</span>
+                                <span class="text-gray-300 font-bold">VS</span>
+                                <span class="font-medium text-gray-600">${n.teamB || 'TBD'}</span>
+                            </div>
+                            ${n.message ? `<p class="text-[9px] text-gray-400 mt-0.5 italic">${n.message}</p>` : ''}
                         </div>
                     `;
-                } else if (n.type === 'winner_declared') {
-                    icon = 'trophy';
-                    colorClass = 'green';
-                    bgClass = 'bg-green-50';
-                    borderClass = 'border-green-200';
-                    typeLabel = 'Winner';
+                }).join('');
+            } else {
+                matchContainer.innerHTML = '<p class="text-gray-300 text-[10px] text-center py-2">No match updates</p>';
+            }
+            
+            if (winnerNotifications.length > 0) {
+                winnerContainer.innerHTML = winnerNotifications.map(n => {
                     const winnerName = n.winner || n.message || 'TBD';
-                    content = `
-                        <div class="text-center py-1 px-2 bg-white rounded border border-${colorClass}-200">
-                            <p class="text-xs text-gray-500">${n.teamA || ''} vs ${n.teamB || ''}</p>
-                            <p class="font-bold text-${colorClass}-700 text-sm">Winner: ${winnerName}</p>
+                    
+                    return `
+                        <div class="border border-gray-100 rounded-md p-2 hover:shadow-sm transition-shadow">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-green-600">
+                                    <i class="fas fa-trophy text-[8px]"></i>Winner Announced
+                                </span>
+                                <span class="text-[9px] text-gray-400">${new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <p class="text-[11px] font-semibold text-gray-800 mb-0.5">${n.event?.title || 'Event'}</p>
+                            <p class="text-[10px] text-gray-500 mb-0.5">${n.teamA || ''} vs ${n.teamB || ''}</p>
+                            <p class="text-[11px] font-bold text-blue-600">${winnerName}</p>
                         </div>
                     `;
-                } else if (n.type === 'next_match') {
-                    icon = 'forward';
-                    colorClass = 'purple';
-                    bgClass = 'bg-purple-50';
-                    borderClass = 'border-purple-200';
-                    typeLabel = 'Next Match';
-                    content = `
-                        <div class="flex items-center justify-center py-1 px-2 bg-white rounded border border-${colorClass}-200 text-xs">
-                            <span class="font-medium text-${colorClass}-700">${n.teamA || 'TBD'}</span>
-                            <span class="mx-2 text-gray-400">VS</span>
-                            <span class="font-medium text-${colorClass}-700">${n.teamB || 'TBD'}</span>
-                        </div>
-                    `;
-                }
-                
-                return `
-                    <div class="${bgClass} border ${borderClass} rounded p-2 mb-2">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 mt-0.5">
-                                <i class="fas fa-${icon} text-${colorClass}-500 text-xs"></i>
-                            </div>
-                            <div class="ml-2 flex-1">
-                                <div class="flex items-center justify-between">
-                                    <p class="text-xs font-semibold text-${colorClass}-600">${typeLabel}</p>
-                                    <span class="text-xs text-gray-400">${new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                                </div>
-                                <p class="text-xs font-bold text-gray-700">${n.event?.title || 'Event'}</p>
-                                ${content}
-                                ${n.message && n.type !== 'winner_declared' ? `<p class="text-xs text-gray-500 italic">${n.message}</p>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            container.innerHTML = html;
+                }).join('');
+            } else {
+                winnerContainer.innerHTML = '<p class="text-gray-300 text-[10px] text-center py-2">No winners announced yet</p>';
+            }
         } else {
-            container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No live updates yet</p>';
+            matchContainer.innerHTML = '<p class="text-gray-300 text-[10px] text-center py-2">No live updates yet</p>';
+            winnerContainer.innerHTML = '<p class="text-gray-300 text-[10px] text-center py-2">No live updates yet</p>';
         }
     } catch (error) {
         console.error('Error loading live updates:', error);
     }
 }
 
-// Load live updates on page load and refresh every 30 seconds
 document.addEventListener('DOMContentLoaded', function() {
     loadLiveUpdates();
-    setInterval(loadLiveUpdates, 30000); // Refresh every 30 seconds
-});
+    setInterval(loadLiveUpdates, 30000);});
 </script>
 
 <%- include('../partials/footer') %>

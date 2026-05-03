@@ -290,7 +290,6 @@
                             </div>
                             <div class="ml-4">
                                 <h2 class="text-2xl font-bold text-gray-900"><%= event.title %></h2>
-                                <p class="text-sm text-gray-500"><%= event.description ? event.description.substring(0, 80) + (event.description.length > 80 ? '...' : '') : 'No description' %></p>
                             </div>
                         </div>
 
@@ -362,51 +361,48 @@
                     </div>
                 </div>
 
-                <!-- Live Match Updates (for team events) -->
-                <% if (event.eventType === 'team') { %>
+                <% if (event.eventType === 'team' && event.eventFormat === 'knockout') { %>
                 <div class="p-6 border-t border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">
                         <i class="fas fa-broadcast-tower text-red-500 mr-2"></i>Live Match Updates
                     </h3>
 
-                    <!-- Row 1: Start Match -->
-                    <div class="flex flex-wrap items-center gap-3 py-3 border-b border-gray-100">
+                    <div class="grid grid-cols-[auto_140px_30px_140px_140px_1fr_auto] gap-3 items-center">
+                        <!-- Row 1: Start Match -->
                         <span class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md whitespace-nowrap">
                             <i class="fas fa-play text-xs"></i>Start Match
                         </span>
-                        <input type="text" id="matchStartTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-28">
-                        <span class="text-gray-400 text-sm">vs</span>
-                        <input type="text" id="matchStartTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-28">
-                        <input type="text" id="matchStartMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 flex-1 min-w-[120px]">
+                        <input type="text" id="matchStartTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-full">
+                        <span class="text-gray-400 text-sm text-center">vs</span>
+                        <input type="text" id="matchStartTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-full">
+                        <div></div>
+                        <input type="text" id="matchStartMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-full">
                         <button onclick="createMatchNotification('match-started')" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap">
                             <i class="fas fa-play mr-1"></i>Go
                         </button>
-                    </div>
 
-                    <!-- Row 2: Declare Winner -->
-                    <div class="flex flex-wrap items-center gap-3 py-3 border-b border-gray-100">
+                        <!-- Row 2: Declare Winner -->
                         <span class="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 bg-green-50 px-2.5 py-1 rounded-md whitespace-nowrap">
                             <i class="fas fa-trophy text-xs"></i>Winner
                         </span>
-                        <input type="text" id="winnerTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-28">
-                        <span class="text-gray-400 text-sm">vs</span>
-                        <input type="text" id="winnerTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-28">
-                        <input type="text" id="winnerTeam" placeholder="Winner" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-28">
-                        <input type="text" id="winnerMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 flex-1 min-w-[100px]">
+                        <input type="text" id="winnerTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-full">
+                        <span class="text-gray-400 text-sm text-center">vs</span>
+                        <input type="text" id="winnerTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-full">
+                        <input type="text" id="winnerTeam" placeholder="Winner" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-full">
+                        <input type="text" id="winnerMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500 w-full">
                         <button onclick="createWinnerNotification()" class="bg-green-600 text-white px-4 py-1.5 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap">
                             <i class="fas fa-trophy mr-1"></i>Go
                         </button>
-                    </div>
 
-                    <!-- Row 3: Next Match -->
-                    <div class="flex flex-wrap items-center gap-3 py-3">
+                        <!-- Row 3: Next Match -->
                         <span class="inline-flex items-center gap-1.5 text-sm font-medium text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md whitespace-nowrap">
                             <i class="fas fa-forward text-xs"></i>Next Match
                         </span>
-                        <input type="text" id="nextMatchTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 w-28">
-                        <span class="text-gray-400 text-sm">vs</span>
-                        <input type="text" id="nextMatchTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 w-28">
-                        <input type="text" id="nextMatchMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 flex-1 min-w-[120px]">
+                        <input type="text" id="nextMatchTeamA" placeholder="Team A" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 w-full">
+                        <span class="text-gray-400 text-sm text-center">vs</span>
+                        <input type="text" id="nextMatchTeamB" placeholder="Team B" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 w-full">
+                        <div></div>
+                        <input type="text" id="nextMatchMessage" placeholder="Message (optional)" class="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-purple-500 w-full">
                         <button onclick="createMatchNotification('next-match')" class="bg-purple-600 text-white px-4 py-1.5 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium whitespace-nowrap">
                             <i class="fas fa-forward mr-1"></i>Go
                         </button>

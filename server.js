@@ -92,6 +92,7 @@ app.use((req, res, next) => {
             req.session.error = null;
         }
         res.locals.error = req.session.error || null;
+        req.session.error = null;
     }
     
     next();
