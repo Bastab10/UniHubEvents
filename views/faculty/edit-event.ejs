@@ -192,7 +192,6 @@
         overflow-x: hidden;
     }
 }
-</style>
 
 .btn-secondary {
     background: #6b7280;
@@ -397,8 +396,8 @@
                                 </div>
                             </div>
 
-                            <!-- Team Size and Max Participants - Two Columns -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Team Size, Max Participants, and Max Teams per Department - Three Columns -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div id="teamSizeField" style="display: none;">
                                     <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">Team Size *</label>
                                     <input type="number" 
@@ -410,20 +409,7 @@
                                            placeholder="Number of team members">
                                 </div>
                                 
-                                <div>
-                                    <label for="maxParticipants" class="block text-sm font-semibold mb-2 text-gray-700">Max Participants</label>
-                                    <input type="number" 
-                                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
-                                           id="maxParticipants" 
-                                           name="maxParticipants" 
-                                           value="<%= formData.maxParticipants || event.maxParticipants %>"
-                                           min="1"
-                                           placeholder="Leave empty for unlimited">
-                                </div>
-                            </div>
-
-                            <!-- Maximum Teams per Department - Shows only for Team events -->
-                            <div id="maxTeamsPerDeptField" style="display: none;">
+                                <div id="maxTeamsPerDeptField" style="display: none;">
                                 <label for="maxTeamsPerDepartment" class="block text-sm font-semibold mb-2 text-gray-700">
                                     Maximum Teams per Department
                                     <span class="text-xs font-normal text-gray-500 ml-1">(Optional - Leave empty for unlimited)</span>
@@ -437,6 +423,30 @@
                                        max="50"
                                        placeholder="e.g., 2 (only 2 teams allowed per department)">
                                 <p class="text-xs text-gray-500 mt-1">Leave empty to allow unlimited teams from any department</p>
+                            </div>
+                            <div>
+                                <label for="maxParticipants" class="block text-sm font-semibold mb-2 text-gray-700">Max Participants</label>
+                                <input type="number" 
+                                       class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
+                                       id="maxParticipants" 
+                                       name="maxParticipants" 
+                                       value="<%= formData.maxParticipants || event.maxParticipants %>"
+
+                                       min="1"
+                                       placeholder="Leave empty for unlimited">
+                            </div>
+                            <div id="eventFormatField" style="display: none;">
+                                <label for="eventFormat" class="block text-sm font-semibold mb-2 text-gray-700">
+                                    Event Format *
+                                    <span class="text-xs font-normal text-gray-500 ml-1">(For team events only)</span>
+                                </label>
+                                <select id="eventFormat" name="eventFormat"
+                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
+                                    <option value="">Select format</option>
+                                    <option value="knockout" <%= (formData.eventFormat || event.eventFormat) === 'knockout' ? 'selected' : '' %>>Knockout (Match-based)</option>
+                                    <option value="ranking" <%= (formData.eventFormat || event.eventFormat) === 'ranking' ? 'selected' : '' %>>Ranking (Multiple teams compete)</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">Knockout: Teams compete in matches | Ranking: Final positions assigned</p>
                             </div>
                         </div>
 
@@ -522,19 +532,19 @@
                             <% if (event.poster && event.poster.trim() !== '') { %>
                                 <div>
                                     <label class="block text-sm font-semibold mb-2 text-gray-700">Current Poster</label>
-                                    <div class="border-2 border-gray-200 rounded-xl p-4 bg-gray-50">
+                                    <div class="border-2 border-gray-200 rounded-lg p-4 bg-gray-50 inline-block">
                                         <img src="<%= event.poster %>" 
                                              alt="Current Event Poster" 
-                                             class="w-full h-56 object-cover rounded-xl shadow-md">
+                                             class="w-32 h-32 object-cover rounded-lg shadow-md">
                                         <p class="text-sm text-gray-500 text-center mt-2">Current event poster</p>
                                     </div>
                                 </div>
                             <% } else { %>
                                 <div>
                                     <label class="block text-sm font-semibold mb-2 text-gray-700">Current Poster</label>
-                                    <div class="border-2 border-gray-200 rounded-lg p-8 bg-gray-50">
+                                    <div class="border-2 border-gray-200 rounded-lg p-8 bg-gray-50 inline-block">
                                         <div class="text-center">
-                                            <div class="w-full h-32 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center mb-3">
+                                            <div class="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center mb-3">
                                                 <i class="fas fa-calendar-alt text-white text-3xl"></i>
                                             </div>
                                             <p class="text-gray-500">No poster uploaded yet</p>
@@ -579,13 +589,16 @@ function toggleTeamSize() {
     const eventType = document.getElementById('eventType').value;
     const teamSizeField = document.getElementById('teamSizeField');
     const maxTeamsPerDeptField = document.getElementById('maxTeamsPerDeptField');
+    const eventFormatField = document.getElementById('eventFormatField');
 
     if (eventType === 'team') {
         teamSizeField.style.display = 'block';
         maxTeamsPerDeptField.style.display = 'block';
+        if (eventFormatField) eventFormatField.style.display = 'block';
     } else {
         teamSizeField.style.display = 'none';
         maxTeamsPerDeptField.style.display = 'none';
+        if (eventFormatField) eventFormatField.style.display = 'none';
     }
 }
 

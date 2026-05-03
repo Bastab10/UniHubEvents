@@ -143,7 +143,7 @@ router.post('/register', [
         if (req.body.role === 'student') {
             const pattern = /^\d+(BA|BCA|BSC|BPES)\d{3}$/;
             if (!pattern.test(value.toUpperCase())) {
-                throw new Error('Invalid College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123, 24BCA456)');
+                throw new Error('Invalid College ID format. Use format: YEAR + COURSE + 3 digits');
             }
         }
         if (req.body.role === 'faculty') {
