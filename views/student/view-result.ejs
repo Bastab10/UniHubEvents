@@ -6,201 +6,204 @@
     <title>Event Result - <%= event.title %></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .winner-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-        }
-
-        .winner-card.first { border-top: 4px solid #f59e0b; }
-        .winner-card.second { border-top: 4px solid #6b7280; }
-        .winner-card.third { border-top: 4px solid #b45309; }
-
-        .medal { font-size: 32px; margin-bottom: 12px; }
-
-        .rank {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .rank.first { color: #f59e0b; }
-        .rank.second { color: #6b7280; }
-        .rank.third { color: #b45309; }
-
-        .winner-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-
-        .winner-info {
-            font-size: 14px;
-            color: #64748b;
-        }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-
-<body>
+<body class="bg-gray-50 min-h-screen">
     <%- include('../partials/header') %>
     <%- include('../partials/sidebar') %>
 
-    <!-- FIXED MAIN CONTAINER -->
-    <div class="lg:ml-64 min-h-screen bg-gray-50">
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- CENTERED CONTENT -->
-        <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10">
-
+        <% if (result) { %>
+        <!-- Results Card -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
             <!-- Header -->
-            <div class="text-center py-6">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">
-                    <%= event.title %>
-                </h1>
-
-                <p class="text-gray-500 text-sm">
-                    <%= new Date(event.date).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    }) %>
-                </p>
+            <div class="bg-white border-b border-gray-200 py-6 px-4 sm:px-6 lg:px-8 -mx-6 -mt-6 rounded-t-lg">
+                <div class="text-center">
+                    <h1 class="text-2xl font-semibold text-gray-800"><%= event.title %></h1>
+                    <p class="mt-1 text-gray-500 text-sm">
+                        <%= new Date(event.date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        }) %>
+                    </p>
+                </div>
             </div>
 
-            <% if (result) { %>
-
-            <!-- Result Header -->
-            <div class="mb-6 text-center">
-                <h2 class="text-xl font-bold text-gray-800 inline-flex items-center justify-center">
+            <!-- Results Section -->
+            <div class="pt-6">
+                <div class="flex items-center justify-center mb-6">
                     <i class="fas fa-trophy text-amber-500 mr-2"></i>
-                    Event Results
-                </h2>
+                    <h2 class="text-lg font-semibold text-gray-800 uppercase tracking-wide">Event Results</h2>
+                </div>
+
+                <!-- Winners Grid -->
+                <div class="grid gap-4 md:grid-cols-3">
+                    <!-- 1st Position -->
+                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                        <div class="text-2xl mb-2">🥇</div>
+                        <div class="text-sm font-medium text-amber-600 mb-3">First Place</div>
+
+                        <div class="text-base font-semibold text-gray-900 mb-2">
+                            <%= result.firstPosition.name %>
+                        </div>
+
+                        <% if (result.firstPosition.department) { %>
+                            <div class="text-sm text-gray-600 mb-1">
+                                <%= result.firstPosition.department %>
+                            </div>
+                        <% } %>
+
+                        <% if (result.firstPosition.collegeId) { %>
+                            <div class="text-sm text-gray-500 mb-1">
+                                ID: <%= result.firstPosition.collegeId %>
+                            </div>
+                        <% } %>
+
+                        <% if (result.firstPosition.points) { %>
+                            <div class="mt-3">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-800">
+                                    <%= result.firstPosition.points %> Points
+                                </span>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <!-- 2nd Position -->
+                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                        <div class="text-2xl mb-2">🥈</div>
+                        <div class="text-sm font-medium text-gray-600 mb-3">Second Place</div>
+
+                        <div class="text-base font-semibold text-gray-900 mb-2">
+                            <%= result.secondPosition.name %>
+                        </div>
+
+                        <% if (result.secondPosition.department) { %>
+                            <div class="text-sm text-gray-600 mb-1">
+                                <%= result.secondPosition.department %>
+                            </div>
+                        <% } %>
+
+                        <% if (result.secondPosition.collegeId) { %>
+                            <div class="text-sm text-gray-500 mb-1">
+                                ID: <%= result.secondPosition.collegeId %>
+                            </div>
+                        <% } %>
+
+                        <% if (result.secondPosition.points) { %>
+                            <div class="mt-3">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700">
+                                    <%= result.secondPosition.points %> Points
+                                </span>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <!-- 3rd Position -->
+                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                        <div class="text-2xl mb-2">🥉</div>
+                        <div class="text-sm font-medium text-orange-700 mb-3">Third Place</div>
+
+                        <div class="text-base font-semibold text-gray-900 mb-2">
+                            <%= result.thirdPosition.name %>
+                        </div>
+
+                        <% if (result.thirdPosition.department) { %>
+                            <div class="text-sm text-gray-600 mb-1">
+                                <%= result.thirdPosition.department %>
+                            </div>
+                        <% } %>
+
+                        <% if (result.thirdPosition.collegeId) { %>
+                            <div class="text-sm text-gray-500 mb-1">
+                                ID: <%= result.thirdPosition.collegeId %>
+                            </div>
+                        <% } %>
+
+                        <% if (result.thirdPosition.points) { %>
+                            <div class="mt-3">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-800">
+                                    <%= result.thirdPosition.points %> Points
+                                </span>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
             </div>
 
-            <!-- Winners -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                <!-- 1st -->
-                <div class="winner-card first">
-                    <div class="medal">🥇</div>
-                    <div class="rank first">Winner</div>
-                    <div class="winner-name"><%= result.firstPosition.name %></div>
-
-                    <% if (result.firstPosition.department) { %>
-                        <div class="winner-info"><%= result.firstPosition.department %></div>
-                    <% } %>
-
-                    <% if (result.firstPosition.collegeId) { %>
-                        <div class="winner-info">ID: <%= result.firstPosition.collegeId %></div>
-                    <% } %>
-                </div>
-
-                <!-- 2nd -->
-                <div class="winner-card second">
-                    <div class="medal">🥈</div>
-                    <div class="rank second">Runner-up</div>
-                    <div class="winner-name"><%= result.secondPosition.name %></div>
-
-                    <% if (result.secondPosition.department) { %>
-                        <div class="winner-info"><%= result.secondPosition.department %></div>
-                    <% } %>
-
-                    <% if (result.secondPosition.collegeId) { %>
-                        <div class="winner-info">ID: <%= result.secondPosition.collegeId %></div>
-                    <% } %>
-                </div>
-
-                <!-- 3rd -->
-                <div class="winner-card third">
-                    <div class="medal">🥉</div>
-                    <div class="rank third">Third Place</div>
-                    <div class="winner-name"><%= result.thirdPosition.name %></div>
-
-                    <% if (result.thirdPosition.department) { %>
-                        <div class="winner-info"><%= result.thirdPosition.department %></div>
-                    <% } %>
-
-                    <% if (result.thirdPosition.collegeId) { %>
-                        <div class="winner-info">ID: <%= result.thirdPosition.collegeId %></div>
-                    <% } %>
-                </div>
-            </div>
-
-            <!-- Event Info -->
-            <div class="card mt-8 p-6">
-                <h3 class="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
-                    Event Information
-                </h3>
-
+            <!-- Event Information -->
+            <div class="pt-6 border-t border-gray-200 mt-6">
+                <h3 class="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">Event Information</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                        <span class="text-gray-500">Date</span>
-                        <p class="font-medium text-gray-800"><%= new Date(event.date).toLocaleDateString() %></p>
+                        <span class="text-gray-500 block">Date</span>
+                        <span class="font-medium text-gray-800"><%= new Date(event.date).toLocaleDateString() %></span>
                     </div>
-
                     <div>
-                        <span class="text-gray-500">Time</span>
-                        <p class="font-medium text-gray-800"><%= event.startTime %> - <%= event.endTime %></p>
+                        <span class="text-gray-500 block">Time</span>
+                        <span class="font-medium text-gray-800"><%= event.startTime %> - <%= event.endTime %></span>
                     </div>
-
                     <div>
-                        <span class="text-gray-500">Venue</span>
-                        <p class="font-medium text-gray-800"><%= event.venue %></p>
+                        <span class="text-gray-500 block">Venue</span>
+                        <span class="font-medium text-gray-800"><%= event.venue %></span>
                     </div>
-
                     <div>
-                        <span class="text-gray-500">Category</span>
-                        <p class="font-medium text-gray-800 capitalize"><%= event.category %></p>
+                        <span class="text-gray-500 block">Category</span>
+                        <span class="font-medium text-gray-800 capitalize"><%= event.category %></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Declared -->
-            <div class="card mt-4 p-6 flex justify-between items-center">
+            <!-- Declared By -->
+            <div class="pt-6 border-t border-gray-200 mt-6 flex justify-between items-center">
                 <div>
-                    <span class="text-gray-500 text-sm">Declared By</span>
-                    <p class="font-medium text-gray-800">
+                    <span class="text-gray-500 text-sm block">Declared By</span>
+                    <span class="font-medium text-gray-800">
                         <%= coordinator.profile.firstName %> <%= coordinator.profile.lastName %>
-                    </p>
+                    </span>
                 </div>
-
                 <div class="text-right">
-                    <span class="text-gray-500 text-sm">Date</span>
-                    <p class="font-medium text-gray-800">
+                    <span class="text-gray-500 text-sm block">Uploaded On</span>
+                    <span class="font-medium text-gray-800">
                         <%= new Date(result.uploadedAt).toLocaleDateString() %>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <% } else { %>
+        <!-- No Result Card -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <div class="bg-white border-b border-gray-200 py-6 px-4 sm:px-6 lg:px-8 -mx-6 -mt-6 rounded-t-lg">
+                <div class="text-center">
+                    <h1 class="text-2xl font-semibold text-gray-800"><%= event.title %></h1>
+                    <p class="mt-1 text-gray-500 text-sm">
+                        <%= new Date(event.date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        }) %>
                     </p>
                 </div>
             </div>
 
-            <% } else { %>
-
-            <!-- No Result -->
-            <div class="card text-center py-16">
-                <div class="text-4xl mb-4"></div>
+            <div class="text-center py-16">
+                <div class="text-6xl mb-4"></div>
                 <h2 class="text-xl font-semibold text-gray-800 mb-2">Result Not Declared</h2>
                 <p class="text-gray-500 mb-6">
                     The coordinator has not uploaded the results for this event yet.
                 </p>
             </div>
-
-            <% } %>
-
         </div>
+        <% } %>
+
     </div>
 
     <%- include('../partials/footer') %>

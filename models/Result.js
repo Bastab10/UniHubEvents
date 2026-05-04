@@ -15,17 +15,20 @@ const resultSchema = new mongoose.Schema({
     firstPosition: {
         name: { type: String, required: true },
         department: { type: String, default: '' },
-        collegeId: { type: String, default: '' }
+        collegeId: { type: String, default: '' },
+        points: { type: Number, min: 0 }
     },
     secondPosition: {
         name: { type: String, required: true },
         department: { type: String, default: '' },
-        collegeId: { type: String, default: '' }
+        collegeId: { type: String, default: '' },
+        points: { type: Number, min: 0 }
     },
     thirdPosition: {
         name: { type: String, required: true },
         department: { type: String, default: '' },
-        collegeId: { type: String, default: '' }
+        collegeId: { type: String, default: '' },
+        points: { type: Number, min: 0 }
     },
     uploadedAt: {
         type: Date,

@@ -49,6 +49,12 @@
                                         <span class="text-sm font-medium text-gray-900"><%= event.category %></span>
                                     </div>
                                     <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Event Mode:</span>
+                                        <span class="text-sm font-medium text-gray-900 <%= event.eventMode === 'versity' ? 'text-red-600' : 'text-teal-600' %>">
+                                            <%= event.eventMode === 'versity' ? 'Versity Week Event' : 'Normal Day Event' %>
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between">
                                         <span class="text-sm text-gray-600">Date:</span>
                                         <span class="text-sm font-medium text-gray-900"><%= new Date(event.date).toLocaleDateString() %></span>
                                     </div>

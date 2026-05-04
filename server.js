@@ -44,56 +44,15 @@ app.set('views', path.join(__dirname, 'views'));
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
     
-    const currentPath = req.path;
-    if (currentPath === '/auth/login') {
-        res.locals.success = req.session.success || null;
-        if (req.session.success) {
-            const tempSuccess = req.session.success;
-            req.session.success = null;
-            res.locals.success = tempSuccess;
-        }
-    } else if (currentPath.includes('/student/events/') && req.session.success) {
-        const eventId = currentPath.split('/').pop();
-        if (!req.session.eventSuccess || req.session.eventSuccess === eventId) {
-            const tempSuccess = req.session.success;
-            req.session.success = null;
-            req.session.eventSuccess = null;
-            res.locals.success = tempSuccess;
-        } else {
-            req.session.success = null;
-            res.locals.success = null;
-        }
-    } else {
-        if (req.session.success) {
-            req.session.success = null;
-        }
-        if (req.session.eventSuccess) {
-            req.session.eventSuccess = null;
-        }
-        res.locals.success = null;
-    }
+    // Handle success messages - show once and clear
+    res.locals.success = req.session.success || null;
+    req.session.success = null;
+    req.session.eventSuccess = null;
     
-    if (currentPath.includes('/student/events/') && req.session.error) {
-        const eventId = currentPath.split('/').pop();
-        if (!req.session.eventError || req.session.eventError === eventId) {
-            const tempError = req.session.error;
-            req.session.error = null;
-            req.session.eventError = null;
-            res.locals.error = tempError;
-        } else {
-            req.session.error = null;
-            res.locals.error = null;
-        }
-    } else {
-        if (req.session.eventError) {
-            req.session.eventError = null;
-        }
-        if (req.session.error && req.session.error.includes('Please login to access this page')) {
-            req.session.error = null;
-        }
-        res.locals.error = req.session.error || null;
-        req.session.error = null;
-    }
+    // Handle error messages - show once and clear
+    res.locals.error = req.session.error || null;
+    req.session.error = null;
+    req.session.eventError = null;
     
     next();
 });

@@ -456,6 +456,9 @@
                                                                     <%= event.subCategory %>
                                                                 </span>
                                                             <% } %>
+                                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium <%= event.eventMode === 'versity' ? 'bg-red-100 text-red-800' : 'bg-teal-100 text-teal-800' %>">
+                                                                <%= event.eventMode === 'versity' ? 'Versity Week' : 'Normal Day' %>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>

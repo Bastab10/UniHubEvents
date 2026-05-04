@@ -6,59 +6,7 @@ const Result = require('../models/Result');
 const Notification = require('../models/Notification');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 
-const isAuthenticatedForEventDetails = (req, res, next) => {
-    if (req.session.user) {
-        return next();
-    }
-    res.redirect('/auth/login');
-};
-
-const checkRoleForEventDetails = (...roles) => {
-    return (req, res, next) => {
-        if (!req.session.user) {
-            return res.redirect('/auth/login');
-        }
-        
-        if (!roles.includes(req.session.user.role)) {
-            req.session.error = 'Access denied. You do not have permission to access this page.';
-            return res.redirect('/auth/login');
-        }
-        
-        next();
-    };
-};
-
-const isApprovedForEventDetails = async (req, res, next) => {
-    try {
-        const user = await User.findById(req.session.user._id);
-        if (!user.isApproved && user.role !== 'admin') {
-            req.session.error = 'Your account is pending approval. Please contact the administrator.';
-            return res.redirect('/auth/login');
-        }
-        next();
-    } catch (error) {
-        console.error(error);
-        req.session.error = 'Server error occurred';
-        res.redirect('/auth/login');
-    }
-};
-
-const isActiveForEventDetails = async (req, res, next) => {
-    try {
-        const user = await User.findById(req.session.user._id);
-        if (!user.isActive) {
-            req.session.error = 'Your account has been deactivated. Please contact the administrator.';
-            return res.redirect('/auth/login');
-        }
-        next();
-    } catch (error) {
-        console.error(error);
-        req.session.error = 'Server error occurred';
-        res.redirect('/auth/login');
-    }
-};
-
-router.get('/events/:id', isAuthenticatedForEventDetails, checkRoleForEventDetails('student'), isApprovedForEventDetails, isActiveForEventDetails, async (req, res) => {
+router.get('/events/:id', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
             .populate('organizer', 'profile.firstName profile.lastName email')

@@ -362,14 +362,14 @@
                                           required><%= formData.description || event.description %></textarea>
                             </div>
 
-                            <!-- Category and Event Type - Two Columns -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Category, Event Mode and Event Type - Three Columns -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label for="category" class="block text-sm font-semibold mb-2 text-gray-700">Category *</label>
-                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
-                                            id="category" 
-                                            name="category" 
-                                            required 
+                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
+                                            id="category"
+                                            name="category"
+                                            required
                                             onchange="toggleSubCategory()">
                                         <option value="">Select Category</option>
                                         <option value="seminar" <%= (formData.category || event.category) === 'seminar' ? 'selected' : '' %>>Seminars</option>
@@ -385,10 +385,22 @@
                                 </div>
 
                                 <div>
+                                    <label for="eventMode" class="block text-sm font-semibold mb-2 text-gray-700">Event Mode *</label>
+                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
+                                            id="eventMode"
+                                            name="eventMode"
+                                            required>
+                                        <option value="">Select Event Mode</option>
+                                        <option value="normal" <%= (formData.eventMode || event.eventMode) === 'normal' ? 'selected' : '' %>>Normal Day Event</option>
+                                        <option value="versity" <%= (formData.eventMode || event.eventMode) === 'versity' ? 'selected' : '' %>>Versity Week Event</option>
+                                    </select>
+                                </div>
+
+                                <div>
                                     <label for="eventType" class="block text-sm font-semibold mb-2 text-gray-700">Event Type *</label>
-                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black" 
-                                            id="eventType" 
-                                            name="eventType" 
+                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
+                                            id="eventType"
+                                            name="eventType"
                                             onchange="toggleTeamSize()">
                                         <option value="individual" <%= (formData.eventType || event.eventType) === 'individual' ? 'selected' : '' %>>Individual</option>
                                         <option value="team" <%= (formData.eventType || event.eventType) === 'team' ? 'selected' : '' %>>Team</option>

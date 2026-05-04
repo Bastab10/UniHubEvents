@@ -301,8 +301,17 @@
                                 </div>
                             </div>
 
-                            <!-- Event Type and Team Size - Two Columns -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="eventMode" class="block text-sm font-semibold mb-2 text-gray-700">Event Mode *</label>
+                                    <select id="eventMode" name="eventMode" required
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
+                                        <option value="">Select event mode</option>
+                                        <option value="normal">Normal Day Event</option>
+                                        <option value="versity">Versity Week Event</option>
+                                    </select>
+                                </div>
+
                                 <div>
                                     <label for="eventType" class="block text-sm font-semibold mb-2 text-gray-700">Event Type *</label>
                                     <select id="eventType" name="eventType" required
@@ -316,32 +325,24 @@
                                 <div id="teamSizeDiv" class="hidden">
                                     <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">
                                         Team Size (Members Only)
-                                        <span class="text-xs font-normal text-gray-500 ml-1">(excluding team leader)</span>
                                     </label>
                                     <input type="number" id="teamSize" name="teamSize" min="1" max="20"
                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
                                            placeholder="Number of team members (excluding leader)">
-                                    <p class="text-xs text-gray-500 mt-1">Total people = 1 leader + N members</p>
                                 </div>
                             </div>
 
-                            <!-- Maximum Teams per Department - Shows only for Team events -->
                             <div id="maxTeamsPerDeptDiv" class="hidden">
                                 <label for="maxTeamsPerDepartment" class="block text-sm font-semibold mb-2 text-gray-700">
                                     Maximum Teams per Department
-                                    <span class="text-xs font-normal text-gray-500 ml-1">(Optional - Leave empty for unlimited)</span>
                                 </label>
                                 <input type="number" id="maxTeamsPerDepartment" name="maxTeamsPerDepartment" min="1" max="50"
                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black"
-                                       placeholder="e.g., 2 (only 2 teams allowed per department)">
-                                <p class="text-xs text-gray-500 mt-1">Leave empty to allow unlimited teams from any department</p>
+                                       placeholder="">
                             </div>
-
-                            <!-- Event Format - Shows only for Team events -->
                             <div id="eventFormatDiv" class="hidden">
                                 <label for="eventFormat" class="block text-sm font-semibold mb-2 text-gray-700">
                                     Event Format *
-                                    <span class="text-xs font-normal text-gray-500 ml-1">(For team events only)</span>
                                 </label>
                                 <select id="eventFormat" name="eventFormat"
                                         class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
@@ -349,10 +350,8 @@
                                     <option value="knockout">Knockout (Match-based)</option>
                                     <option value="ranking">Ranking (Multiple teams compete)</option>
                                 </select>
-                                <p class="text-xs text-gray-500 mt-1">Knockout: Teams compete in matches | Ranking: Final positions assigned</p>
                             </div>
 
-                            <!-- Maximum Participants - Full Width -->
                             <div>
                                 <label for="maxParticipants" class="block text-sm font-semibold mb-2 text-gray-700">Maximum Participants</label>
                                 <input type="number" id="maxParticipants" name="maxParticipants" min="1"
@@ -361,11 +360,8 @@
                             </div>
                         </div>
 
-                        <!-- Event Schedule Section -->
                         <div class="space-y-6">
                             <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Event Schedule</h2>
-                            
-                            <!-- Date and Time - Three Columns -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label for="date" class="block text-sm font-semibold mb-2 text-gray-700">Event Date *</label>
@@ -385,8 +381,6 @@
                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors text-black">
                                 </div>
                             </div>
-
-                            <!-- Venue - Full Width -->
                             <div>
                                 <label for="venue" class="block text-sm font-semibold mb-2 text-gray-700">Venue *</label>
                                 <input type="text" id="venue" name="venue" required
@@ -395,11 +389,9 @@
                             </div>
                         </div>
 
-                        <!-- Media Section -->
                         <div class="space-y-6">
                             <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Event Media</h2>
                             
-                            <!-- Poster Upload -->
                             <div>
                                 <label for="poster" class="block text-sm font-semibold mb-2 text-gray-700">Event Poster</label>
                                 <input type="file" id="poster" name="poster" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
@@ -408,7 +400,6 @@
                                 <p class="text-sm text-gray-500 mt-1">Upload an image for your event poster (optional)</p>
                                 <p class="text-xs text-gray-400 mt-1">Supported formats: JPEG, JPG, PNG, GIF, WEBP (Max size: 5MB)</p>
                                 
-                                <!-- Image Preview -->
                                 <div id="imagePreview" class="mt-3 hidden">
                                     <img id="previewImg" src="" alt="Image preview" class="w-32 h-32 object-cover rounded-lg shadow-md">
                                     <p class="text-sm text-gray-500 mt-1">Image preview will appear here</p>
@@ -449,7 +440,6 @@
                             </div>
                         </div>
 
-                        <!-- Form Actions -->
                         <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
                             <a href="/faculty/events" class="compact-action-btn">
                                 <i class="fas fa-times text-sm"></i>
@@ -468,7 +458,6 @@
 </div>
 
 <script>
-// Auto-hide flash messages after 5 seconds
 document.addEventListener('DOMContentLoaded', function() {
     const flashMessage = document.getElementById('flash-message');
     if (flashMessage) {
@@ -481,7 +470,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Show/hide team fields based on event type
 document.getElementById('eventType').addEventListener('change', function() {
     const teamSizeDiv = document.getElementById('teamSizeDiv');
     const maxTeamsPerDeptDiv = document.getElementById('maxTeamsPerDeptDiv');
@@ -497,7 +485,6 @@ document.getElementById('eventType').addEventListener('change', function() {
     }
 });
 
-// Image preview functionality for mobile
 function previewImage(input) {
     const preview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
@@ -505,14 +492,12 @@ function previewImage(input) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
         
-        // Validate file size (5MB limit)
         if (file.size > 5 * 1024 * 1024) {
             alert('File size must be less than 5MB');
             input.value = '';
             return;
         }
         
-        // Validate file type
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
             alert('Only JPEG, JPG, PNG, GIF, and WEBP files are allowed');
@@ -529,7 +514,6 @@ function previewImage(input) {
     }
 }
 
-// Remove image functionality
 function removeImage() {
     const input = document.getElementById('poster');
     const preview = document.getElementById('imagePreview');
@@ -540,9 +524,7 @@ function removeImage() {
     preview.classList.add('hidden');
 }
 
-// Mobile-specific enhancements
 if (window.innerWidth <= 768) {
-    // Add mobile-specific file input handling
     const fileInput = document.getElementById('poster');
     
     fileInput.addEventListener('touchstart', function() {
@@ -555,7 +537,6 @@ if (window.innerWidth <= 768) {
         }, 200);
     });
     
-    // Prevent zoom on input focus (mobile)
     fileInput.addEventListener('focus', function() {
         document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0');
     });

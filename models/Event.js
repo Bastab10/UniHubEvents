@@ -15,6 +15,11 @@ const eventSchema = new mongoose.Schema({
         enum: ['seminar', 'workshop', 'hackathon', 'quiz', 'talkshow', 'bootcamp', 'cultural', 'sports'],
         required: true
     },
+    eventMode: {
+        type: String,
+        enum: ['normal', 'versity'],
+        required: true
+    },
     subCategory: {
         type: String,
         required: function() {

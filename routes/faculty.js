@@ -125,6 +125,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             title,
             description,
             category,
+            eventMode,
             subCategory,
             eventType,
             maxParticipants,
@@ -142,7 +143,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             posterUrl = await uploadImage(req.file);
         }
 
-        if (!title || !description || !category || !date || !startTime || !endTime || !venue) {
+        if (!title || !description || !category || !eventMode || !date || !startTime || !endTime || !venue) {
             req.session.error = 'All required fields must be filled';
             return res.render('faculty/create-event', { 
                 title: 'Create Event',
@@ -215,6 +216,7 @@ router.post('/events/create', upload.single('poster'), async (req, res) => {
             title,
             description,
             category,
+            eventMode,
             subCategory: category === 'sports' ? subCategory : undefined,
             eventType: eventType || 'individual',
             maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
@@ -298,6 +300,7 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             title,
             description,
             category,
+            eventMode,
             subCategory,
             eventType,
             maxParticipants,
@@ -310,7 +313,7 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
             venue
         } = req.body;
 
-        if (!title || !description || !category || !date || !startTime || !endTime || !venue) {
+        if (!title || !description || !category || !eventMode || !date || !startTime || !endTime || !venue) {
             req.session.error = 'All required fields must be filled';
             return res.render('faculty/edit-event', { 
                 title: 'Edit Event',
@@ -387,6 +390,7 @@ router.post('/events/:id/edit', upload.single('poster'), async (req, res) => {
         event.title = title;
         event.description = description;
         event.category = category;
+        event.eventMode = eventMode;
         event.subCategory = category === 'sports' ? subCategory : undefined;
         event.eventType = eventType || 'individual';
         event.maxParticipants = maxParticipants ? parseInt(maxParticipants) : null;
@@ -489,38 +493,6 @@ router.get('/events/:id', async (req, res) => {
     } catch (error) {
         console.error('View event error:', error);
         req.session.error = 'Error loading event details';
-        res.redirect('/faculty/dashboard');
-    }
-});
-
-router.get('/profile', async (req, res) => {
-    try {
-        const facultyId = req.session.user._id;
-        
-        const faculty = await User.findById(facultyId)
-            .populate('createdEvents')
-            .populate('registeredEvents');
-        
-        if (!faculty) {
-            req.session.error = 'Faculty not found';
-            return res.redirect('/faculty/dashboard');
-        }
-        
-        const totalEvents = faculty.createdEvents ? faculty.createdEvents.length : 0;
-        const totalRegistrations = faculty.createdEvents ? 
-            faculty.createdEvents.reduce((sum, event) => sum + (event.registrations ? event.registrations.length : 0), 0) : 0;
-        
-        res.render('faculty/profile', {
-            title: 'Faculty Profile',
-            faculty,
-            stats: {
-                totalEvents,
-                totalRegistrations
-            }
-        });
-    } catch (error) {
-        console.error('Faculty profile error:', error);
-        req.session.error = 'Error loading profile';
         res.redirect('/faculty/dashboard');
     }
 });
@@ -805,44 +777,60 @@ router.get('/upload-result', async (req, res) => {
 router.post('/upload-result', async (req, res) => {
     try {
         const { eventId, firstPosition, secondPosition, thirdPosition } = req.body;
-        
+
         const event = await Event.findOne({
             _id: eventId,
             organizer: req.session.user._id
         });
-        
+
         if (!event) {
             req.session.error = 'Event not found or you are not authorized';
             return res.redirect('/faculty/upload-result');
         }
-        
+
         const existingResult = await Result.findOne({ event: eventId });
-        
+
         if (existingResult) {
             req.session.error = 'Result has already been uploaded for this event';
             return res.redirect('/faculty/upload-result');
         }
-        
+
+        // Parse points only if user entered them (optional)
+        const firstPoints = firstPosition.points ? parseInt(firstPosition.points) : undefined;
+        const secondPoints = secondPosition.points ? parseInt(secondPosition.points) : undefined;
+        const thirdPoints = thirdPosition.points ? parseInt(thirdPosition.points) : undefined;
+
+        // Validate points are non-negative if provided
+        if ((firstPoints !== undefined && firstPoints < 0) ||
+            (secondPoints !== undefined && secondPoints < 0) ||
+            (thirdPoints !== undefined && thirdPoints < 0)) {
+            req.session.error = 'Points cannot be negative values';
+            return res.redirect('/faculty/upload-result');
+        }
+
         const result = new Result({
             event: eventId,
             coordinator: req.session.user._id,
             firstPosition: {
                 name: firstPosition.name,
                 department: firstPosition.department || '',
-                collegeId: firstPosition.collegeId || ''
+                collegeId: firstPosition.collegeId || '',
+                points: firstPoints
             },
             secondPosition: {
                 name: secondPosition.name,
                 department: secondPosition.department || '',
-                collegeId: secondPosition.collegeId || ''
+                collegeId: secondPosition.collegeId || '',
+                points: secondPoints
             },
             thirdPosition: {
                 name: thirdPosition.name,
                 department: thirdPosition.department || '',
-                collegeId: thirdPosition.collegeId || ''
+                collegeId: thirdPosition.collegeId || '',
+                points: thirdPoints
             }
         });
-        
+
         await result.save();
         
         req.session.success = 'Result uploaded successfully!';

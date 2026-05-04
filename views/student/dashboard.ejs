@@ -186,6 +186,11 @@
                                                 <%= event.category.charAt(0).toUpperCase() + event.category.slice(1) %>
                                             </span>
                                         <% } %>
+                                        <% if (event.eventMode) { %>
+                                            <span class="category-badge flex-shrink-0 <%= event.eventMode === 'versity' ? 'bg-red-100 text-red-800' : 'bg-teal-100 text-teal-800' %> ml-1">
+                                                <%= event.eventMode === 'versity' ? 'Versity Week' : 'Normal Day' %>
+                                            </span>
+                                        <% } %>
                                     </div>
                                     
                                     <p class="event-description mb-3">

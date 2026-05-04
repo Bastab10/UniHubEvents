@@ -253,62 +253,6 @@ router.get('/events/:id/registrations', async (req, res) => {
     }
 });
 
-router.post('/registrations/:id/approve', async (req, res) => {
-    try {
-        const registrationId = req.params.id;
-        
-        const event = await Event.findOneAndUpdate(
-            { 'registrations._id': registrationId },
-            { 
-                $set: { 
-                    'registrations.$.status': 'approved',
-                    'registrations.$.approvedBy': req.session.user._id,
-                    'registrations.$.approvalDate': new Date()
-                }
-            },
-            { new: true }
-        );
-        
-        if (event) {
-            res.json({ success: true, message: 'Registration approved successfully' });
-        } else {
-            res.status(404).json({ success: false, message: 'Registration not found' });
-        }
-    } catch (error) {
-        console.error('Approve registration error:', error);
-        res.status(500).json({ success: false, message: 'Error approving registration' });
-    }
-});
-
-router.post('/registrations/:id/reject', async (req, res) => {
-    try {
-        const registrationId = req.params.id;
-        const { reason } = req.body;
-        
-        const event = await Event.findOneAndUpdate(
-            { 'registrations._id': registrationId },
-            { 
-                $set: { 
-                    'registrations.$.status': 'rejected',
-                    'registrations.$.rejectionReason': reason,
-                    'registrations.$.approvedBy': req.session.user._id,
-                    'registrations.$.approvalDate': new Date()
-                }
-            },
-            { new: true }
-        );
-        
-        if (event) {
-            res.json({ success: true, message: 'Registration rejected successfully' });
-        } else {
-            res.status(404).json({ success: false, message: 'Registration not found' });
-        }
-    } catch (error) {
-        console.error('Reject registration error:', error);
-        res.status(500).json({ success: false, message: 'Error rejecting registration' });
-    }
-});
-
 router.post('/registrations/bulk-approve', async (req, res) => {
     try {
         const { registrationIds } = req.body;
@@ -962,58 +906,6 @@ router.get('/students/:id', async (req, res) => {
     }
 });
 
-router.post('/registrations/:id/approve', async (req, res) => {
-    try {
-        const registrationId = req.params.id;
-        
-        const registration = await Event.findOneAndUpdate(
-            { 'registrations._id': registrationId },
-            { 
-                'registrations.$.status': 'approved',
-                'registrations.$.approvedBy': req.session.user._id,
-                'registrations.$.approvedDate': new Date()
-            },
-            { new: true }
-        );
-        
-        if (registration) {
-            res.json({ success: true, message: 'Registration approved successfully' });
-        } else {
-            res.status(404).json({ success: false, message: 'Registration not found' });
-        }
-    } catch (error) {
-        console.error('Approve registration error:', error);
-        res.status(500).json({ success: false, message: 'Error approving registration' });
-    }
-});
-
-router.post('/registrations/:id/reject', async (req, res) => {
-    try {
-        const registrationId = req.params.id;
-        const { reason } = req.body;
-        
-        const registration = await Event.findOneAndUpdate(
-            { 'registrations._id': registrationId },
-            { 
-                'registrations.$.status': 'rejected',
-                'registrations.$.rejectedBy': req.session.user._id,
-                'registrations.$.rejectedDate': new Date(),
-                'registrations.$.rejectionReason': reason
-            },
-            { new: true }
-        );
-        
-        if (registration) {
-            res.json({ success: true, message: 'Registration rejected successfully' });
-        } else {
-            res.status(404).json({ success: false, message: 'Registration not found' });
-        }
-    } catch (error) {
-        console.error('Reject registration error:', error);
-        res.status(500).json({ success: false, message: 'Error rejecting registration' });
-    }
-});
-
 router.post('/users/:id/block', async (req, res) => {
     try {
         const userId = req.params.id;
@@ -1062,7 +954,7 @@ router.post('/users/:id/unblock', async (req, res) => {
     }
 });
 
-router.post('/events/:id/delete', async (req, res) => {
+router.delete('/events/:id/delete', async (req, res) => {
     try {
         const eventId = req.params.id;
         

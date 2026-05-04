@@ -274,6 +274,9 @@
                                 <span class="px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800 ml-1">
                                     <%= event.eventType === 'team' ? 'Team' : 'Individual' %>
                                 </span>
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full <%= event.eventMode === 'versity' ? 'bg-red-100 text-red-800' : 'bg-teal-100 text-teal-800' %> ml-1">
+                                    <%= event.eventMode === 'versity' ? 'Versity Week' : 'Normal Day' %>
+                                </span>
                             </div>
                             <div class="mt-4 text-center">
                                 <p class="text-sm text-gray-500">Registrations</p>
