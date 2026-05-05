@@ -1,0 +1,145 @@
+<%- include('../partials/header') %>
+
+<div class="flex h-screen bg-gray-100">
+    <%- include('../partials/sidebar') %>
+
+    <main class="flex-1 overflow-y-auto">
+            <div class="p-8 max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Edit Result</h1>
+                    <a href="/admin/results" class="text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Results
+                    </a>
+                </div>
+
+                <!-- Event Info -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h3 class="font-semibold text-blue-900"><%= result.event.title %></h3>
+                    <p class="text-sm text-blue-700">
+                        <i class="fas fa-calendar mr-1"></i>
+                        <%= new Date(result.event.date).toLocaleDateString() %>
+                        <% if (result.event.eventMode === 'versity') { %>
+                            <span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                                Versity Week Event
+                            </span>
+                            <p class="mt-1 text-xs text-purple-600">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Changes will automatically update the department leaderboard
+                            </p>
+                        <% } %>
+                    </p>
+                </div>
+
+                <form action="/admin/results/<%= result._id %>/edit" method="POST" class="bg-white rounded-lg shadow-md p-6">
+                    <!-- First Position -->
+                    <div class="mb-6 border-b border-gray-200 pb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-medal text-yellow-500 mr-2"></i>First Position
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                                <input type="text" name="firstName" value="<%= result.firstPosition.name %>" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                                <input type="text" name="firstDepartment" value="<%= result.firstPosition.department %>"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">College ID</label>
+                                <input type="text" name="firstCollegeId" value="<%= result.firstPosition.collegeId %>"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Points (Optional)</label>
+                                <input type="number" name="firstPoints" value="<%= result.firstPosition.points || '' %>" min="0"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Second Position -->
+                    <div class="mb-6 border-b border-gray-200 pb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-medal text-gray-400 mr-2"></i>Second Position
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                                <input type="text" name="secondName" value="<%= result.secondPosition.name %>" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                                <input type="text" name="secondDepartment" value="<%= result.secondPosition.department %>"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">College ID</label>
+                                <input type="text" name="secondCollegeId" value="<%= result.secondPosition.collegeId %>"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Points (Optional)</label>
+                                <input type="number" name="secondPoints" value="<%= result.secondPosition.points || '' %>" min="0"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Third Position -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-medal text-orange-400 mr-2"></i>Third Position
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                                <input type="text" name="thirdName" value="<%= result.thirdPosition.name %>" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                                <input type="text" name="thirdDepartment" value="<%= result.thirdPosition.department %>"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">College ID</label>
+                                <input type="text" name="thirdCollegeId" value="<%= result.thirdPosition.collegeId %>"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Points (Optional)</label>
+                                <input type="number" name="thirdPoints" value="<%= result.thirdPosition.points || '' %>" min="0"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scoring Note -->
+                    <% if (result.event.eventMode === 'versity') { %>
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+                            <h4 class="font-semibold text-purple-900 mb-2">
+                                <i class="fas fa-info-circle mr-1"></i>Versity Week Auto-Scoring
+                            </h4>
+                            <p class="text-sm text-purple-700">
+                                Departments will receive points automatically: 1st Place = 10 pts, 2nd Place = 7 pts, 3rd Place = 5 pts
+                            </p>
+                        </div>
+                    <% } %>
+
+                    <!-- Buttons -->
+                    <div class="flex justify-end space-x-4">
+                        <a href="/admin/results" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </a>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            <i class="fas fa-save mr-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>

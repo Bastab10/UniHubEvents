@@ -1,0 +1,124 @@
+<%- include('../partials/header') %>
+
+<div class="flex h-screen bg-gray-100">
+    <%- include('../partials/sidebar') %>
+
+    <main class="flex-1 overflow-y-auto">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800"><%= department.department %></h1>
+                        <p class="text-gray-600">Department Performance Details</p>
+                    </div>
+                    <a href="/admin/leaderboard" class="text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Leaderboard
+                    </a>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-trophy text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm text-gray-500">Current Rank</p>
+                                <p class="text-2xl font-bold text-gray-800">#<%= rank %></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-star text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm text-gray-500">Total Points</p>
+                                <p class="text-2xl font-bold text-gray-800"><%= department.totalPoints %></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-calendar-check text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm text-gray-500">Events Won</p>
+                                <p class="text-2xl font-bold text-gray-800"><%= department.eventBreakdown ? department.eventBreakdown.length : 0 %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Breakdown -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <h2 class="text-lg font-semibold text-gray-800">Event-wise Performance</h2>
+                    </div>
+                    <% if (department.eventBreakdown && department.eventBreakdown.length > 0) { %>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <% department.eventBreakdown.forEach((event) => { %>
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <%= event.eventTitle %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <% if (event.position === 'first') { %>
+                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                        <i class="fas fa-medal mr-1"></i> 1st
+                                                    </span>
+                                                <% } else if (event.position === 'second') { %>
+                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                        <i class="fas fa-medal mr-1"></i> 2nd
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                                        <i class="fas fa-medal mr-1"></i> 3rd
+                                                    </span>
+                                                <% } %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-900">
+                                                +<%= event.points %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
+                                                <%= new Date(event.date).toLocaleDateString() %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="p-8 text-center">
+                            <div class="text-4xl mb-2">📊</div>
+                            <p class="text-gray-500">No events recorded yet</p>
+                        </div>
+                    <% } %>
+                </div>
+
+                <!-- Scoring Reference -->
+                <div class="mt-6 bg-blue-50 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold text-blue-800 mb-2">Scoring System</h3>
+                    <div class="flex space-x-6 text-sm">
+                        <span class="text-yellow-700"><i class="fas fa-medal mr-1"></i> 1st Place: 10 points</span>
+                        <span class="text-gray-700"><i class="fas fa-medal mr-1"></i> 2nd Place: 7 points</span>
+                        <span class="text-orange-700"><i class="fas fa-medal mr-1"></i> 3rd Place: 5 points</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>

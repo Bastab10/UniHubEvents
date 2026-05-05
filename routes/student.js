@@ -4,6 +4,7 @@ const Event = require('../models/Event');
 const User = require('../models/User');
 const Result = require('../models/Result');
 const Notification = require('../models/Notification');
+const DepartmentPoints = require('../models/DepartmentPoints');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 
 router.get('/events/:id', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
@@ -481,15 +482,14 @@ router.get('/events/:id/result', async (req, res) => {
 
 router.post('/profile', async (req, res) => {
     try {
-        const { fullName, phone } = req.body;
-        
+        const { fullName } = req.body;
+
+        // Only allow updating fullName - other fields (email, collegeId, department) are read-only
         await User.findByIdAndUpdate(req.session.user._id, {
-            'profile.fullName': fullName,
-            'profile.phone': phone
+            'profile.fullName': fullName
         });
 
         req.session.user.profile.fullName = fullName;
-        req.session.user.profile.phone = phone;
 
         req.session.success = 'Profile updated successfully';
         res.redirect('/student/profile');
@@ -569,6 +569,100 @@ router.get('/events/:eventId/notifications', async (req, res) => {
     } catch (error) {
         console.error('Error fetching event notifications:', error);
         res.json({ success: false, message: 'Error fetching notifications' });
+    }
+});
+
+// Department Leaderboard for Versity Week
+router.get('/leaderboard', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
+    try {
+        const userDepartment = req.session.user.profile.department;
+
+        // Get all department points sorted by totalPoints (descending)
+        const allDepartments = await DepartmentPoints.find()
+            .sort({ totalPoints: -1 })
+            .lean();
+
+        // Calculate rank with tie handling
+        let currentRank = 1;
+        let previousPoints = null;
+        const rankedDepartments = allDepartments.map((dept, index) => {
+            if (previousPoints !== null && dept.totalPoints < previousPoints) {
+                currentRank = index + 1;
+            }
+            previousPoints = dept.totalPoints;
+
+            return {
+                ...dept,
+                rank: currentRank,
+                isUserDepartment: dept.department === userDepartment
+            };
+        });
+
+        // Find user's department details
+        const userDepartmentData = rankedDepartments.find(d => d.isUserDepartment) || null;
+
+        // Separate top 3 and rest
+        const top3 = rankedDepartments.slice(0, 3);
+        const rest = rankedDepartments.slice(3);
+
+        res.render('student/leaderboard', {
+            title: 'Versity Week Leaderboard',
+            top3,
+            rest,
+            userDepartment: userDepartmentData,
+            allDepartments: rankedDepartments,
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Leaderboard error:', error);
+        req.session.error = 'Error loading leaderboard';
+        res.redirect('/student/dashboard');
+    }
+});
+
+// Department details view
+router.get('/leaderboard/department/:departmentName', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
+    try {
+        const { departmentName } = req.params;
+        const decodedDept = decodeURIComponent(departmentName);
+        const userDepartment = req.session.user.profile.department;
+
+        const departmentData = await DepartmentPoints.findOne({ department: decodedDept })
+            .populate('eventBreakdown.event', 'title date category');
+
+        if (!departmentData) {
+            req.session.error = 'Department not found';
+            return res.redirect('/student/leaderboard');
+        }
+
+        // Sort event breakdown by date (most recent first)
+        departmentData.eventBreakdown.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Calculate rank
+        const allDepartments = await DepartmentPoints.find().sort({ totalPoints: -1 });
+        let rank = 1;
+        let previousPoints = null;
+        for (let i = 0; i < allDepartments.length; i++) {
+            if (previousPoints !== null && allDepartments[i].totalPoints < previousPoints) {
+                rank = i + 1;
+            }
+            previousPoints = allDepartments[i].totalPoints;
+            if (allDepartments[i].department === decodedDept) {
+                break;
+            }
+        }
+
+        res.render('student/department-details', {
+            title: `${decodedDept} - Performance`,
+            department: departmentData,
+            rank,
+            isUserDepartment: decodedDept === userDepartment,
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Department details error:', error);
+        req.session.error = 'Error loading department details';
+        res.redirect('/student/leaderboard');
     }
 });
 

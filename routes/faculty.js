@@ -4,6 +4,7 @@ const Event = require('../models/Event');
 const User = require('../models/User');
 const Result = require('../models/Result');
 const Notification = require('../models/Notification');
+const DepartmentPoints = require('../models/DepartmentPoints');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 const { upload, uploadImage, deleteImage } = require('../config/cloudinary');
 
@@ -832,7 +833,44 @@ router.post('/upload-result', async (req, res) => {
         });
 
         await result.save();
-        
+
+        // Update department points for Versity Week events
+        if (event.eventMode === 'versity') {
+            const pointValues = {
+                first: 10,
+                second: 7,
+                third: 5
+            };
+
+            const positions = [
+                { dept: firstPosition.department, pos: 'first', points: pointValues.first },
+                { dept: secondPosition.department, pos: 'second', points: pointValues.second },
+                { dept: thirdPosition.department, pos: 'third', points: pointValues.third }
+            ];
+
+            for (const position of positions) {
+                if (position.dept) {
+                    await DepartmentPoints.findOneAndUpdate(
+                        { department: position.dept },
+                        {
+                            $inc: { totalPoints: position.points },
+                            $push: {
+                                eventBreakdown: {
+                                    event: eventId,
+                                    eventTitle: event.title,
+                                    points: position.points,
+                                    position: position.pos,
+                                    date: new Date()
+                                }
+                            },
+                            $set: { lastUpdated: new Date() }
+                        },
+                        { upsert: true, new: true }
+                    );
+                }
+            }
+        }
+
         req.session.success = 'Result uploaded successfully!';
         res.redirect('/faculty/upload-result');
     } catch (error) {
@@ -841,6 +879,199 @@ router.post('/upload-result', async (req, res) => {
         res.redirect('/faculty/upload-result');
     }
 });
+
+// Edit Result - GET route
+router.get('/results/:resultId/edit', async (req, res) => {
+    try {
+        const { resultId } = req.params;
+
+        const result = await Result.findById(resultId)
+            .populate('event', 'title date eventMode');
+
+        if (!result) {
+            req.session.error = 'Result not found';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        // Check authorization
+        if (result.coordinator.toString() !== req.session.user._id.toString()) {
+            req.session.error = 'You are not authorized to edit this result';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        res.render('faculty/edit-result', {
+            title: 'Edit Result',
+            result,
+            error: req.session.error,
+            success: req.session.success
+        });
+
+        delete req.session.error;
+        delete req.session.success;
+    } catch (error) {
+        console.error('Edit result page error:', error);
+        req.session.error = 'Error loading result';
+        res.redirect('/faculty/dashboard');
+    }
+});
+
+// Edit Result - POST route
+router.post('/results/:resultId/edit', async (req, res) => {
+    try {
+        const { resultId } = req.params;
+        const { firstPosition, secondPosition, thirdPosition } = req.body;
+
+        const result = await Result.findById(resultId).populate('event');
+
+        if (!result) {
+            req.session.error = 'Result not found';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        if (result.coordinator.toString() !== req.session.user._id.toString()) {
+            req.session.error = 'Unauthorized';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        // Store old departments for point recalculation
+        const oldDepartments = {
+            first: result.firstPosition.department,
+            second: result.secondPosition.department,
+            third: result.thirdPosition.department
+        };
+
+        // Update result
+        result.firstPosition = {
+            name: firstPosition.name,
+            department: firstPosition.department || '',
+            collegeId: firstPosition.collegeId || '',
+            points: firstPosition.points ? parseInt(firstPosition.points) : undefined
+        };
+        result.secondPosition = {
+            name: secondPosition.name,
+            department: secondPosition.department || '',
+            collegeId: secondPosition.collegeId || '',
+            points: secondPosition.points ? parseInt(secondPosition.points) : undefined
+        };
+        result.thirdPosition = {
+            name: thirdPosition.name,
+            department: thirdPosition.department || '',
+            collegeId: thirdPosition.collegeId || '',
+            points: thirdPosition.points ? parseInt(thirdPosition.points) : undefined
+        };
+
+        await result.save();
+
+        // Recalculate department points for Versity Week events
+        if (result.event.eventMode === 'versity') {
+            await recalculateDepartmentPoints(result.event._id, oldDepartments, {
+                first: firstPosition.department,
+                second: secondPosition.department,
+                third: thirdPosition.department
+            });
+        }
+
+        req.session.success = 'Result updated successfully!';
+        res.redirect('/faculty/dashboard');
+    } catch (error) {
+        console.error('Edit result error:', error);
+        req.session.error = 'Error updating result';
+        res.redirect('/faculty/dashboard');
+    }
+});
+
+// Delete Result
+router.post('/results/:resultId/delete', async (req, res) => {
+    try {
+        const { resultId } = req.params;
+
+        const result = await Result.findById(resultId).populate('event');
+
+        if (!result) {
+            req.session.error = 'Result not found';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        if (result.coordinator.toString() !== req.session.user._id.toString()) {
+            req.session.error = 'Unauthorized';
+            return res.redirect('/faculty/dashboard');
+        }
+
+        // Remove department points for Versity Week events
+        if (result.event.eventMode === 'versity') {
+            const pointValues = { first: 10, second: 7, third: 5 };
+            const positions = ['first', 'second', 'third'];
+
+            for (const pos of positions) {
+                const dept = result[`${pos}Position`].department;
+                if (dept) {
+                    await DepartmentPoints.findOneAndUpdate(
+                        { department: dept },
+                        {
+                            $inc: { totalPoints: -pointValues[pos] },
+                            $pull: { eventBreakdown: { event: result.event._id } },
+                            $set: { lastUpdated: new Date() }
+                        }
+                    );
+                }
+            }
+        }
+
+        await Result.findByIdAndDelete(resultId);
+
+        req.session.success = 'Result deleted successfully!';
+        res.redirect('/faculty/dashboard');
+    } catch (error) {
+        console.error('Delete result error:', error);
+        req.session.error = 'Error deleting result';
+        res.redirect('/faculty/dashboard');
+    }
+});
+
+// Helper function to recalculate department points
+async function recalculateDepartmentPoints(eventId, oldDepts, newDepts) {
+    const pointValues = { first: 10, second: 7, third: 5 };
+    const positions = ['first', 'second', 'third'];
+
+    for (const pos of positions) {
+        const oldDept = oldDepts[pos];
+        const newDept = newDepts[pos];
+
+        // Remove points from old department if different
+        if (oldDept && oldDept !== newDept) {
+            await DepartmentPoints.findOneAndUpdate(
+                { department: oldDept },
+                {
+                    $inc: { totalPoints: -pointValues[pos] },
+                    $pull: { eventBreakdown: { event: eventId } },
+                    $set: { lastUpdated: new Date() }
+                }
+            );
+        }
+
+        // Add points to new department if different
+        if (newDept && oldDept !== newDept) {
+            const event = await Event.findById(eventId);
+            await DepartmentPoints.findOneAndUpdate(
+                { department: newDept },
+                {
+                    $inc: { totalPoints: pointValues[pos] },
+                    $push: {
+                        eventBreakdown: {
+                            event: eventId,
+                            eventTitle: event.title,
+                            points: pointValues[pos],
+                            position: pos,
+                            date: new Date()
+                        }
+                    },
+                    $set: { lastUpdated: new Date() }
+                },
+                { upsert: true }
+            );
+        }
+    }
+}
 
 router.post('/events/:eventId/notifications/match-started', async (req, res) => {
     try {

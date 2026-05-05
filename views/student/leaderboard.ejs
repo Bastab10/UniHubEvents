@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .podium-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .podium-2 { background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%); }
+        .podium-3 { background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <%- include('../partials/header') %>
+    <%- include('../partials/sidebar') %>
+
+    <!-- Main Content -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <% if (success && success.length > 0) { %>
+            <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-green-500"></i>
+                    <span class="font-medium"><%= success %></span>
+                </div>
+            </div>
+        <% } %>
+        <% if (error && error.length > 0) { %>
+            <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+                    <span class="font-medium"><%= error %></span>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- User's Department Summary Card -->
+        <% if (userDepartment) { %>
+        <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6 <%= userDepartment.rank <= 3 ? 'border-l-4 border-l-amber-400' : '' %>">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold mr-4">
+                        <%= userDepartment.department.charAt(0) %>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Your Department</p>
+                        <h2 class="text-2xl font-bold text-gray-800"><%= userDepartment.department %></h2>
+                        <p class="text-sm text-gray-600 mt-1">
+                            Rank: <span class="font-semibold <%= userDepartment.rank <= 3 ? 'text-amber-600' : 'text-gray-800' %>">#<%= userDepartment.rank %></span>
+                            <span class="mx-2">|</span>
+                            Events: <%= userDepartment.eventBreakdown ? userDepartment.eventBreakdown.length : 0 %>
+                        </p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-3xl font-bold text-gray-800"><%= userDepartment.totalPoints %></p>
+                    <p class="text-sm text-gray-500">Total Points</p>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <a href="/student/leaderboard/department/<%= encodeURIComponent(userDepartment.department) %>"
+                   class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    View Performance Details
+                </a>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Leaderboard Header -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+            <div class="text-center">
+                <h1 class="text-2xl font-semibold text-gray-800">🏆 Versity Week Leaderboard</h1>
+                <p class="mt-1 text-gray-500 text-sm">Department rankings based on event performance</p>
+            </div>
+        </div>
+
+        <!-- Top 3 Podium -->
+        <% if (top3 && top3.length > 0) { %>
+        <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 2nd Place -->
+                <% if (top3[1]) { %>
+                <div class="text-center <%= top3[1].isUserDepartment ? 'ring-2 ring-blue-400 rounded-lg' : '' %>">
+                    <div class="podium-2 rounded-t-lg p-4 text-white">
+                        <div class="text-4xl mb-2">🥈</div>
+                        <div class="text-lg font-semibold">#2</div>
+                    </div>
+                    <div class="bg-gray-100 rounded-b-lg p-4">
+                        <h3 class="font-bold text-gray-800 text-lg"><%= top3[1].department %></h3>
+                        <p class="text-2xl font-bold text-gray-700 mt-2"><%= top3[1].totalPoints %></p>
+                        <p class="text-sm text-gray-500">points</p>
+                        <% if (top3[1].isUserDepartment) { %>
+                            <span class="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">Your Dept</span>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- 1st Place -->
+                <% if (top3[0]) { %>
+                <div class="text-center transform md:-translate-y-4 <%= top3[0].isUserDepartment ? 'ring-2 ring-blue-400 rounded-lg' : '' %>">
+                    <div class="podium-1 rounded-t-lg p-6 text-white">
+                        <div class="text-5xl mb-2">🥇</div>
+                        <div class="text-xl font-semibold">#1</div>
+                    </div>
+                    <div class="bg-amber-50 rounded-b-lg p-5 border-2 border-amber-200">
+                        <h3 class="font-bold text-gray-800 text-xl"><%= top3[0].department %></h3>
+                        <p class="text-3xl font-bold text-amber-600 mt-2"><%= top3[0].totalPoints %></p>
+                        <p class="text-sm text-gray-500">points</p>
+                        <% if (top3[0].isUserDepartment) { %>
+                            <span class="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">Your Dept</span>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- 3rd Place -->
+                <% if (top3[2]) { %>
+                <div class="text-center <%= top3[2].isUserDepartment ? 'ring-2 ring-blue-400 rounded-lg' : '' %>">
+                    <div class="podium-3 rounded-t-lg p-4 text-white">
+                        <div class="text-4xl mb-2">🥉</div>
+                        <div class="text-lg font-semibold">#3</div>
+                    </div>
+                    <div class="bg-orange-50 rounded-b-lg p-4">
+                        <h3 class="font-bold text-gray-800 text-lg"><%= top3[2].department %></h3>
+                        <p class="text-2xl font-bold text-orange-600 mt-2"><%= top3[2].totalPoints %></p>
+                        <p class="text-sm text-gray-500">points</p>
+                        <% if (top3[2].isUserDepartment) { %>
+                            <span class="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">Your Dept</span>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Full Rankings Table -->
+        <div class="bg-white rounded-lg border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800">Complete Rankings</h2>
+            </div>
+
+            <% if (allDepartments && allDepartments.length > 0) { %>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Events</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <% allDepartments.forEach((dept) => { %>
+                        <tr class="<%= dept.isUserDepartment ? 'bg-blue-50' : 'hover:bg-gray-50' %>">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <% if (dept.rank === 1) { %>
+                                    <span class="inline-flex items-center justify-center w-8 h-8 bg-amber-100 text-amber-800 rounded-full font-bold">1</span>
+                                <% } else if (dept.rank === 2) { %>
+                                    <span class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-700 rounded-full font-bold">2</span>
+                                <% } else if (dept.rank === 3) { %>
+                                    <span class="inline-flex items-center justify-center w-8 h-8 bg-orange-100 text-orange-800 rounded-full font-bold">3</span>
+                                <% } else { %>
+                                    <span class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-full font-medium"><%= dept.rank %></span>
+                                <% } %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-sm font-bold mr-3">
+                                        <%= dept.department.charAt(0) %>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">
+                                            <%= dept.department %>
+                                            <% if (dept.isUserDepartment) { %>
+                                                <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">You</span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                                <%= dept.eventBreakdown ? dept.eventBreakdown.length : 0 %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <span class="text-sm font-bold <%= dept.rank <= 3 ? 'text-amber-600' : 'text-gray-800' %>">
+                                    <%= dept.totalPoints %>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <a href="/student/leaderboard/department/<%= encodeURIComponent(dept.department) %>"
+                                   class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <% } else { %>
+            <div class="text-center py-12">
+                <!-- <div class="text-6xl mb-4">📊</div> -->
+                <h3 class="text-lg font-medium text-gray-900">No Data Available</h3>
+                <p class="text-gray-500 mt-2">Versity Week events are yet to conclude. Check back soon!</p>
+            </div>
+            <% } %>
+        </div>
+
+    </div>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

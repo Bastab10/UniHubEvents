@@ -3,6 +3,9 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Event = require('../models/Event');
+const Result = require('../models/Result');
+const Notification = require('../models/Notification');
+const DepartmentPoints = require('../models/DepartmentPoints');
 const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
 const { deleteImage } = require('../config/cloudinary');
 
@@ -745,6 +748,409 @@ router.delete('/past-events/:id/delete', async (req, res) => {
     }
 });
 
+// Admin Leaderboard Route
+router.get('/leaderboard', async (req, res) => {
+    try {
+        const departments = await DepartmentPoints.find().sort({ totalPoints: -1 });
+
+        // Calculate ranks with tie handling
+        let currentRank = 1;
+        let previousPoints = null;
+
+        const rankedDepartments = departments.map((dept, index) => {
+            if (previousPoints !== null && dept.totalPoints < previousPoints) {
+                currentRank = index + 1;
+            }
+            previousPoints = dept.totalPoints;
+            return {
+                ...dept.toObject(),
+                rank: currentRank
+            };
+        });
+
+        res.render('admin/leaderboard', {
+            title: 'Department Leaderboard',
+            departments: rankedDepartments,
+            currentPath: '/admin/leaderboard'
+        });
+    } catch (error) {
+        console.error('Leaderboard error:', error);
+        req.session.error = 'Error loading leaderboard';
+        res.redirect('/admin/dashboard');
+    }
+});
+
+// Admin Department Details Route
+router.get('/leaderboard/department/:departmentName', async (req, res) => {
+    try {
+        const { departmentName } = req.params;
+        const department = await DepartmentPoints.findOne({ department: departmentName });
+
+        if (!department) {
+            req.session.error = 'Department not found';
+            return res.redirect('/admin/leaderboard');
+        }
+
+        // Get all departments for rank calculation
+        const allDepartments = await DepartmentPoints.find().sort({ totalPoints: -1 });
+        let rank = 1;
+        let previousPoints = null;
+
+        for (let i = 0; i < allDepartments.length; i++) {
+            if (previousPoints !== null && allDepartments[i].totalPoints < previousPoints) {
+                rank = i + 1;
+            }
+            if (allDepartments[i].department === departmentName) {
+                break;
+            }
+            previousPoints = allDepartments[i].totalPoints;
+        }
+
+        res.render('admin/department-details', {
+            title: `${departmentName} - Details`,
+            department,
+            rank,
+            currentPath: '/admin/leaderboard'
+        });
+    } catch (error) {
+        console.error('Department details error:', error);
+        req.session.error = 'Error loading department details';
+        res.redirect('/admin/leaderboard');
+    }
+});
+
+// Admin Results Management - View All Results
+router.get('/results', async (req, res) => {
+    try {
+        const results = await Result.find()
+            .populate('event', 'title date eventMode category')
+            .populate('coordinator', 'profile.fullName')
+            .sort({ uploadedAt: -1 });
+
+        res.render('admin/results', {
+            title: 'All Results',
+            results,
+            currentPath: '/admin/results'
+        });
+    } catch (error) {
+        console.error('Results error:', error);
+        req.session.error = 'Error loading results';
+        res.redirect('/admin/dashboard');
+    }
+});
+
+// Admin Edit Result - GET
+router.get('/results/:id/edit', async (req, res) => {
+    try {
+        const result = await Result.findById(req.params.id)
+            .populate('event', 'title date eventMode category')
+            .populate('coordinator', 'profile.fullName');
+
+        if (!result) {
+            req.session.error = 'Result not found';
+            return res.redirect('/admin/results');
+        }
+
+        res.render('admin/edit-result', {
+            title: 'Edit Result',
+            result,
+            currentPath: '/admin/results'
+        });
+    } catch (error) {
+        console.error('Edit result error:', error);
+        req.session.error = 'Error loading result';
+        res.redirect('/admin/results');
+    }
+});
+
+// Admin Edit Result - POST
+router.post('/results/:id/edit', async (req, res) => {
+    try {
+        const resultId = req.params.id;
+        const { firstName, firstDepartment, firstCollegeId, firstPoints,
+                secondName, secondDepartment, secondCollegeId, secondPoints,
+                thirdName, thirdDepartment, thirdCollegeId, thirdPoints } = req.body;
+
+        const result = await Result.findById(resultId).populate('event');
+        if (!result) {
+            req.session.error = 'Result not found';
+            return res.redirect('/admin/results');
+        }
+
+        // Store old positions for point recalculation
+        const isVersityEvent = result.event.eventMode === 'versity';
+        const oldPositions = isVersityEvent ? {
+            first: result.firstPosition.department,
+            second: result.secondPosition.department,
+            third: result.thirdPosition.department
+        } : null;
+
+        // Update result
+        result.firstPosition = {
+            name: firstName,
+            department: firstDepartment,
+            collegeId: firstCollegeId,
+            points: firstPoints ? parseInt(firstPoints) : undefined
+        };
+        result.secondPosition = {
+            name: secondName,
+            department: secondDepartment,
+            collegeId: secondCollegeId,
+            points: secondPoints ? parseInt(secondPoints) : undefined
+        };
+        result.thirdPosition = {
+            name: thirdName,
+            department: thirdDepartment,
+            collegeId: thirdCollegeId,
+            points: thirdPoints ? parseInt(thirdPoints) : undefined
+        };
+
+        await result.save();
+
+        // Recalculate department points for Versity Week events
+        if (isVersityEvent) {
+            const pointValues = { first: 10, second: 7, third: 5 };
+
+            // Remove old points
+            if (oldPositions) {
+                for (const [position, dept] of Object.entries(oldPositions)) {
+                    if (dept) {
+                        await DepartmentPoints.findOneAndUpdate(
+                            { department: dept },
+                            {
+                                $inc: { totalPoints: -pointValues[position] },
+                                $pull: { eventBreakdown: { event: result.event._id } }
+                            }
+                        );
+                    }
+                }
+            }
+
+            // Add new points
+            const newPositions = {
+                first: firstDepartment,
+                second: secondDepartment,
+                third: thirdDepartment
+            };
+
+            for (const [position, dept] of Object.entries(newPositions)) {
+                if (dept) {
+                    await DepartmentPoints.findOneAndUpdate(
+                        { department: dept },
+                        {
+                            $inc: { totalPoints: pointValues[position] },
+                            $push: {
+                                eventBreakdown: {
+                                    event: result.event._id,
+                                    eventTitle: result.event.title,
+                                    points: pointValues[position],
+                                    position: position,
+                                    date: new Date()
+                                }
+                            },
+                            $set: { lastUpdated: new Date() }
+                        },
+                        { upsert: true }
+                    );
+                }
+            }
+        }
+
+        req.session.success = 'Result updated successfully';
+        res.redirect('/admin/results');
+    } catch (error) {
+        console.error('Update result error:', error);
+        req.session.error = 'Error updating result';
+        res.redirect(`/admin/results/${req.params.id}/edit`);
+    }
+});
+
+// Admin Delete Result
+router.post('/results/:id/delete', async (req, res) => {
+    try {
+        const result = await Result.findById(req.params.id).populate('event');
+        if (!result) {
+            req.session.error = 'Result not found';
+            return res.redirect('/admin/results');
+        }
+
+        // Remove department points for Versity Week events
+        if (result.event.eventMode === 'versity') {
+            const pointValues = { first: 10, second: 7, third: 5 };
+            const positions = {
+                first: result.firstPosition.department,
+                second: result.secondPosition.department,
+                third: result.thirdPosition.department
+            };
+
+            for (const [position, dept] of Object.entries(positions)) {
+                if (dept) {
+                    await DepartmentPoints.findOneAndUpdate(
+                        { department: dept },
+                        {
+                            $inc: { totalPoints: -pointValues[position] },
+                            $pull: { eventBreakdown: { event: result.event._id } },
+                            $set: { lastUpdated: new Date() }
+                        }
+                    );
+                }
+            }
+        }
+
+        await Result.findByIdAndDelete(req.params.id);
+
+        req.session.success = 'Result deleted successfully';
+        res.redirect('/admin/results');
+    } catch (error) {
+        console.error('Delete result error:', error);
+        req.session.error = 'Error deleting result';
+        res.redirect('/admin/results');
+    }
+});
+
+// Admin Reports/Analytics Route
+router.get('/reports', async (req, res) => {
+    try {
+        // Get statistics
+        const totalEvents = await Event.countDocuments();
+        const totalStudents = await User.countDocuments({ role: 'student' });
+        const totalFaculty = await User.countDocuments({ role: 'faculty', isApproved: true });
+
+        // Category-wise events
+        const categoryStats = await Event.aggregate([
+            { $group: { _id: '$category', count: { $sum: 1 } } },
+            { $sort: { count: -1 } }
+        ]);
+
+        // Event mode distribution
+        const eventModeStats = await Event.aggregate([
+            { $group: { _id: '$eventMode', count: { $sum: 1 } } }
+        ]);
+
+        // Total registrations
+        const totalRegistrations = await Event.aggregate([
+            { $unwind: '$registrations' },
+            { $group: { _id: null, count: { $sum: 1 } } }
+        ]);
+
+        // Registration status breakdown
+        const registrationStats = await Event.aggregate([
+            { $unwind: '$registrations' },
+            { $group: { _id: '$registrations.status', count: { $sum: 1 } } }
+        ]);
+
+        // Department-wise student count
+        const departmentStats = await User.aggregate([
+            { $match: { role: 'student' } },
+            { $group: { _id: '$profile.department', count: { $sum: 1 } } },
+            { $sort: { count: -1 } }
+        ]);
+
+        // Monthly events (last 6 months)
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+        const monthlyStats = await Event.aggregate([
+            { $match: { createdAt: { $gte: sixMonthsAgo } } },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: '$createdAt' },
+                        month: { $month: '$createdAt' }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { '_id.year': -1, '_id.month': -1 } }
+        ]);
+
+        res.render('admin/reports', {
+            title: 'Reports & Analytics',
+            stats: {
+                totalEvents,
+                totalStudents,
+                totalFaculty,
+                totalRegistrations: totalRegistrations[0]?.count || 0,
+                categoryStats,
+                eventModeStats,
+                registrationStats,
+                departmentStats,
+                monthlyStats
+            },
+            currentPath: '/admin/reports'
+        });
+    } catch (error) {
+        console.error('Reports error:', error);
+        req.session.error = 'Error loading reports';
+        res.redirect('/admin/dashboard');
+    }
+});
+
+// Admin Notifications Management
+router.get('/notifications', async (req, res) => {
+    try {
+        const notifications = await Notification.find()
+            .populate('event', 'title')
+            .populate('createdBy', 'profile.fullName')
+            .sort({ createdAt: -1 });
+
+        res.render('admin/notifications', {
+            title: 'Notifications Management',
+            notifications,
+            currentPath: '/admin/notifications'
+        });
+    } catch (error) {
+        console.error('Notifications error:', error);
+        req.session.error = 'Error loading notifications';
+        res.redirect('/admin/dashboard');
+    }
+});
+
+// Admin Delete Notification
+router.post('/notifications/:id/delete', async (req, res) => {
+    try {
+        await Notification.findByIdAndDelete(req.params.id);
+        req.session.success = 'Notification deleted successfully';
+        res.redirect('/admin/notifications');
+    } catch (error) {
+        console.error('Delete notification error:', error);
+        req.session.error = 'Error deleting notification';
+        res.redirect('/admin/notifications');
+    }
+});
+
+// Admin Events with Filter
+router.get('/events-filter', async (req, res) => {
+    try {
+        const { category, eventMode, dateFrom, dateTo, search } = req.query;
+        let query = {};
+
+        if (category) query.category = category;
+        if (eventMode) query.eventMode = eventMode;
+        if (search) query.title = { $regex: search, $options: 'i' };
+        if (dateFrom || dateTo) {
+            query.date = {};
+            if (dateFrom) query.date.$gte = new Date(dateFrom);
+            if (dateTo) query.date.$lte = new Date(dateTo);
+        }
+
+        const events = await Event.find(query)
+            .populate('organizer', 'profile.firstName profile.lastName')
+            .sort({ date: -1 });
+
+        res.render('admin/events-filter', {
+            title: 'Filter Events',
+            events,
+            filters: { category, eventMode, dateFrom, dateTo, search },
+            currentPath: '/admin/events'
+        });
+    } catch (error) {
+        console.error('Events filter error:', error);
+        req.session.error = 'Error loading events';
+        res.redirect('/admin/events');
+    }
+});
+
 router.get('/faculty', async (req, res) => {
     try {
         const coordinators = await User.find({
@@ -954,7 +1360,7 @@ router.post('/users/:id/unblock', async (req, res) => {
     }
 });
 
-router.delete('/events/:id/delete', async (req, res) => {
+router.post('/events/:id/delete', async (req, res) => {
     try {
         const eventId = req.params.id;
         
@@ -962,15 +1368,15 @@ router.delete('/events/:id/delete', async (req, res) => {
         
         if (event) {
             req.session.success = 'Event deleted successfully';
-            res.redirect('/admin/dashboard');
+            res.redirect('/admin/events');
         } else {
             req.session.error = 'Event not found';
-            res.redirect('/admin/dashboard');
+            res.redirect('/admin/events');
         }
     } catch (error) {
         console.error('Delete event error:', error);
         req.session.error = 'Error deleting event';
-        res.redirect('/admin/dashboard');
+        res.redirect('/admin/events');
     }
 });
 

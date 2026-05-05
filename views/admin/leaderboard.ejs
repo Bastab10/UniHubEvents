@@ -1,0 +1,100 @@
+<%- include('../partials/header') %>
+
+<div class="flex h-screen bg-gray-100">
+    <%- include('../partials/sidebar') %>
+
+    <main class="flex-1 overflow-y-auto">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Department Leaderboard</h1>
+                    <a href="/admin/dashboard" class="text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Dashboard
+                    </a>
+                </div>
+
+                <% if (departments && departments.length > 0) { %>
+                    <!-- Top 3 Podium -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-8">
+                        <% const top3 = departments.slice(0, 3); %>
+                        <% const colors = ['bg-yellow-100 border-yellow-400', 'bg-gray-100 border-gray-400', 'bg-orange-100 border-orange-400']; %>
+                        <% const icons = ['fa-medal text-yellow-600', 'fa-medal text-gray-600', 'fa-medal text-orange-600']; %>
+                        <% const ranks = [1, 2, 3]; %>
+                        
+                        <% top3.forEach((dept, index) => { %>
+                            <div class="<%= colors[index] %> border-2 rounded-lg p-6 text-center">
+                                <i class="fas <%= icons[index] %> text-4xl mb-3"></i>
+                                <h3 class="text-lg font-bold text-gray-800">Rank <%= ranks[index] %></h3>
+                                <p class="text-xl font-bold text-gray-900 mt-2"><%= dept.department %></p>
+                                <p class="text-3xl font-bold text-blue-600 mt-2"><%= dept.totalPoints %> pts</p>
+                                <p class="text-sm text-gray-600 mt-1"><%= dept.eventBreakdown ? dept.eventBreakdown.length : 0 %> events</p>
+                            </div>
+                        <% }); %>
+                    </div>
+
+                    <!-- Full Rankings Table -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                            <h2 class="text-lg font-semibold text-gray-800">Complete Rankings</h2>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Events</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Points</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <% departments.forEach((dept) => { %>
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <% if (dept.rank <= 3) { %>
+                                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full 
+                                                        <%= dept.rank === 1 ? 'bg-yellow-100 text-yellow-800' : dept.rank === 2 ? 'bg-gray-100 text-gray-800' : 'bg-orange-100 text-orange-800' %> font-bold">
+                                                        <%= dept.rank %>
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold">
+                                                        <%= dept.rank %>
+                                                    </span>
+                                                <% } %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <%= dept.department %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                                                <%= dept.eventBreakdown ? dept.eventBreakdown.length : 0 %>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                                <span class="text-sm font-bold <%= dept.rank <= 3 ? 'text-amber-600' : 'text-gray-800' %>">
+                                                    <%= dept.totalPoints %>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <a href="/admin/leaderboard/department/<%= encodeURIComponent(dept.department) %>"
+                                                   class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                                                    <i class="fas fa-eye mr-1"></i> View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                        <div class="text-6xl mb-4">🏆</div>
+                        <h3 class="text-lg font-medium text-gray-900">No Leaderboard Data</h3>
+                        <p class="text-gray-500 mt-2">Versity Week events are yet to conclude. Results will appear here automatically.</p>
+                        <a href="/admin/results" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            <i class="fas fa-trophy mr-2"></i>View Results
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>

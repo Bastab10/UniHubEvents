@@ -682,7 +682,7 @@
                     <!-- Logo/Brand -->
                     <div class="flex items-center space-x-2 sm:space-x-3">
                         <div class="logo-text">
-                            <h1 class="text-black text-sm sm:text-sm md:text-base lg:text-lg xl:text-xl font-bold tracking-tight">UniHub Events</h1>
+                            <h1 class="text-black text-sm sm:text-sm md:text-base lg:text-lg xl:text-xl font-bold tracking-tight">UniHub</h1>
                             <p class="text-black text-xs font-medium sm:block">NLU Event Management System</p>
                         </div>
                     </div>
@@ -752,17 +752,25 @@
                         <i class="fas fa-graduation-cap text-base sm:text-lg"></i>
                         <span class="text-sm sm:text-base">Students</span>
                     </a>
-                    <a href="/admin/faculty">
-                        <i class="fas fa-chalkboard-teacher text-base sm:text-lg"></i>
-                        <span class="text-sm sm:text-base">Coordinators</span>
-                    </a>
                     <a href="/admin/events">
                         <i class="fas fa-calendar text-base sm:text-lg"></i>
                         <span class="text-sm sm:text-base">Events</span>
                     </a>
-                    <a href="/admin/profile">
-                        <i class="fas fa-user text-base sm:text-lg"></i>
-                        <span class="text-sm sm:text-base">My Profile</span>
+                    <a href="/admin/results">
+                        <i class="fas fa-trophy text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Results</span>
+                    </a>
+                    <a href="/admin/leaderboard">
+                        <i class="fas fa-medal text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Leaderboard</span>
+                    </a>
+                    <a href="/admin/reports">
+                        <i class="fas fa-chart-bar text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Reports</span>
+                    </a>
+                    <a href="/admin/notifications">
+                        <i class="fas fa-bell text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Notifications</span>
                     </a>
                 <% } else if (currentUser.role === 'faculty') { %>
                     <a href="/faculty/dashboard">
@@ -789,6 +797,10 @@
                     <a href="/student/registrations">
                         <i class="fas fa-ticket-alt text-base sm:text-lg"></i>
                         <span class="text-sm sm:text-base">My Registrations</span>
+                    </a>
+                    <a href="/student/leaderboard">
+                        <i class="fas fa-trophy text-base sm:text-lg"></i>
+                        <span class="text-sm sm:text-base">Leaderboard</span>
                     </a>
                     <a href="/student/profile">
                         <i class="fas fa-user text-base sm:text-lg"></i>

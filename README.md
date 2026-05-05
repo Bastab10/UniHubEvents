@@ -208,6 +208,12 @@ UniHunEvent/
 - **Fields**: event, coordinator, firstPosition, secondPosition, thirdPosition
 - **Position Details**: name, department, collegeId, points (optional)
 
+### DepartmentPoints Model
+- **Purpose**: Tracks department performance in Versity Week events
+- **Fields**: department, totalPoints, eventBreakdown, lastUpdated
+- **Point System**: 1st Place = 10 pts, 2nd Place = 7 pts, 3rd Place = 5 pts
+- **Features**: Auto-updates when results are uploaded/edited/deleted
+
 ## 🔐 Authentication & Authorization
 
 - **Session-based authentication** using express-session
@@ -270,6 +276,24 @@ Events can be classified into two modes:
 - If provided, points are displayed on the result page
 - Points can be used for departmental or inter-college competitions
 
+## 🏆 Versity Week Leaderboard
+
+### Department Competition System
+- **Automatic Point Calculation**: When results are uploaded for Versity Week events
+- **Scoring**: 1st Place = 10 pts | 2nd Place = 7 pts | 3rd Place = 5 pts
+- **Real-time Updates**: Points auto-adjust when results are edited or deleted
+- **Tie Handling**: Same rank for departments with equal points
+
+### Student Views
+- **Full Leaderboard**: Complete department rankings with top 3 podium
+- **Personal Highlight**: User's department is highlighted in the list
+- **Department Details**: Event-wise breakdown of points earned
+- **Statistics**: Total events, win counts, current rank
+
+### Faculty Management
+- Results can be edited/deleted with automatic point recalculation
+- Visual indicators for Versity Week events during result management
+
 ## 🔧 API Routes
 
 ### Authentication (`/auth`)
@@ -296,7 +320,11 @@ Events can be classified into two modes:
 - `GET /events/:id` - View event details
 - `GET /events/:id/students` - View registered students
 - `POST /events/:id/notifications/:type` - Create notification
-- `POST /events/:id/upload-result` - Upload results
+- `GET /upload-result` - Upload result form
+- `POST /upload-result` - Upload results
+- `GET /results/:id/edit` - Edit result form
+- `POST /results/:id/edit` - Update result
+- `POST /results/:id/delete` - Delete result
 
 ### Student (`/student`)
 - `GET /dashboard` - Student dashboard
@@ -306,6 +334,8 @@ Events can be classified into two modes:
 - `POST /registrations/:id/cancel` - Cancel registration
 - `GET /notifications` - Get notifications
 - `GET /events/:eventId/notifications` - Event-specific notifications
+- `GET /leaderboard` - Versity Week department leaderboard
+- `GET /leaderboard/department/:name` - Department performance details
 
 ## 🐛 Troubleshooting
 

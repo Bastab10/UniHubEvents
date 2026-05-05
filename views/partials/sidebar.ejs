@@ -363,6 +363,26 @@
                 <i class="fas fa-graduation-cap"></i>
                 Students
             </a>
+            <a href="/admin/events" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/events') ? 'active' : '' %>">
+                <i class="fas fa-calendar"></i>
+                Events
+            </a>
+            <a href="/admin/results" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/results') ? 'active' : '' %>">
+                <i class="fas fa-trophy"></i>
+                Results
+            </a>
+            <a href="/admin/leaderboard" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/leaderboard') ? 'active' : '' %>">
+                <i class="fas fa-medal"></i>
+                Leaderboard
+            </a>
+            <a href="/admin/reports" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/reports') ? 'active' : '' %>">
+                <i class="fas fa-chart-bar"></i>
+                Reports
+            </a>
+            <a href="/admin/notifications" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/notifications') ? 'active' : '' %>">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
             <a href="/admin/past-events" class="<%= (typeof currentPath !== 'undefined' && currentPath === '/admin/past-events') ? 'active' : '' %>">
                 <i class="fas fa-history"></i>
                 Past Events
@@ -414,6 +434,10 @@
             <a href="/student/registrations">
                 <i class="fas fa-ticket-alt"></i>
                 My Registrations
+            </a>
+            <a href="/student/leaderboard">
+                <i class="fas fa-trophy"></i>
+                Leaderboard
             </a>
             <a href="/student/profile">
                 <i class="fas fa-user"></i>
