@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - NLU Event Management System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+<%- include('../partials/header') %>
+
+<style>
     /* Dashboard Container Styles */
     .dashboard-container {
         min-height: 100vh;
@@ -19,6 +13,17 @@
         }
     }
 
+    /* Mobile text color fixes */
+    @media (max-width: 640px) {
+        .dashboard-container h1 {
+            color: #1f2937;
+        }
+        
+        .dashboard-container p {
+            color: #374151;
+        }
+    }
+
     /* Past Event Badge */
     .past-badge {
         background-color: #6b7280;
@@ -27,6 +32,50 @@
         border-radius: 9999px;
         font-size: 0.75rem;
         font-weight: 500;
+    }
+
+    /* Stat Card */
+    .stat-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Team Card */
+    .team-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+
+    .team-card:hover {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-color: #d1d5db;
+    }
+
+    /* Winner Badge */
+    .winner-badge {
+        background-color: #fbbf24;
+        color: #92400e;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* Position Badge */
+    .position-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Event Poster */
@@ -47,11 +96,8 @@
         justify-content: center;
     }
     </style>
-</head>
-<body class="bg-gray-50">
-    <%- include('../partials/header') %>
 
-    <div class="dashboard-container">
+<div class="dashboard-container">
         <%- include('../partials/sidebar') %>
 
         <main class="flex-1 overflow-y-auto">
@@ -368,6 +414,4 @@
             }
         }
     </script>
-</body>
-</html>
 <%- include('../partials/footer') %>

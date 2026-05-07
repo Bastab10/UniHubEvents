@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coordinator Profile - Event Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+<%- include('../partials/header') %>
+
+<style>
     /* Compact Action Buttons - Match Header Logout Button Style */
     .compact-action-btn {
         text-decoration: none;
@@ -203,14 +197,8 @@
         }
     }
     </style>
-</head>
 
-<body class="bg-gray-50">
-
-    <%- include('../partials/header') %>
-
-    <!-- ✅ FIXED HERE (min-h-screen instead of h-screen) -->
-    <div class="flex min-h-screen">
+<div class="flex min-h-screen">
 
         <%- include('../partials/sidebar') %>
 
@@ -352,7 +340,4 @@
         </main>
     </div>
 
-    <%- include('../partials/footer') %>
-
-</body>
-</html>
+<%- include('../partials/footer') %>

@@ -1,22 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .podium-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
-        .podium-2 { background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%); }
-        .podium-3 { background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%); }
-    </style>
-</head>
-<body class="bg-gray-50 min-h-screen">
-    <%- include('../partials/header') %>
-    <%- include('../partials/sidebar') %>
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<style>
+    .podium-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+    .podium-2 { background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%); }
+    .podium-3 { background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%); }
+</style>
 
     <!-- Main Content -->
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -217,6 +206,4 @@
 
     </div>
 
-    <%- include('../partials/footer') %>
-</body>
-</html>
+<%- include('../partials/footer') %>

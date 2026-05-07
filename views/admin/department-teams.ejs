@@ -1,19 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - NLU Event Management System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .team-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-    </style>
-</head>
-<body class="bg-slate-50">
-    <%- include('../partials/header') %>
+<%- include('../partials/header') %>
+
+<style>
+    .team-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+</style>
     
     <div class="flex min-h-screen">
         <%- include('../partials/sidebar') %>
@@ -239,6 +230,4 @@
             }
         }
     </script>
-</body>
-</html>
 <%- include('../partials/footer') %>
