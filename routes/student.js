@@ -484,7 +484,6 @@ router.post('/profile', async (req, res) => {
     try {
         const { fullName } = req.body;
 
-        // Only allow updating fullName - other fields (email, collegeId, department) are read-only
         await User.findByIdAndUpdate(req.session.user._id, {
             'profile.fullName': fullName
         });
@@ -572,17 +571,14 @@ router.get('/events/:eventId/notifications', async (req, res) => {
     }
 });
 
-// Department Leaderboard for Versity Week
 router.get('/leaderboard', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
     try {
         const userDepartment = req.session.user.profile.department;
 
-        // Get all department points sorted by totalPoints (descending)
         const allDepartments = await DepartmentPoints.find()
             .sort({ totalPoints: -1 })
             .lean();
 
-        // Calculate rank with tie handling
         let currentRank = 1;
         let previousPoints = null;
         const rankedDepartments = allDepartments.map((dept, index) => {
@@ -598,10 +594,8 @@ router.get('/leaderboard', isAuthenticated, checkRole('student'), isApproved, is
             };
         });
 
-        // Find user's department details
         const userDepartmentData = rankedDepartments.find(d => d.isUserDepartment) || null;
 
-        // Separate top 3 and rest
         const top3 = rankedDepartments.slice(0, 3);
         const rest = rankedDepartments.slice(3);
 
@@ -620,7 +614,6 @@ router.get('/leaderboard', isAuthenticated, checkRole('student'), isApproved, is
     }
 });
 
-// Department details view
 router.get('/leaderboard/department/:departmentName', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
     try {
         const { departmentName } = req.params;
@@ -635,10 +628,8 @@ router.get('/leaderboard/department/:departmentName', isAuthenticated, checkRole
             return res.redirect('/student/leaderboard');
         }
 
-        // Sort event breakdown by date (most recent first)
         departmentData.eventBreakdown.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        // Calculate rank
         const allDepartments = await DepartmentPoints.find().sort({ totalPoints: -1 });
         let rank = 1;
         let previousPoints = null;

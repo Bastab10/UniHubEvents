@@ -1,7 +1,6 @@
 <%- include('../partials/header') %>
 
 <style>
-/* Edit Event Styles */
 .edit-event-container {
     background: #f8fafc;
     min-height: 100vh;
@@ -49,7 +48,6 @@
     box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
 }
 
-/* Mobile Responsive Layout */
 @media (max-width: 768px) {
     .edit-event-container {
         padding: 0.5rem;
@@ -68,7 +66,6 @@
     }
 }
 
-/* Form Mobile Optimization */
 @media (max-width: 640px) {
     .form-group {
         margin-bottom: 1.25rem;
@@ -116,7 +113,6 @@
     }
 }
 
-/* File Upload Mobile Optimization */
 @media (max-width: 640px) {
     input[type="file"] {
         width: 100%;
@@ -133,7 +129,6 @@
     }
 }
 
-/* Typography Mobile Optimization */
 @media (max-width: 640px) {
     h1 {
         font-size: 1.5rem;
@@ -159,7 +154,6 @@
     }
 }
 
-/* Button Groups Mobile */
 @media (max-width: 640px) {
     .flex.gap-4 {
         flex-direction: column;
@@ -182,7 +176,6 @@
     }
 }
 
-/* Remove horizontal scrolling */
 @media (max-width: 640px) {
     body {
         overflow-x: hidden;
@@ -236,7 +229,6 @@
     margin-bottom: 1rem;
 }
 
-/* Compact Action Buttons - Match Header Logout Button Style */
 .compact-action-btn {
     text-decoration: none;
     display: inline-flex;
@@ -265,7 +257,6 @@
     outline: none;
 }
 
-/* Mobile responsiveness for compact buttons */
 @media (max-width: 640px) {
     .compact-action-btn {
         padding: 0.25rem 0.5rem;
@@ -281,7 +272,6 @@
     }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .form-container {
         padding: 1.5rem;
@@ -300,21 +290,16 @@
     
     <main class="flex-1">
         <div class="container mx-auto px-4 py-6">
-            <!-- Page Header -->
             <div class="mb-8">
-                <!-- Centered Title and Subtitle -->
                 <div class="text-center">
                     <h1 class="text-3xl font-bold text-gray-800 mb-2">Edit Event</h1>
                     <p class="text-gray-600">Update your event details</p>
                 </div>
             </div>
 
-        <!-- Form Section -->
         <div class="container mx-auto px-4 py-6">
-            <!-- Centered Container -->
             <div class="max-w-4xl mx-auto">
                 <div class="form-container">
-                    <!-- Flash Messages -->
                     <% if (typeof error !== 'undefined' && error) { %>
                         <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
                             <div class="flex items-center">
@@ -335,11 +320,9 @@
 
                     <form action="/faculty/events/<%= event._id %>/edit" method="POST" enctype="multipart/form-data" class="space-y-8">
                         
-                        <!-- Basic Information Section -->
                         <div class="space-y-6">
                             <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Basic Information</h2>
                             
-                            <!-- Event Title - Full Width -->
                             <div>
                                 <label for="title" class="block text-sm font-semibold mb-2 text-gray-700">Event Title *</label>
                                 <input type="text" 
@@ -351,7 +334,6 @@
                                        required>
                             </div>
 
-                            <!-- Description - Full Width -->
                             <div>
                                 <label for="description" class="block text-sm font-semibold mb-2 text-gray-700">Description *</label>
                                 <textarea class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 resize-vertical transition-colors text-black" 
@@ -362,7 +344,6 @@
                                           required><%= formData.description || event.description %></textarea>
                             </div>
 
-                            <!-- Category, Event Mode and Event Type - Three Columns -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label for="category" class="block text-sm font-semibold mb-2 text-gray-700">Category *</label>
@@ -408,7 +389,6 @@
                                 </div>
                             </div>
 
-                            <!-- Team Size, Max Participants, and Max Teams per Department - Three Columns -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div id="teamSizeField" style="display: none;">
                                     <label for="teamSize" class="block text-sm font-semibold mb-2 text-gray-700">Team Size *</label>
@@ -462,35 +442,15 @@
                             </div>
                         </div>
 
-                        <!-- Subcategory Section (for Sports) -->
                         <div class="space-y-6" id="subCategoryField" style="display: none;">
                             <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Sports Subcategory</h2>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- <div>
-                                    <label for="subCategory" class="block text-sm font-semibold mb-2 text-gray-700">Subcategory</label>
-                                    <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400 transition-colors" 
-                                            id="subCategory" 
-                                            name="subCategory">
-                                        <option value="">Select Subcategory</option>
-                                        <option value="cricket" <%= (formData.subCategory || event.subCategory) === 'cricket' ? 'selected' : '' %>>Cricket</option>
-                                        <option value="football" <%= (formData.subCategory || event.subCategory) === 'football' ? 'selected' : '' %>>Football</option>
-                                        <option value="basketball" <%= (formData.subCategory || event.subCategory) === 'basketball' ? 'selected' : '' %>>Basketball</option>
-                                        <option value="volleyball" <%= (formData.subCategory || event.subCategory) === 'volleyball' ? 'selected' : '' %>>Volleyball</option>
-                                        <option value="badminton" <%= (formData.subCategory || event.subCategory) === 'badminton' ? 'selected' : '' %>>Badminton</option>
-                                        <option value="table-tennis" <%= (formData.subCategory || event.subCategory) === 'table-tennis' ? 'selected' : '' %>>Table Tennis</option>
-                                        <option value="athletics" <%= (formData.subCategory || event.subCategory) === 'athletics' ? 'selected' : '' %>>Athletics</option>
-                                        <option value="chess" <%= (formData.subCategory || event.subCategory) === 'chess' ? 'selected' : '' %>>Chess</option>
-                                    </select>
-                                </div> -->
-                            </div>
+    
                         </div>
 
-                        <!-- Event Schedule Section -->
                         <div class="space-y-6">
                             <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Event Schedule</h2>
                             
-                            <!-- Date and Time - Three Columns -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label for="date" class="block text-sm font-semibold mb-2 text-gray-700">Date *</label>
@@ -523,7 +483,6 @@
                                 </div>
                             </div>
 
-                            <!-- Venue - Full Width -->
                             <div>
                                 <label for="venue" class="block text-sm font-semibold mb-2 text-gray-700">Venue *</label>
                                 <input type="text" 
@@ -536,11 +495,9 @@
                             </div>
                         </div>
 
-                        <!-- Event Media Section -->
                         <div class="space-y-6">
                             <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Event Media</h2>
                             
-                            <!-- Current Poster Display -->
                             <% if (event.poster && event.poster.trim() !== '') { %>
                                 <div>
                                     <label class="block text-sm font-semibold mb-2 text-gray-700">Current Poster</label>
@@ -577,7 +534,6 @@
                             </div>
                         </div>
 
-                        <!-- Form Actions -->
                         <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
                             <a href="/faculty/events" class="compact-action-btn">
                                 <i class="fas fa-times text-sm"></i>
@@ -596,7 +552,6 @@
 </div>
 
 <script>
-// Show/hide team fields based on event type
 function toggleTeamSize() {
     const eventType = document.getElementById('eventType').value;
     const teamSizeField = document.getElementById('teamSizeField');
@@ -614,7 +569,6 @@ function toggleTeamSize() {
     }
 }
 
-// Show/hide subcategory field based on category
 function toggleSubCategory() {
     const category = document.getElementById('category').value;
     const subCategoryField = document.getElementById('subCategoryField');
@@ -626,7 +580,6 @@ function toggleSubCategory() {
     }
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleTeamSize();
     toggleSubCategory();

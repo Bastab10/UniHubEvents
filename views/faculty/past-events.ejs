@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="/css/dashboard.css">
 
 <style>
-/* Force white background for Past Events page on all devices */
 main {
     background-color: #ffffff !important;
     padding: 1rem;
@@ -14,14 +13,12 @@ main {
     margin: 0;
 }
 
-/* Override dark mode styles for Past Events page */
 @media (prefers-color-scheme: dark) {
     main {
         background-color: #ffffff !important;
     }
 }
 
-/* Mobile-specific override */
 @media (max-width: 768px) {
     main {
         background-color: #ffffff !important;
@@ -34,7 +31,6 @@ main {
     }
 }
 
-/* Ensure all content areas are white */
 .bg-gray-50 {
     background-color: #ffffff !important;
 }
@@ -45,7 +41,6 @@ main {
     }
 }
 
-/* Compact Action Buttons - Match Header Logout Button Style */
 .compact-action-btn {
     text-decoration: none;
     display: flex;
@@ -75,7 +70,6 @@ main {
     outline: none;
 }
 
-/* Mobile responsiveness for compact buttons */
 @media (max-width: 640px) {
     .compact-action-btn {
         padding: 0.625rem 0.75rem;
@@ -93,7 +87,6 @@ main {
         font-size: 0.75rem !important;
     }
 
-    /* Button groups on mobile */
     .flex.gap-2.justify-end {
         flex-direction: column;
         gap: 0.5rem !important;
@@ -105,7 +98,6 @@ main {
     }
 }
 
-/* Events Grid Mobile Optimization */
 @media (max-width: 640px) {
     .events-grid {
         grid-template-columns: 1fr !important;
@@ -114,7 +106,6 @@ main {
     }
 }
 
-/* Typography Mobile Optimization */
 @media (max-width: 640px) {
     h1 {
         font-size: 1.5rem;
@@ -132,7 +123,6 @@ main {
     }
 }
 
-/* Remove horizontal scrolling */
 @media (max-width: 640px) {
     body {
         overflow-x: hidden;
@@ -143,7 +133,6 @@ main {
     }
 }
 
-/* Past event badge styling */
 .past-event-badge {
     background-color: #6b7280;
     color: white;
@@ -153,7 +142,6 @@ main {
     font-weight: 500;
 }
 
-/* Stats summary card */
 .stats-summary {
     background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
     border-left: 4px solid #6b7280;
@@ -161,12 +149,10 @@ main {
 </style>
 
 <main class="flex-1">
-    <!-- Past Events Title -->
     <h1 class="text-2xl font-bold text-gray-800 mb-2">Past Events</h1>
     <p class="text-gray-700 sm:text-gray-600 mb-8">View all your previous events that have already taken place.</p>
 
     <% if (pastEvents && pastEvents.length > 0) { %>
-        <!-- Stats Summary -->
         <div class="stats-summary rounded-lg shadow-md p-4 mb-6">
             <div class="flex items-center">
                 <div class="p-2 bg-gray-500 rounded-full">
@@ -179,11 +165,9 @@ main {
             </div>
         </div>
 
-        <!-- Past Events Grid -->
         <div class="events-grid">
             <% pastEvents.forEach(event => { %>
                 <div class="event-card group" data-category="<%= event.category || 'other' %>">
-                    <!-- Event Image -->
                     <div class="event-image">
                         <% if (event.poster && event.poster.trim() !== '') { %>
                             <img src="<%= event.poster %>"
@@ -198,15 +182,12 @@ main {
                                 </div>
                             </div>
                         <% } %>
-                        <!-- Past Event Overlay -->
                         <div class="absolute top-3 right-3">
                             <span class="past-event-badge">Completed</span>
                         </div>
                     </div>
 
-                    <!-- Event Content -->
                     <div class="event-content">
-                        <!-- Title and Category Badge -->
                         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                             <h3 class="event-title mb-2 sm:mb-0 sm:mr-2">
                                 <%= event.title %>
@@ -230,12 +211,10 @@ main {
                             <% } %>
                         </div>
 
-                        <!-- Description -->
                         <p class="event-description mb-3">
                             <%= event.description || 'No description available' %>
                         </p>
 
-                        <!-- Event Details -->
                         <div class="event-details mb-4">
                             <div class="flex items-center">
                                 <i class="fas fa-calendar mr-2 text-gray-400"></i>
@@ -259,7 +238,6 @@ main {
                             </div>
                         </div>
 
-                        <!-- View Button -->
                         <div class="flex gap-2 justify-end">
                             <a href="/faculty/events/<%= event._id %>" class="compact-action-btn">
                                 <i class="fas fa-eye text-sm"></i>
@@ -271,7 +249,6 @@ main {
             <% }) %>
         </div>
     <% } else { %>
-        <!-- No Past Events State -->
         <div class="text-center py-12 bg-white rounded-xl shadow-lg mb-8">
             <i class="fas fa-calendar-check text-gray-400 text-6xl mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-600 mb-2">No Past Events</h3>
@@ -283,7 +260,6 @@ main {
         </div>
     <% } %>
 
-    <!-- Quick Actions Section -->
     <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
     <div class="flex flex-wrap gap-3">
         <a href="/faculty/dashboard" class="compact-action-btn">

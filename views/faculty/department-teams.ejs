@@ -10,7 +10,6 @@
     <%- include('../partials/sidebar') %>
     
     <main class="flex-1 overflow-y-auto">
-        <!-- Clean Header -->
         <div class="bg-white border-b border-gray-200 px-8 py-6">
             <div class="max-w-7xl mx-auto">
                 <div class="flex items-center gap-4 mb-4">
@@ -34,11 +33,9 @@
 
         <div class="max-w-7xl mx-auto p-6 space-y-6">
 
-            <!-- Teams Grid -->
             <div class="grid grid-cols-1 gap-6">
                 <% teams.forEach((team, index) => { %>
                     <div class="team-card bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                        <!-- Team Header -->
                         <div class="bg-gray-100 px-6 py-4 border-b border-gray-200">
                             <div class="flex items-center gap-3">
                                 <div class="h-10 w-10 rounded-lg bg-white flex items-center justify-center shadow-sm">
@@ -57,7 +54,6 @@
                         </div>
 
                         <div class="p-5 space-y-5">
-                            <!-- Team Leader Section -->
                             <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
                                 <div class="flex items-center gap-2 mb-3">
                                     <div class="h-8 w-8 rounded-lg bg-blue-500 flex items-center justify-center">
@@ -81,7 +77,6 @@
                                 </div>
                             </div>
 
-                            <!-- Team Members Section -->
                             <% if (team.teamMembers && team.teamMembers.length > 0) { %>
                                 <div>
                                     <div class="flex items-center gap-2 mb-3">
@@ -141,7 +136,6 @@
                                 </div>
                             <% } %>
 
-                            <!-- Team Footer -->
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-3 border-t border-gray-100">
                                 <div class="flex items-center gap-3 text-sm text-gray-500">
                                     <span><i class="fas fa-users mr-1"></i><%= (team.teamMembers?.length || 0) + 1 %> members</span>

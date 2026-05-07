@@ -34,7 +34,7 @@ app.use(session({
         collectionName: 'sessions'
     }),
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 // 24 hours
+        maxAge: 1000 * 60 * 60 * 24
     }
 }));
 
@@ -44,12 +44,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
     
-    // Handle success messages - show once and clear
     res.locals.success = req.session.success || null;
     req.session.success = null;
     req.session.eventSuccess = null;
     
-    // Handle error messages - show once and clear
     res.locals.error = req.session.error || null;
     req.session.error = null;
     req.session.eventError = null;

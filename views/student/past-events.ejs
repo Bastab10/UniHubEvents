@@ -1,15 +1,12 @@
 <%- include('../partials/header') %>
 
-<!-- Dashboard Styles -->
 <link rel="stylesheet" href="/css/dashboard.css">
 
 <div class="dashboard-container">
     <%- include('../partials/sidebar') %>
     
     <main class="flex-1">
-        <!-- Past Events Content -->
         <div class="p-4 sm:p-6">
-            <!-- Header Section -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                 <h2 class="responsive-text-2xl font-bold text-gray-800 flex items-center">
                     <i class="fas fa-history mr-3 text-gray-600"></i>
@@ -23,42 +20,10 @@
 
             <p class="text-gray-600 mb-4">Browse through all completed events from the past.</p>
             
-            <!-- Category Filter Buttons
-            <div class="flex flex-wrap gap-2 mb-6">
-                <button onclick="filterPastEvents('all')" class="category-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-[#0ea5a4] text-white border border-[#0ea5a4]">
-                    All Past Events
-                </button>
-                <button onclick="filterPastEvents('seminar')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Seminars
-                </button>
-                <button onclick="filterPastEvents('workshop')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Workshops
-                </button>
-                <button onclick="filterPastEvents('hackathon')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Hackathons
-                </button>
-                <button onclick="filterPastEvents('quiz')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Quizzes
-                </button>
-                <button onclick="filterPastEvents('talkshow')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Talk Shows
-                </button>
-                <button onclick="filterPastEvents('bootcamp')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Bootcamps
-                </button>
-                <button onclick="filterPastEvents('cultural')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Cultural
-                </button>
-                <button onclick="filterPastEvents('sports')" class="category-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300 border border-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white">
-                    Sports
-                </button>
-            </div> -->
-            
             <% if (events && events.length > 0) { %>
                 <div class="events-grid">
                     <% events.forEach((event, index) => { %>
                         <div class="event-card group" data-category="<%= event.category || 'other' %>">
-                            <!-- Event Image -->
                             <div class="event-image">
                                 <% if (event.poster && event.poster.trim() !== '') { %>
                                     <img src="<%= event.poster %>" 
@@ -76,9 +41,7 @@
 
                             </div>
                             
-                            <!-- Event Content -->
                             <div class="event-content">
-                                <!-- Title and Category Badge -->
                                 <div class="event-title-row">
                                     <h3 class="event-title">
                                         <%= event.title %>
@@ -102,14 +65,11 @@
                                     <% } %>
                                 </div>
                                 
-                                <!-- Description -->
                                 <p class="event-description mb-3">
                                     <%= event.description || 'No description available' %>
                                 </p>
                                 
-                                <!-- Event Details -->
                                 <div class="event-details mb-4">
-                                    <!-- First row: Date and Time -->
                                     <div class="detail-row">
                                         <div class="detail-item">
                                             <i class="fas fa-calendar text-gray-400"></i>
@@ -120,7 +80,6 @@
                                             <span><%= event.startTime %> - <%= event.endTime %></span>
                                         </div>
                                     </div>
-                                    <!-- Second row: Organized By -->
                                     <div class="detail-row full-width">
                                         <div class="detail-item">
                                             <i class="fas fa-user text-gray-400"></i>
@@ -129,7 +88,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- View Result Button with Status Badge -->
                                 <div class="flex items-center justify-between">
                                     <% if (event.hasResult) { %>
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -165,14 +123,12 @@
 <%- include('../partials/footer') %>
 
 <script>
-// Filter past events by category
 function filterPastEvents(category) {
     const eventCards = document.querySelectorAll('.event-card');
     const categoryButtons = document.querySelectorAll('.category-btn');
     const eventCount = document.getElementById('event-count');
     const noEventsMessage = document.getElementById('no-past-events');
     
-    // Update active button styling
     categoryButtons.forEach(btn => {
         btn.classList.remove('bg-[#0ea5a4]', 'text-white', 'active');
         btn.classList.add('bg-gray-200', 'text-gray-700');
@@ -184,7 +140,6 @@ function filterPastEvents(category) {
         btn.style.backgroundColor = '#f3f4f6';
     });
     
-    // Find and activate the clicked button
     let activeButton = null;
     categoryButtons.forEach(btn => {
         const onclickAttr = btn.getAttribute('onclick');
@@ -203,7 +158,6 @@ function filterPastEvents(category) {
         activeButton.style.backgroundColor = '#0ea5a4';
     }
     
-    // Filter events
     let visibleCount = 0;
     eventCards.forEach(card => {
         const eventCategory = card.getAttribute('data-category');
@@ -216,10 +170,8 @@ function filterPastEvents(category) {
         }
     });
     
-    // Update event count
     eventCount.textContent = visibleCount;
     
-    // Show/hide no events message
     if (visibleCount === 0) {
         noEventsMessage.style.display = 'block';
     } else {

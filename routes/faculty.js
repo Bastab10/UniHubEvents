@@ -796,12 +796,10 @@ router.post('/upload-result', async (req, res) => {
             return res.redirect('/faculty/upload-result');
         }
 
-        // Parse points only if user entered them (optional)
         const firstPoints = firstPosition.points ? parseInt(firstPosition.points) : undefined;
         const secondPoints = secondPosition.points ? parseInt(secondPosition.points) : undefined;
         const thirdPoints = thirdPosition.points ? parseInt(thirdPosition.points) : undefined;
 
-        // Validate points are non-negative if provided
         if ((firstPoints !== undefined && firstPoints < 0) ||
             (secondPoints !== undefined && secondPoints < 0) ||
             (thirdPoints !== undefined && thirdPoints < 0)) {
@@ -834,7 +832,6 @@ router.post('/upload-result', async (req, res) => {
 
         await result.save();
 
-        // Update department points for Versity Week events
         if (event.eventMode === 'versity') {
             const pointValues = {
                 first: 10,
@@ -880,7 +877,6 @@ router.post('/upload-result', async (req, res) => {
     }
 });
 
-// Edit Result - GET route
 router.get('/results/:resultId/edit', async (req, res) => {
     try {
         const { resultId } = req.params;
@@ -893,7 +889,6 @@ router.get('/results/:resultId/edit', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
 
-        // Check authorization
         if (result.coordinator.toString() !== req.session.user._id.toString()) {
             req.session.error = 'You are not authorized to edit this result';
             return res.redirect('/faculty/dashboard');
@@ -915,7 +910,6 @@ router.get('/results/:resultId/edit', async (req, res) => {
     }
 });
 
-// Edit Result - POST route
 router.post('/results/:resultId/edit', async (req, res) => {
     try {
         const { resultId } = req.params;
@@ -933,14 +927,12 @@ router.post('/results/:resultId/edit', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
 
-        // Store old departments for point recalculation
         const oldDepartments = {
             first: result.firstPosition.department,
             second: result.secondPosition.department,
             third: result.thirdPosition.department
         };
 
-        // Update result
         result.firstPosition = {
             name: firstPosition.name,
             department: firstPosition.department || '',
@@ -962,7 +954,6 @@ router.post('/results/:resultId/edit', async (req, res) => {
 
         await result.save();
 
-        // Recalculate department points for Versity Week events
         if (result.event.eventMode === 'versity') {
             await recalculateDepartmentPoints(result.event._id, oldDepartments, {
                 first: firstPosition.department,
@@ -980,7 +971,6 @@ router.post('/results/:resultId/edit', async (req, res) => {
     }
 });
 
-// Delete Result
 router.post('/results/:resultId/delete', async (req, res) => {
     try {
         const { resultId } = req.params;
@@ -997,7 +987,6 @@ router.post('/results/:resultId/delete', async (req, res) => {
             return res.redirect('/faculty/dashboard');
         }
 
-        // Remove department points for Versity Week events
         if (result.event.eventMode === 'versity') {
             const pointValues = { first: 10, second: 7, third: 5 };
             const positions = ['first', 'second', 'third'];
@@ -1028,7 +1017,6 @@ router.post('/results/:resultId/delete', async (req, res) => {
     }
 });
 
-// Helper function to recalculate department points
 async function recalculateDepartmentPoints(eventId, oldDepts, newDepts) {
     const pointValues = { first: 10, second: 7, third: 5 };
     const positions = ['first', 'second', 'third'];
@@ -1037,7 +1025,6 @@ async function recalculateDepartmentPoints(eventId, oldDepts, newDepts) {
         const oldDept = oldDepts[pos];
         const newDept = newDepts[pos];
 
-        // Remove points from old department if different
         if (oldDept && oldDept !== newDept) {
             await DepartmentPoints.findOneAndUpdate(
                 { department: oldDept },
@@ -1049,7 +1036,6 @@ async function recalculateDepartmentPoints(eventId, oldDepts, newDepts) {
             );
         }
 
-        // Add points to new department if different
         if (newDept && oldDept !== newDept) {
             const event = await Event.findById(eventId);
             await DepartmentPoints.findOneAndUpdate(

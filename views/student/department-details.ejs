@@ -1,10 +1,8 @@
 <%- include('../partials/header') %>
 <%- include('../partials/sidebar') %>
 
-    <!-- Main Content -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- Back Button -->
         <div class="mb-6">
             <a href="/student/leaderboard" class="inline-flex items-center text-gray-600 hover:text-gray-800 font-medium">
                 <i class="fas fa-arrow-left mr-2"></i>
@@ -12,7 +10,6 @@
             </a>
         </div>
 
-        <!-- Department Summary Card -->
         <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6 <%= isUserDepartment ? 'border-l-4 border-l-blue-500' : '' %>">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
@@ -58,7 +55,6 @@
             </div>
         </div>
 
-        <!-- Event Breakdown -->
         <div class="bg-white rounded-lg border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-800">

@@ -1,8 +1,6 @@
 <% if (currentUser) { %>
 
-<!-- Simple Working Sidebar -->
 <style>
-/* Sidebar Styles - Mobile First */
 .sidebar {
     position: fixed;
     top: 0;
@@ -10,10 +8,10 @@
     width: 85%;
     max-width: 320px;
     height: 100vh;
-    background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
+    background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%);
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1030;
+    z-index: 1050;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -25,7 +23,6 @@
         height: calc(100vh - 56px);
         width: 280px;
         left: -280px;
-        background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
     }
 }
 
@@ -33,59 +30,15 @@
     .sidebar {
         top: 64px;
         height: calc(100vh - 64px);
-        background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
     }
 }
 
-/* Mobile-specific overrides */
-@media (max-width: 639px) {
-    .sidebar {
-        background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
-    }
-    .sidebar.open {
-        left: 0;
-        display: flex !important;
-        visibility: visible !important;
-    }
-}
-
-/* Force background color for all states */
 .sidebar.open {
     left: 0;
-    background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
 }
 
-/* Additional overrides to prevent any conflicts */
 .sidebar * {
     box-sizing: border-box;
-}
-
-/* Ensure sidebar maintains color in all scenarios */
-.sidebar,
-.sidebar.open,
-.sidebar:hover,
-.sidebar:focus,
-.sidebar:active {
-    background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
-}
-
-/* Override any external CSS that might affect sidebar */
-@media (max-width: 767px) {
-    .sidebar,
-    .sidebar.open,
-    .sidebar:hover,
-    .sidebar:focus {
-        background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .sidebar,
-    .sidebar.open,
-    .sidebar:hover,
-    .sidebar:focus {
-        background: linear-gradient(135deg, #cfe3e6 0%, #d8dee8 100%) !important;
-    }
 }
 
 .sidebar-header {
@@ -111,7 +64,7 @@
     border-radius: 50%;
     background: rgba(14, 165, 164, 0.1);
     border: none;
-    color: #374151; /* text-gray-700 equivalent */
+    color: #374151;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -130,7 +83,7 @@
 
 .sidebar-close-btn:hover {
     background: rgba(14, 165, 164, 0.2);
-    color: #0ea5a4; /* Theme color on hover */
+    color: #0ea5a4;
     transform: rotate(90deg);
 }
 
@@ -145,7 +98,7 @@
     display: flex;
     align-items: center;
     padding: 1rem 1rem;
-    color: #374151; /* text-gray-700 equivalent */
+    color: #374151;
     text-decoration: none;
     transition: all 0.3s ease;
     position: relative;
@@ -155,7 +108,7 @@
 
 .sidebar-nav a:hover {
     background: rgba(14, 165, 164, 0.05);
-    color: #0ea5a4; /* Exact theme color from header */
+    color: #0ea5a4;
     padding-left: 1.5rem;
 }
 
@@ -234,7 +187,6 @@
     color: #ff6b6b;
 }
 
-/* Overlay */
 .overlay {
     position: fixed;
     top: 0;
@@ -268,42 +220,25 @@
     visibility: visible;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
-    /* Hide sidebar toggle on tablet and show only mobile menu */
-    /* .sidebar {
-        display: none;
-    } */
 }
 
 @media (max-width: 639px) {
     .sidebar {
-        display: block !important;
-        background: #cfe3e6 !important;
+        top: 0;
+        height: 100vh;
     }
 }
 
 @media (max-width: 480px) {
     .sidebar {
-        display: block !important;
-        background: #cfe3e6 !important;
-    }
-}
-
-/* Extra mobile overrides */
-@media (max-width: 425px) {
-    .sidebar {
-        display: block !important;
-        background: #cfe3e6 !important;
-        visibility: visible !important;
+        width: 90%;
     }
 }
 
 @media (max-width: 375px) {
     .sidebar {
-        display: block !important;
-        background: #cfe3e6 !important;
-        visibility: visible !important;
+        width: 90%;
     }
 }
 
@@ -332,15 +267,16 @@
     }
 }
 
-/* Show sidebar only on desktop */
 @media (min-width: 1025px) {
     .sidebar {
-        display: block;
+        left: -280px;
+    }
+    .sidebar.open {
+        left: 0;
     }
 }
 </style>
 
-<!-- Sidebar -->
 <aside id="mainSidebar" class="sidebar">
     <div class="sidebar-header">
         <h3 class="text-gray-700 font-bold text-xl mb-1">
@@ -454,7 +390,6 @@
     </nav>
 </aside>
 
-<!-- Overlay -->
 <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
 
 <script>
@@ -474,7 +409,6 @@ function closeSidebar() {
     document.body.style.overflow = '';
 }
 
-// Close sidebar on escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeSidebar();

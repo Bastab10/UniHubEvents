@@ -1,6 +1,3 @@
-/* Global Responsive Enhancements - Compatible with Tailwind CSS */
-
-/* Prevent horizontal scrolling */
 html, body {
     overflow-x: hidden;
     max-width: 100%;
@@ -10,18 +7,15 @@ html, body {
     box-sizing: border-box;
 }
 
-/* Responsive images and media */
 img, video, iframe {
     max-width: 100%;
     height: auto;
 }
 
-/* Touch-friendly minimum sizes */
 button, a, input, select, textarea {
     min-height: 44px;
 }
 
-/* Mobile menu toggle */
 .mobile-menu-toggle {
     display: block;
     position: fixed;
@@ -42,7 +36,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Table mobile stacking */
 .table-mobile-stack {
     display: block;
 }
@@ -78,12 +71,10 @@ button, a, input, select, textarea {
     }
 }
 
-/* Event cards responsive */
 .event-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Dashboard responsive */
 .dashboard-stats {
     display: grid;
     gap: 1rem;
@@ -107,7 +98,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Registration details responsive */
 .registration-details {
     padding: 1rem;
 }
@@ -132,7 +122,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Search bar responsive */
 .search-bar {
     display: flex;
     align-items: center;
@@ -176,7 +165,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Dashboard Improvements */
 @media (max-width: 768px) {
     .dashboard-header {
         flex-direction: column;
@@ -206,7 +194,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Button Groups on Mobile */
 @media (max-width: 640px) {
     .btn-group {
         display: flex;
@@ -220,7 +207,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Table Improvements */
 @media (max-width: 768px) {
     .table-responsive {
         font-size: 0.875rem;
@@ -238,7 +224,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Modal Improvements */
 @media (max-width: 640px) {
     .modal-content {
         margin: 1rem;
@@ -264,7 +249,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Improved Event Cards on Mobile */
 @media (max-width: 640px) {
     .event-card {
         margin-bottom: 1rem;
@@ -285,7 +269,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Enhanced Form Responsiveness */
 @media (max-width: 640px) {
     .form-container {
         padding: 1rem;
@@ -308,7 +291,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Print styles */
 @media print {
     .sidebar,
     .mobile-menu-toggle,
@@ -327,7 +309,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms;
@@ -336,7 +317,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Utility classes for responsive design */
 .responsive-container {
     width: 100%;
     max-width: 100%;
@@ -382,7 +362,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Touch-friendly spacing */
 .touch-target {
     min-height: 44px;
     min-width: 44px;
@@ -391,7 +370,6 @@ button, a, input, select, textarea {
     justify-content: center;
 }
 
-/* Prevent text overflow */
 .text-truncate-responsive {
     white-space: nowrap;
     overflow: hidden;
@@ -399,7 +377,6 @@ button, a, input, select, textarea {
     max-width: 100%;
 }
 
-/* Responsive grid utilities */
 .grid-responsive {
     display: grid;
     gap: 1rem;
@@ -424,7 +401,6 @@ button, a, input, select, textarea {
     }
 }
 
-/* Device visibility utilities */
 .desktop-only { display: none; }
 .tablet-only { display: none; }
 

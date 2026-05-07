@@ -1,7 +1,6 @@
 <%- include('../partials/header') %>
 
 <style>
-/* Responsive Dashboard Styles */
 .dashboard-container {
     min-height: 100vh;
     background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
@@ -13,34 +12,31 @@
     }
 }
 
-/* Mobile text color fixes */
 @media (max-width: 640px) {
     .dashboard-container h3 {
-        color: #1f2937 !important; /* Force dark gray */
+        color: #1f2937 !important;
     }
     
     .dashboard-container p {
-        color: #4b5563 !important; /* Force medium gray */
+        color: #4b5563 !important;
     }
     
-    /* Input field mobile fixes */
     input[type="text"],
     input[type="email"],
     input[type="tel"] {
-        color: #1a1a1a !important; /* Force dark text */
-        background-color: #ffffff !important; /* Force white background */
+        color: #1a1a1a !important;
+        background-color: #ffffff !important;
     }
     
     input[type="text"]::placeholder,
     input[type="email"]::placeholder,
     input[type="tel"]::placeholder {
-        color: #6b7280 !important; /* Gray placeholder */
-        opacity: 1 !important; /* Force full opacity */
+        color: #6b7280 !important;
+        opacity: 1 !important;
     }
     
-    /* Label text mobile fixes */
     label {
-        color: #374151 !important; /* Force dark gray for labels */
+        color: #374151 !important;
     }
 }
 </style>
@@ -50,17 +46,13 @@
     
     <main class="flex-1 overflow-y-auto">
         <div class="p-4 sm:p-6">
-           <!-- <div class="max-w-4xl mx-auto mb-8">
-                <div class="bg-white rounded-lg shadow-md border border-gray-200 p-8"> -->
                     <div class="text-center mb-6">
                         <h3 class="text-2xl font-bold text-gray-800 mb-2">My Profile</h3>
                     </div>
 
             <div class="max-w-4xl mx-auto">
-                <!-- Combined Profile Section -->
                 <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Profile Card -->
                         <div class="lg:col-span-1">
                             <div class="text-center">
                                 <div class="mx-auto h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center mb-3">
@@ -76,7 +68,6 @@
                             </div>
                         </div>
 
-                        <!-- Profile Form -->
                         <div class="lg:col-span-2">
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Your Details</h3>
                             <form method="POST" action="/student/profile" class="space-y-3">
@@ -125,96 +116,6 @@
                 </div>
             </div>
 
-            <!-- Account Statistics -->
-            <!-- <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-blue-100 rounded-full">
-                            <i class="fas fa-ticket-alt text-blue-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-500">Total Events</p>
-                            <p class="text-2xl font-bold text-gray-800"><%= currentUser.registeredEvents ? currentUser.registeredEvents.length : 0 %></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-green-100 rounded-full">
-                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-500">Completed</p>
-                            <p class="text-2xl font-bold text-gray-800">0</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 bg-purple-100 rounded-full">
-                            <i class="fas fa-calendar-check text-purple-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm text-gray-500">Upcoming</p>
-                            <p class="text-2xl font-bold text-gray-800">0</p>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
-            <!-- Event Highlight Card -->
-            <!-- <div class="mt-8">
-                <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-xl p-6 text-white relative overflow-hidden">
-                    Decorative Elements
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-                     -->
-                    <!-- <div class="relative z-10"> -->
-                        <!-- Badge -->
-                        <!-- <div class="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 mb-4">
-                            <span class="text-yellow-300 text-sm font-semibold">⭐ Event of the Week</span>
-                        </div> -->
-                        
-                        <!-- Event Content -->
-                        <!-- <h3 class="text-2xl font-bold mb-3">Annual Tech Symposium 2026</h3>
-                        
-                        <div class="flex items-center mb-4">
-                            <i class="fas fa-calendar-alt mr-2 text-yellow-300"></i>
-                            <span class="text-yellow-100">March 25, 2026 • Main Auditorium</span>
-                        </div>
-                        
-                        <p class="text-yellow-50 mb-6 leading-relaxed">
-                            Join us for the biggest technical gathering of the year, featuring innovation, project exhibitions, coding challenges, and expert sessions.
-                        </p> -->
-                        
-                        <!-- Sports Event -->
-                        <!-- <div class="mt-6 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
-                            <div class="flex items-center mb-3">
-                                <i class="fas fa-trophy text-yellow-300 text-xl mr-3"></i>
-                                <span class="text-yellow-300 text-sm font-semibold">Popular Sports Event</span>
-                            </div>
-                            <h4 class="text-lg font-bold mb-2 text-white">Sports Championship</h4>
-                            <div class="flex items-center mb-3">
-                                <i class="fas fa-calendar-alt mr-2 text-yellow-300"></i>
-                                <span class="text-white text-sm">June 10, 2026</span>
-                            </div>
-                            <p class="text-white text-sm mb-4">Limited spots available</p>
-                            <button class="w-full bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-50 transition-all transform hover:scale-105 shadow-lg">
-                                <i class="fas fa-running mr-2"></i>
-                                View Sports Events
-                            </button>
-                        </div> -->
-                        
-                        <!-- Action Button -->
-                        <!-- <button class="w-full bg-white text-blue-600 font-semibold py-3 px-6 rounded-lg hover:bg-yellow-50 transition-all transform hover:scale-105 shadow-lg">
-                            <i class="fas fa-user-plus mr-2"></i>
-                            Register Now
-                        </button> -->
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 </div>

@@ -1,7 +1,6 @@
 <%- include('../partials/header') %>
 
 <style>
-    /* Compact Action Buttons - Match Header Logout Button Style */
     .compact-action-btn {
         text-decoration: none;
         display: flex;
@@ -32,7 +31,6 @@
         outline: none;
     }
 
-    /* Mobile responsiveness for compact buttons */
     @media (max-width: 640px) {
         .compact-action-btn {
             padding: 0.625rem 0.75rem;
@@ -51,7 +49,6 @@
         }
     }
 
-    /* Mobile Responsive Layout */
     @media (max-width: 768px) {
         body {
             padding: 0.5rem;
@@ -74,7 +71,6 @@
         }
     }
 
-    /* Profile Card Mobile Optimization */
     @media (max-width: 640px) {
         .profile-card {
             padding: 1.25rem;
@@ -107,7 +103,6 @@
         }
     }
 
-    /* Form Mobile Optimization */
     @media (max-width: 640px) {
         .form-group {
             margin-bottom: 1.25rem;
@@ -147,7 +142,6 @@
         }
     }
 
-    /* Typography Mobile Optimization */
     @media (max-width: 640px) {
         h1 {
             font-size: 1.5rem;
@@ -173,7 +167,6 @@
         }
     }
 
-    /* Button Groups Mobile */
     @media (max-width: 640px) {
         .flex.gap-4 {
             flex-direction: column;
@@ -186,7 +179,6 @@
         }
     }
 
-    /* Remove horizontal scrolling */
     @media (max-width: 640px) {
         body {
             overflow-x: hidden;
@@ -202,7 +194,6 @@
 
         <%- include('../partials/sidebar') %>
 
-        <!-- ✅ FIXED HERE (removed overflow-y-auto) -->
         <main class="flex-1">
             <div class="p-6">
                  <div class="text-center mb-6">
@@ -218,7 +209,6 @@
 
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                            <!-- Profile Card -->
                             <div class="lg:col-span-1">
                                 <div class="text-center">
                                     <div class="mx-auto h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center mb-3">
@@ -239,7 +229,6 @@
                                 </div>
                             </div>
 
-                            <!-- Profile Form -->
                             <div class="lg:col-span-2">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
                                     Edit Profile

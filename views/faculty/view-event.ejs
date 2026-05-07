@@ -1,7 +1,6 @@
 <%- include('../partials/header') %>
 
 <style>
-/* Compact Action Buttons - Match Header Logout Button Style */
 .compact-action-btn {
     text-decoration: none;
     display: inline-flex;
@@ -32,7 +31,6 @@
     outline: none;
 }
 
-/* Mobile responsiveness for compact buttons */
 @media (max-width: 640px) {
     .compact-action-btn {
         padding: 0.625rem 0.75rem;
@@ -51,7 +49,6 @@
     }
 }
 
-/* Mobile Responsive Layout */
 @media (max-width: 768px) {
     .flex.min-h-screen.bg-gray-50 {
         padding: 0.5rem;
@@ -78,7 +75,6 @@
     }
 }
 
-/* Mobile Table Responsiveness */
 @media (max-width: 768px) {
     .overflow-x-auto {
         overflow-x: auto;
@@ -105,7 +101,6 @@
     }
 }
 
-/* Mobile Card View for Tables */
 @media (max-width: 640px) {
     .mobile-table-container {
         display: none;
@@ -165,7 +160,6 @@
     }
 }
 
-/* Desktop Table View */
 @media (min-width: 641px) {
     .mobile-table-container {
         display: block;
@@ -176,7 +170,6 @@
     }
 }
 
-/* Typography Mobile Optimization */
 @media (max-width: 640px) {
     h1 {
         font-size: 1.5rem;
@@ -202,7 +195,6 @@
     }
 }
 
-/* Button Groups Mobile */
 @media (max-width: 640px) {
     .flex.items-center.gap-4 {
         flex-direction: column;
@@ -217,7 +209,6 @@
     }
 }
 
-/* Remove horizontal scrolling */
 @media (max-width: 640px) {
     body {
         overflow-x: hidden;
@@ -234,10 +225,8 @@
     
     <main class="flex-1">
         <div class="p-6">
-            <!-- Centered Container -->
             <div class="max-w-6xl mx-auto">
                 <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-                <!-- Page Header -->
                 <div class="p-6 border-b border-gray-200 border-l-4 border-blue-500">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                         <div>
@@ -247,9 +236,7 @@
                     </div>
                 </div>
 
-                <!-- Event Information Grid (like admin view-past-event) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-                    <!-- Event Poster & Quick Info -->
                     <div class="lg:col-span-1">
                         <div class="bg-gray-50 rounded-2xl p-4">
                             <% if (event.poster && event.poster.trim() !== '') { %>
@@ -285,7 +272,6 @@
                         </div>
                     </div>
 
-                    <!-- Event Details -->
                     <div class="lg:col-span-2 bg-gray-50 rounded-xl p-5">
                         <div class="flex items-center mb-4">
                             <div class="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center">
@@ -296,9 +282,7 @@
                             </div>
                         </div>
 
-                        <!-- Event Details Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Date and Time -->
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex items-center mb-2">
                                     <i class="fas fa-calendar-alt text-blue-500 text-xl mr-3"></i>
@@ -310,7 +294,6 @@
                                 </p>
                             </div>
 
-                            <!-- Venue -->
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex items-center mb-2">
                                     <i class="fas fa-map-marker-alt text-red-500 text-xl mr-3"></i>
@@ -319,7 +302,6 @@
                                 <p class="text-gray-600 ml-8"><%= event.venue %></p>
                             </div>
 
-                            <!-- Max Participants -->
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <div class="flex items-center mb-2">
                                     <i class="fas fa-users text-green-500 text-xl mr-3"></i>
@@ -334,7 +316,6 @@
                                 </p>
                             </div>
 
-                            <!-- Team Size (if team event) -->
                             <% if (event.eventType === 'team') { %>
                                 <div class="bg-gray-50 rounded-lg p-4">
                                     <div class="flex items-center mb-2">
@@ -356,7 +337,6 @@
                             </div>
                         <% } %>
 
-                        <!-- Description -->
                         <div class="mt-4">
                             <h3 class="text-lg font-semibold text-gray-800 mb-2">Description</h3>
                             <p class="text-gray-600 leading-relaxed"><%= event.description || 'No description available' %></p>
@@ -371,7 +351,6 @@
                     </h3>
 
                     <div class="grid grid-cols-[auto_140px_30px_140px_140px_1fr_auto] gap-3 items-center">
-                        <!-- Row 1: Start Match -->
                         <span class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md whitespace-nowrap">
                             <i class="fas fa-play text-xs"></i>Start Match
                         </span>
@@ -384,7 +363,6 @@
                             <i class="fas fa-play mr-1"></i>Go
                         </button>
 
-                        <!-- Row 2: Declare Winner -->
                         <span class="inline-flex items-center gap-1.5 text-sm font-medium text-green-700 bg-green-50 px-2.5 py-1 rounded-md whitespace-nowrap">
                             <i class="fas fa-trophy text-xs"></i>Winner
                         </span>
@@ -397,7 +375,6 @@
                             <i class="fas fa-trophy mr-1"></i>Go
                         </button>
 
-                        <!-- Row 3: Next Match -->
                         <span class="inline-flex items-center gap-1.5 text-sm font-medium text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md whitespace-nowrap">
                             <i class="fas fa-forward text-xs"></i>Next Match
                         </span>
@@ -411,7 +388,6 @@
                         </button>
                     </div>
 
-                    <!-- Recent Notifications -->
                     <div class="mt-4 pt-4 border-t border-gray-200">
                         <h4 class="font-medium text-gray-700 mb-3">Recent Updates</h4>
                         <div id="notificationsList" class="space-y-2 max-h-60 overflow-y-auto">
@@ -574,14 +550,12 @@
                 </script>
                 <% } %>
 
-                <!-- Quick Actions -->
                 <div class="p-6 border-t border-gray-200">
                     <a href="/faculty/events/<%= event._id %>/edit" class="w-full bg-teal-500 text-white px-4 py-3 rounded-lg hover:bg-teal-600 transition-colors font-medium text-center block">
                         <i class="fas fa-edit mr-2"></i>Edit Event
                     </a>
                 </div>
 
-                <!-- Registered Students Section -->
                 <div class="p-6 border-t border-gray-200">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-gray-800">Registered Students</h2>
@@ -599,7 +573,6 @@
                     </div>
 
                     <% if (event.registrations && event.registrations.length > 0) { %>
-                        <!-- Desktop Table View -->
                         <div class="mobile-table-container overflow-x-auto">
                             <table class="w-full table-auto">
                                 <thead>
@@ -621,7 +594,6 @@
                                     <% if (event.eventType === 'team' && departmentGroups && departmentGroups.length > 0) { %>
                                         <% departmentGroups.forEach(deptGroup => { %>
                                             <tr class="hover:bg-gray-50 transition-colors">
-                                                <!-- Team Event: Show Department Group -->
                                                 <td class="px-3 py-3 whitespace-nowrap">
                                                     <div class="flex items-center">
                                                         <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
@@ -710,7 +682,6 @@
                             </table>
                         </div>
 
-                        <!-- Mobile Card View -->
                         <div class="mobile-cards-container">
                             <% event.registrations.forEach((registration, index) => { %>
                                 <div class="student-card">
@@ -801,7 +772,6 @@
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <!-- No Registrations State -->
                         <div class="text-center py-12">
                             <i class="fas fa-user-graduate text-gray-400 text-6xl mb-4"></i>
                             <h3 class="text-xl font-semibold text-gray-600 mb-2">No students have registered for this event yet.</h3>
@@ -815,12 +785,9 @@
 </div>
 
 <script>
-// Define event ID for JavaScript functions
 const eventId = '<%= event._id %>';
 
-// Export registrations function
 function exportRegistrations() {
-    // Get data from server-side rendered variables
     const registrationsElement = document.getElementById('registrations-data');
     const eventTitleElement = document.getElementById('event-title-data');
     const eventTypeElement = document.getElementById('event-type-data');
@@ -838,18 +805,14 @@ function exportRegistrations() {
         alert('No registrations to export');
         return;
     }
-    
-    // Load xlsx library
     const script = document.createElement('script');
     script.src = 'https://cdn.sheetjs.com/xlsx-0.18.5/package/dist/xlsx.full.min.js';
     script.onload = function() {
-        // Create workbook and worksheet
         const wb = XLSX.utils.book_new();
         let ws_data = [];
         let colWidths = [];
         
         if (eventType === 'team') {
-            // Team events format
             ws_data = [
                 ['Team Name', 'Team Leader Name', 'Team Leader College ID', 'Team Leader Email', 'Department (Leader)', 'Member1 Name', 'Member1 College ID', 'Member2 Name', 'Member2 College ID', 'Member3 Name', 'Member3 College ID', 'Registration Date']
             ];
@@ -870,14 +833,11 @@ function exportRegistrations() {
             ];
             
             registrations.forEach(reg => {
-                // Team Information
                 const teamName = reg.teamName || 'N/A';
                 const teamLeaderName = reg.teamLeaderName || 'N/A';
                 const teamLeaderCollegeId = reg.teamLeaderCollegeId || 'N/A';
                 const teamLeaderEmail = reg.teamLeaderEmail || 'N/A';
                 const teamLeaderDepartment = reg.teamLeaderDepartment || 'N/A';
-                
-                // Team Members - extract up to 3 members
                 let member1Name = '', member1CollegeId = '';
                 let member2Name = '', member2CollegeId = '';
                 let member3Name = '', member3CollegeId = '';
@@ -917,7 +877,6 @@ function exportRegistrations() {
                 ]);
             });
         } else {
-            // Individual events format
             ws_data = [
                 ['Student Name', 'Email', 'Department', 'College ID', 'Registration Date']
             ];
@@ -931,14 +890,12 @@ function exportRegistrations() {
             ];
             
             registrations.forEach(reg => {
-                // Extract student data from nested structure
                 let studentName = 'N/A';
                 let studentEmail = 'N/A';
                 let studentDepartment = 'N/A';
                 let collegeId = 'N/A';
                 
                 if (reg.student) {
-                    // Try to get fullName first, then fall back to firstName + lastName
                     studentName = reg.student.profile.fullName || 
                                  (reg.student.profile.firstName && reg.student.profile.lastName ? 
                                   reg.student.profile.firstName + ' ' + reg.student.profile.lastName : 
@@ -967,8 +924,6 @@ function exportRegistrations() {
         
         const ws = XLSX.utils.aoa_to_sheet(ws_data);
         ws['!cols'] = colWidths;
-        
-        // Apply formatting to header row
         const numCols = ws_data[0].length;
         for (let col = 0; col < numCols; col++) {
             const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
@@ -985,8 +940,6 @@ function exportRegistrations() {
                 }
             };
         }
-        
-        // Style data rows with borders and alignment
         for (let row = 1; row <= registrations.length; row++) {
             for (let col = 0; col < numCols; col++) {
                 const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
@@ -1006,24 +959,17 @@ function exportRegistrations() {
                 };
             }
         }
-        
-        // Add worksheet to workbook
         XLSX.utils.book_append_sheet(wb, ws, 'Registrations');
-        
-        // Generate and download Excel file
         const fileName = eventTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_registrations_' + new Date().toISOString().split('T')[0] + '.xlsx';
         XLSX.writeFile(wb, fileName);
     };
     document.head.appendChild(script);
 }
 
-// View Student Details
 function viewStudentDetails(studentId) {
-    // Redirect to student details page or show modal
     window.location.href = `/faculty/student/${studentId}`;
 }
 
-// Delete Department Teams
 function deleteDepartmentTeams(eventId, departmentName) {
     if (confirm('Are you sure you want to delete all teams from this department? This action cannot be undone.')) {
         fetch(`/faculty/events/${eventId}/department/${departmentName}/delete`, {
@@ -1048,7 +994,6 @@ function deleteDepartmentTeams(eventId, departmentName) {
     }
 }
 
-// Delete Registration
 function deleteRegistration(registrationId) {
     if (confirm('Are you sure you want to cancel this student\'s registration?')) {
         fetch(`/faculty/events/${eventId}/registrations/${registrationId}/delete`, {
@@ -1074,7 +1019,6 @@ function deleteRegistration(registrationId) {
 }
 </script>
 
-<!-- Hidden data elements for JavaScript -->
 <div id="registrations-data" style="display: none;"><%- JSON.stringify(event.registrations || []) %></div>
 <div id="event-title-data" style="display: none;"><%= event.title || 'Event' %></div>
 <div id="event-type-data" style="display: none;"><%= event.eventType || 'individual' %></div>

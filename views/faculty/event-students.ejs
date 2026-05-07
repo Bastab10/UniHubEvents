@@ -1,7 +1,6 @@
 <%- include('../partials/header') %>
 
 <style>
-/* Compact Action Buttons - Match Header Logout Button Style */
 .compact-action-btn {
     text-decoration: none;
     display: inline-flex;
@@ -30,7 +29,6 @@
     outline: none;
 }
 
-/* Mobile responsiveness for compact buttons */
 @media (max-width: 640px) {
     .compact-action-btn {
         padding: 0.25rem 0.5rem;
@@ -52,7 +50,6 @@
     
     <main class="flex-1 bg-white">
         <div class="p-6">
-            <!-- Page Header -->
             <div class="mb-6 flex justify-between items-center">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800">Registered Students</h1>
@@ -68,7 +65,6 @@
                 </a>
             </div>
 
-            <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p class="text-sm text-blue-600 font-medium">Total Registrations</p>
@@ -88,7 +84,6 @@
                 </div>
             </div>
 
-            <!-- Registrations Table -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-800">Student Registrations</h2>

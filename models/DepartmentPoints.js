@@ -19,7 +19,7 @@ const departmentPointsSchema = new mongoose.Schema({
         },
         eventTitle: String,
         points: Number,
-        position: String, // 'first', 'second', 'third'
+        position: String,
         date: {
             type: Date,
             default: Date.now

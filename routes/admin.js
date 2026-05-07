@@ -748,12 +748,10 @@ router.delete('/past-events/:id/delete', async (req, res) => {
     }
 });
 
-// Admin Leaderboard Route
 router.get('/leaderboard', async (req, res) => {
     try {
         const departments = await DepartmentPoints.find().sort({ totalPoints: -1 });
 
-        // Calculate ranks with tie handling
         let currentRank = 1;
         let previousPoints = null;
 
@@ -780,7 +778,6 @@ router.get('/leaderboard', async (req, res) => {
     }
 });
 
-// Admin Department Details Route
 router.get('/leaderboard/department/:departmentName', async (req, res) => {
     try {
         const { departmentName } = req.params;
@@ -791,7 +788,6 @@ router.get('/leaderboard/department/:departmentName', async (req, res) => {
             return res.redirect('/admin/leaderboard');
         }
 
-        // Get all departments for rank calculation
         const allDepartments = await DepartmentPoints.find().sort({ totalPoints: -1 });
         let rank = 1;
         let previousPoints = null;
@@ -819,7 +815,6 @@ router.get('/leaderboard/department/:departmentName', async (req, res) => {
     }
 });
 
-// Admin Results Management - View All Results
 router.get('/results', async (req, res) => {
     try {
         const results = await Result.find()
@@ -839,7 +834,6 @@ router.get('/results', async (req, res) => {
     }
 });
 
-// Admin Edit Result - GET
 router.get('/results/:id/edit', async (req, res) => {
     try {
         const result = await Result.findById(req.params.id)

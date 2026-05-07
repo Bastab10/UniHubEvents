@@ -4,121 +4,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %> - College Event Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .btn-primary {
-            background-color: #0ea5a4 !important;
-            border-color: #0ea5a4 !important;
-            color: white !important;
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .form-input:focus, .form-select:focus {
+            border-color: #0ea5a4;
+            box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.1);
+            outline: none;
+        }
+        .btn-primary-teal {
+            background-color: #0ea5a4;
+            color: white;
             transition: all 0.2s ease;
         }
-
-        .btn-primary:hover {
-            background-color: #0d9488 !important;
-            border-color: #0d9488 !important;
+        .btn-primary-teal:hover {
+            background-color: #0d9488;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(14, 165, 164, 0.3);
         }
-
-        .btn-primary:focus {
-            background-color: #0d9488 !important;
-            border-color: #0d9488 !important;
+        .btn-primary-teal:focus {
             box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.3);
         }
+        .input-error {
+            border-color: #ef4444 !important;
+        }
+        @media (max-width: 640px) {
+            .form-input, .form-select {
+                font-size: 16px;
+            }
+        }
     </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="bg-light min-vh-100">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center py-8 px-4">
 
-    <div class="min-vh-100 d-flex align-items-center justify-content-center py-4 px-3">
+    <div class="w-full max-w-md">
+        <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
 
-        <!-- Smaller Card Wrapper -->
-        <div class="w-100 bg-white shadow rounded-4 p-4 border"
-             style="max-width: 34rem; box-sizing: border-box;">
-
-            <div class="text-center mb-3">
-                <div class="mx-auto d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
-                     style="width: 42px; height: 42px;">
-                    <i class="fas fa-user-plus"></i>
+            <div class="text-center mb-6">
+                <div class="mx-auto inline-flex items-center justify-center rounded-full bg-[#0ea5a4] text-white w-10 h-10">
+                    <i class="fas fa-user-plus text-lg"></i>
                 </div>
-                <h3 class="mt-3 fw-bold">
+                <h3 class="mt-4 text-2xl font-bold text-gray-900">
                     Create your account
                 </h3>
-                <p class="text-muted small">
+                <p class="text-gray-500 text-sm mt-1">
                     Join our College Event Management System
                 </p>
             </div>
 
             <!-- Flash Messages -->
             <% if (typeof error !== 'undefined' && error) { %>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <%= error %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
+                    <i class="fas fa-exclamation-circle mt-0.5"></i>
+                    <span><%= error %></span>
                 </div>
             <% } %>
 
             <% if (typeof success !== 'undefined' && success) { %>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <%= success %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
+                    <i class="fas fa-check-circle mt-0.5"></i>
+                    <span><%= success %></span>
                 </div>
             <% } %>
 
             <!-- Validation Errors -->
             <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Please fix the following errors:</strong>
-                    <ul class="mb-0 mt-2">
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                    <div class="flex items-start gap-2 mb-2">
+                        <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                        <strong class="text-sm">Please fix the following errors:</strong>
+                    </div>
+                    <ul class="text-sm list-disc list-inside ml-1">
                         <% errors.forEach(error => { %>
                             <li><%= error.msg %></li>
                         <% }) %>
                     </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <% } %>
 
-            <form action="/auth/register" method="POST" id="registrationForm">
-                <div class="row g-2">
+            <form action="/auth/register" method="POST" id="registrationForm" class="space-y-4">
 
-                    <div class="col-12">
-                        <label for="fullName" class="form-label small">Full Name *</label>
-                        <input id="fullName" name="fullName" type="text" required
-                               value="<%= typeof formData !== 'undefined' ? formData.fullName : '' %>"
-                               class="form-control form-control-sm"
-                               placeholder="Enter your full name">
-                    </div>
+                <div>
+                    <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                    <input id="fullName" name="fullName" type="text" required
+                           value="<%= typeof formData !== 'undefined' ? formData.fullName : '' %>"
+                           class="form-input w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm transition-all"
+                           placeholder="Enter your full name">
+                </div>
 
-                    <div class="col-12">
-                        <label for="email" class="form-label small">Email *</label>
-                        <input id="email" name="email" type="email" required
-                               value="<%= typeof formData !== 'undefined' ? formData.email : '' %>"
-                               class="form-control form-control-sm"
-                               placeholder="Enter your college email">
-                    </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                    <input id="email" name="email" type="email" required
+                           value="<%= typeof formData !== 'undefined' ? formData.email : '' %>"
+                           class="form-input w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm transition-all"
+                           placeholder="Enter your college email">
+                </div>
 
-                    <div class="col-12">
-                        <label for="password" class="form-label small">Password *</label>
-                        <input id="password" name="password" type="password" required
-                               class="form-control form-control-sm"
-                               placeholder="Create a password">
-                    </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                    <input id="password" name="password" type="password" required
+                           class="form-input w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm transition-all"
+                           placeholder="Create a password">
+                </div>
 
-                    <div class="col-12">
-                        <label for="collegeId" class="form-label small">College ID *</label>
-                        <input id="collegeId" name="collegeId" type="text" required
-                               value="<%= typeof formData !== 'undefined' ? formData.collegeId : '' %>"
-                               class="form-control form-control-sm"
-                               placeholder="YYCourseRollNo">
-                        <div id="collegeIdError" class="text-danger small" style="display: none;"></div>
-                    </div>
+                <div>
+                    <label for="collegeId" class="block text-sm font-medium text-gray-700 mb-1">College ID *</label>
+                    <input id="collegeId" name="collegeId" type="text" required
+                           value="<%= typeof formData !== 'undefined' ? formData.collegeId : '' %>"
+                           class="form-input w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm transition-all"
+                           placeholder="YYCourseRollNo">
+                    <div id="collegeIdError" class="text-red-600 text-xs mt-1 hidden"></div>
+                </div>
 
-                    <div class="col-md-6">
-                        <label for="department" class="form-label small">Department *</label>
-                        <select id="department" name="department" required class="form-select form-select-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                        <select id="department" name="department" required class="form-select w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white transition-all">
                             <option value="">Select Department</option>
                             <option value="Anthropology" <%= typeof formData !== 'undefined' && formData.department === 'Anthropology' ? 'selected' : '' %>>Anthropology</option>
                             <option value="Assamese" <%= typeof formData !== 'undefined' && formData.department === 'Assamese' ? 'selected' : '' %>>Assamese</option>
@@ -142,39 +149,35 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6">
-                        <label for="role" class="form-label small">Role *</label>
-                        <select id="role" name="role" required class="form-select form-select-sm">
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                        <select id="role" name="role" required class="form-select w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white transition-all">
                             <option value="">Select Role</option>
                             <option value="student" <%= typeof formData !== 'undefined' && formData.role === 'student' ? 'selected' : '' %>>Student</option>
                             <option value="faculty" <%= typeof formData !== 'undefined' && formData.role === 'faculty' ? 'selected' : '' %>>Coordinator</option>
                         </select>
                     </div>
-
-                    <div class="col-12" id="designationField" style="display: none;">
-                        <label for="designation" class="form-label small">Designation *</label>
-                        <input id="designation" name="designation" type="text"
-                               value="<%= typeof formData !== 'undefined' ? formData.designation : '' %>"
-                               class="form-control form-control-sm"
-                               placeholder="e.g., Assistant Professor, Lecturer, HOD">
-                        <div class="form-text">Your position in the department</div>
-                    </div>
-
-                    <div class="col-12 mt-2">
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                Create Account
-                            </button>
-                        </div>
-                    </div>
-
                 </div>
+
+                <div id="designationField" style="display: none;">
+                    <label for="designation" class="block text-sm font-medium text-gray-700 mb-1">Designation *</label>
+                    <input id="designation" name="designation" type="text"
+                           value="<%= typeof formData !== 'undefined' ? formData.designation : '' %>"
+                           class="form-input w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm transition-all"
+                           placeholder="e.g., Assistant Professor, Lecturer, HOD">
+                    <p class="text-xs text-gray-500 mt-1">Your position in the department</p>
+                </div>
+
+                <button type="submit" class="btn-primary-teal w-full py-2.5 px-4 rounded-lg font-semibold text-sm">
+                    Create Account
+                </button>
+
             </form>
 
-            <div class="text-center mt-3">
-                <p class="text-muted small">
+            <div class="text-center mt-6 pt-4 border-t border-gray-100">
+                <p class="text-gray-500 text-sm">
                     Already have an account?
-                    <a href="/auth/login" class="text-primary text-decoration-none">
+                    <a href="/auth/login" class="text-[#0ea5a4] hover:text-[#0d9488] font-medium">
                         Sign in here
                     </a>
                 </p>
@@ -182,8 +185,6 @@
 
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
         // Student College ID validation function
@@ -210,7 +211,7 @@
             const collegeIdInput = document.getElementById('collegeId');
             const collegeIdLabel = collegeIdInput.parentElement.querySelector('label');
             const collegeIdPlaceholder = collegeIdInput;
-            const collegeIdHelp = collegeIdInput.parentElement.querySelector('.form-text');
+            const collegeIdHelp = collegeIdInput.parentElement.querySelector('p.text-gray-500');
             
             if (role === 'faculty') {
                 // Show designation field for coordinator
@@ -232,15 +233,15 @@
                     if (collegeId && !validateCoordinatorCollegeId(collegeId)) {
                         errorDiv.style.display = 'block';
                         errorDiv.textContent = 'Invalid Coordinator ID format. Use: FAC001 or DEPT123';
-                        this.classList.add('is-invalid');
+                        this.classList.add('input-error');
                         submitButton.disabled = true;
                     } else {
                         errorDiv.style.display = 'none';
-                        this.classList.remove('is-invalid');
+                        this.classList.remove('input-error');
                         submitButton.disabled = false;
                     }
                 });
-                collegeIdInput.classList.remove('is-invalid');
+                collegeIdInput.classList.remove('input-error');
                 document.getElementById('collegeIdError').style.display = 'none';
                 document.querySelector('button[type="submit"]').disabled = false;
                 
@@ -265,15 +266,15 @@
                     if (collegeId && !validateStudentCollegeId(collegeId)) {
                         errorDiv.style.display = 'block';
                         errorDiv.textContent = 'Invalid College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123)';
-                        this.classList.add('is-invalid');
+                        this.classList.add('input-error');
                         submitButton.disabled = true;
                     } else {
                         errorDiv.style.display = 'none';
-                        this.classList.remove('is-invalid');
+                        this.classList.remove('input-error');
                         submitButton.disabled = false;
                     }
                 });
-                collegeIdInput.classList.remove('is-invalid');
+                collegeIdInput.classList.remove('input-error');
                 document.getElementById('collegeIdError').style.display = 'none';
                 document.querySelector('button[type="submit"]').disabled = false;
             } else {
@@ -293,7 +294,7 @@
                 e.preventDefault();
                 document.getElementById('collegeIdError').style.display = 'block';
                 document.getElementById('collegeIdError').textContent = 'Invalid College ID format. Use format: YEAR + COURSE + 3 digits (e.g., 23BA123)';
-                document.getElementById('collegeId').classList.add('is-invalid');
+                document.getElementById('collegeId').classList.add('input-error');
                 document.getElementById('collegeId').focus();
                 return false;
             }
@@ -302,7 +303,7 @@
                 e.preventDefault();
                 document.getElementById('collegeIdError').style.display = 'block';
                 document.getElementById('collegeIdError').textContent = 'Invalid Coordinator ID format. Use: FAC001 or DEPT123';
-                document.getElementById('collegeId').classList.add('is-invalid');
+                document.getElementById('collegeId').classList.add('input-error');
                 document.getElementById('collegeId').focus();
                 return false;
             }

@@ -7,7 +7,6 @@
     .podium-3 { background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%); }
 </style>
 
-    <!-- Main Content -->
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <% if (success && success.length > 0) { %>
@@ -27,7 +26,6 @@
             </div>
         <% } %>
 
-        <!-- User's Department Summary Card -->
         <% if (userDepartment) { %>
         <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6 <%= userDepartment.rank <= 3 ? 'border-l-4 border-l-amber-400' : '' %>">
             <div class="flex items-center justify-between">
@@ -60,7 +58,6 @@
         </div>
         <% } %>
 
-        <!-- Leaderboard Header -->
         <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
             <div class="text-center">
                 <h1 class="text-2xl font-semibold text-gray-800">🏆 Versity Week Leaderboard</h1>
@@ -68,11 +65,9 @@
             </div>
         </div>
 
-        <!-- Top 3 Podium -->
         <% if (top3 && top3.length > 0) { %>
         <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- 2nd Place -->
                 <% if (top3[1]) { %>
                 <div class="text-center <%= top3[1].isUserDepartment ? 'ring-2 ring-blue-400 rounded-lg' : '' %>">
                     <div class="podium-2 rounded-t-lg p-4 text-white">
@@ -90,7 +85,6 @@
                 </div>
                 <% } %>
 
-                <!-- 1st Place -->
                 <% if (top3[0]) { %>
                 <div class="text-center transform md:-translate-y-4 <%= top3[0].isUserDepartment ? 'ring-2 ring-blue-400 rounded-lg' : '' %>">
                     <div class="podium-1 rounded-t-lg p-6 text-white">
@@ -108,7 +102,6 @@
                 </div>
                 <% } %>
 
-                <!-- 3rd Place -->
                 <% if (top3[2]) { %>
                 <div class="text-center <%= top3[2].isUserDepartment ? 'ring-2 ring-blue-400 rounded-lg' : '' %>">
                     <div class="podium-3 rounded-t-lg p-4 text-white">
@@ -129,7 +122,6 @@
         </div>
         <% } %>
 
-        <!-- Full Rankings Table -->
         <div class="bg-white rounded-lg border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-lg font-semibold text-gray-800">Complete Rankings</h2>
@@ -197,7 +189,6 @@
             </div>
             <% } else { %>
             <div class="text-center py-12">
-                <!-- <div class="text-6xl mb-4">📊</div> -->
                 <h3 class="text-lg font-medium text-gray-900">No Data Available</h3>
                 <p class="text-gray-500 mt-2">Versity Week events are yet to conclude. Check back soon!</p>
             </div>

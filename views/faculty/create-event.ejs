@@ -1,7 +1,6 @@
 <%- include('../partials/header') %>
 
 <style>
-/* Flash Message Styles */
 .flash-message {
     animation: slideIn 0.3s ease-out;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
@@ -23,7 +22,6 @@
     }
 }
 
-/* Compact Action Buttons - Match Header Logout Button Style */
 .compact-action-btn {
     text-decoration: none;
     display: inline-flex;
@@ -54,7 +52,6 @@
     outline: none;
 }
 
-/* Mobile responsiveness for compact buttons */
 @media (max-width: 640px) {
     .compact-action-btn {
         padding: 0.625rem 0.75rem;
@@ -73,7 +70,6 @@
     }
 }
 
-/* Mobile Responsive Layout */
 @media (max-width: 768px) {
     .flex.min-h-screen.bg-gray-50 {
         padding: 0.5rem;
@@ -96,7 +92,6 @@
     }
 }
 
-/* Form Mobile Optimization */
 @media (max-width: 640px) {
     .form-group {
         margin-bottom: 1.25rem;
@@ -150,7 +145,6 @@
     }
 }
 
-/* File Upload Mobile Optimization */
 @media (max-width: 640px) {
     .file-upload {
         width: 100%;
@@ -167,7 +161,6 @@
     }
 }
 
-/* Typography Mobile Optimization */
 @media (max-width: 640px) {
     h1 {
         font-size: 1.5rem;
@@ -193,7 +186,6 @@
     }
 }
 
-/* Button Groups Mobile */
 @media (max-width: 640px) {
     .flex.gap-4 {
         flex-direction: column;
@@ -206,7 +198,6 @@
     }
 }
 
-/* Remove horizontal scrolling */
 @media (max-width: 640px) {
     body {
         overflow-x: hidden;
@@ -223,9 +214,7 @@
     
     <main class="flex-1">
         <div class="p-6">
-            <!-- Centered Container -->
             <div class="max-w-4xl mx-auto">
-                <!-- Page Header -->
                 <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-l-4 border-blue-500">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
                         Create New Event
@@ -251,15 +240,12 @@
                     <% } %>
                 </div>
 
-                <!-- Form Container -->
                 <div class="bg-white rounded-xl shadow-xl p-8 border border-gray-200">
                     <form method="POST" action="/faculty/events/create" enctype="multipart/form-data" class="space-y-8">
 
-                        <!-- Basic Information Section -->
                         <div class="space-y-6">
                             <h2 class="text-lg font-semibold text-gray-800 pb-2 border-b border-gray-200">Basic Information</h2>
                             
-                            <!-- Event Title - Full Width -->
                             <div>
                                 <label for="title" class="block text-sm font-semibold mb-2 text-gray-700">Event Title *</label>
                                 <input type="text" id="title" name="title" required
@@ -267,7 +253,6 @@
                                        placeholder="Enter event title">
                             </div>
 
-                            <!-- Description - Full Width -->
                             <div>
                                 <label for="description" class="block text-sm font-semibold mb-2 text-gray-700">Description *</label>
                                 <textarea id="description" name="description" rows="4" required
@@ -275,7 +260,6 @@
                                           placeholder="Describe your event"></textarea>
                             </div>
 
-                            <!-- Category and Sub-category - Two Columns -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="category" class="block text-sm font-semibold mb-2 text-gray-700">Category *</label>

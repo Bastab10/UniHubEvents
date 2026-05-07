@@ -1,4 +1,3 @@
-/* Responsive Dashboard Styles */
 .dashboard-container {
     min-height: 100vh;
     background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
@@ -11,7 +10,6 @@
     }
 }
 
-/* Hero Section Styles */
 .hero-section {
     width: 100vw;
     min-height: 60vh;
@@ -31,7 +29,6 @@
     }
 }
 
-/* Enhanced positioning for floating images container */
 .hero-section .absolute.inset-0 {
     position: absolute;
     top: 0;
@@ -42,13 +39,11 @@
     z-index: 1;
 }
 
-/* Ensure content stays above images */
 .hero-section .relative.z-10 {
     position: relative;
     z-index: 10;
 }
 
-/* Search Container Styles */
 .search-container {
     display: flex;
     align-items: center;
@@ -144,7 +139,6 @@
     transform: translateY(-1px);
 }
 
-/* Events Grid - Ensure equal height rows */
 .events-grid {
     display: grid;
     gap: 1.5rem;
@@ -178,7 +172,7 @@
     border-radius: 0.875rem;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2);
-    box-shadow: 0 2px 8px rgba(0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border: 1px solid rgba(229, 231, 235, 0.1);
     height: 100%;
     min-height: 420px;
@@ -189,7 +183,7 @@
 
 .event-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0.12);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     border-color: rgba(229, 231, 235, 0.2);
 }
 
@@ -374,7 +368,6 @@
     }
 }
 
-/* Mobile Card Optimization */
 @media (max-width: 640px) {
     .event-card, .bg-white.rounded-xl {
         margin-bottom: 1rem;
@@ -401,74 +394,44 @@
     }
 }
 
-/* Stats Cards Mobile */
 @media (max-width: 640px) {
     .card, .prof-card, .event-card {
         margin-bottom: 1.25rem;
     }
 }
 
-/* Typography and Spacing */
 @media (max-width: 640px) {
-    h1 {
+    .dashboard-container h1 {
         font-size: 1.5rem;
         margin-bottom: 1rem;
     }
     
-    h2 {
+    .dashboard-container h2 {
         font-size: 1.25rem;
         margin-bottom: 1rem;
     }
     
-    h3 {
+    .dashboard-container h3 {
         font-size: 1.125rem;
         margin-bottom: 0.75rem;
     }
-    
-    .text-2xl {
-        font-size: 1.5rem;
-    }
-    
-    .text-lg {
-        font-size: 1rem;
-    }
-    
-    .text-sm {
-        font-size: 0.875rem;
-    }
-    
-    .text-xs {
-        font-size: 0.75rem;
-    }
 }
 
-/* Button Groups Mobile */
 @media (max-width: 640px) {
-    .flex.gap-2 {
+    .dashboard-container .btn-group,
+    .dashboard-container .action-buttons {
         flex-direction: column;
         gap: 0.5rem;
     }
     
-    .flex.gap-3 {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .flex.gap-4 {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .flex.justify-end {
-        justify-content: stretch;
-        flex-direction: column;
+    .dashboard-container .action-buttons .btn {
+        width: 100%;
     }
 }
 
-/* Form Elements Mobile */
 @media (max-width: 640px) {
     input, select, textarea {
-        font-size: 16px; /* Prevents zoom on iOS */
+        font-size: 16px;
     }
     
     .form-group {
@@ -482,7 +445,6 @@
     }
 }
 
-/* Table Responsive */
 @media (max-width: 640px) {
     .overflow-x-auto {
         overflow-x: auto;
@@ -499,7 +461,6 @@
     }
 }
 
-/* Remove horizontal scrolling globally */
 @media (max-width: 640px) {
     body {
         overflow-x: hidden;
@@ -515,7 +476,6 @@
     }
 }
 
-/* Sidebar Mobile Compatibility */
 @media (max-width: 640px) {
     main {
         margin-left: 0 !important;
@@ -527,7 +487,6 @@
     }
 }
 
-/* Compact Action Buttons */
 .compact-action-btn {
     font-weight: 600;
     cursor: pointer;
@@ -552,7 +511,6 @@
     box-shadow: 0 0 0 3px rgba(190, 140, 223, 0.3);
 }
 
-/* Responsive Search Styles */
 @media (max-width: 640px) {
     .search-container {
         flex-direction: column;
@@ -607,7 +565,6 @@
     }
 }
 
-/* Hero Section Animations */
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -760,7 +717,6 @@
     animation: float-slow-reverse 7s ease-in-out infinite;
 }
 
-/* Floating Image Cards Styling */
 .floating-card-left-1,
 .floating-card-left-2,
 .floating-card-left-3,
@@ -775,10 +731,9 @@
     backdrop-filter: blur(2px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 3px solid rgba(255, 255, 255, 0.9);
-    position: absolute; /* 🔥 FIX */
+    position: absolute;
 }
 
-/* LEFT SIDE */
 .floating-card-left-1 {
     top: 60px;
     left: 40px;
@@ -800,7 +755,6 @@
     z-index: 13;
 }
 
-/* RIGHT SIDE */
 .floating-card-right-1 {
     top: 60px;
     right: 40px;
@@ -822,7 +776,6 @@
     z-index: 13;
 }
 
-/* Enhanced hover effects for floating cards */
 .floating-card-left-1:hover,
 .floating-card-left-2:hover,
 .floating-card-left-3:hover,
@@ -836,7 +789,6 @@
     filter: brightness(1.15);
 }
 
-/* Improved responsive adjustments for floating cards */
 @media (max-width: 1024px) {
     .floating-card-left-1,
     .floating-card-left-2,
@@ -884,38 +836,30 @@
     }
 }
 
-/* Mobile text color fixes */
 @media (max-width: 640px) {
     .dashboard-container h2 {
-        color: #1f2937 !important; /* Force dark gray */
+        color: #1f2937;
     }
     
     .dashboard-container p {
-        color: #4b5563 !important; /* Force medium gray */
+        color: #4b5563;
     }
     
-    /* Filter button mobile fixes */
     .category-btn.active {
-        background-color: #0ea5a4 !important; /* Force teal background */
-        color: #ffffff !important; /* Force white text */
-    }
-    
-    .category-btn.bg-blue-600 {
-        background-color: #0ea5a4 !important; /* Force teal background */
-        color: #ffffff !important; /* Force white text */
+        background-color: #0ea5a4;
+        color: #ffffff;
     }
 }
 
-/* Category button fade effects (no blur) */
 .category-btn {
-    transition: all 0.3s ease !important;
+    transition: all 0.3s ease;
     position: relative;
 }
 
 .category-btn:not(.active) {
     opacity: 0.7;
     transform: scale(0.95);
-    color: #000000 !important; /* Force black text */
+    color: #000000;
 }
 
 .category-btn:not(.active):hover {
@@ -925,15 +869,9 @@
 
 .category-btn.active {
     opacity: 1;
-    filter: blur(0);
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     z-index: 10;
-}
-
-/* Smooth transitions for all states */
-.category-btn {
-    transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease !important;
 }
 
 .stats-grid {
@@ -1071,7 +1009,6 @@
     text-transform: capitalize;
 }
 
-/* Completed Badge for Past Events */
 .completed-badge {
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
@@ -1102,7 +1039,6 @@
     }
 }
 
-/* View Details Button - Always at bottom */
 .event-card .flex.justify-end {
     margin-top: auto;
     padding-top: 0.75rem;
@@ -1151,17 +1087,10 @@
     }
 }
 
-/* Prevent horizontal scrolling */
-* {
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
 body {
     overflow-x: hidden;
 }
 
-/* Responsive text */
 .responsive-text-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
