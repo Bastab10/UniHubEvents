@@ -1,522 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Campus Event Management System - Welcome</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-
-    <link rel="stylesheet" href="/css/responsive.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #1f2937; }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+      .hero-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        color: white;
+      }
+      .hero-gradient h1, .hero-gradient p { color: white; }
+      .hero-gradient a { color: #2563eb; background: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; margin: 8px; }
+      .hero-gradient a:last-child { color: white; background: transparent; border: 2px solid white; }
 
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+      nav { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+      nav .container { max-width: 80rem; margin: 0 auto; padding: 0 1rem; }
+      @media (min-width: 640px) { nav .container { padding: 0 1.5rem; } }
+      @media (min-width: 1024px) { nav .container { padding: 0 2rem; } }
+      nav .flex { display: flex; justify-content: space-between; align-items: center; height: 4rem; }
+      nav h1 { font-size: 1.25rem; font-weight: 700; color: #111827; margin: 0; }
+      nav p { font-size: 0.875rem; color: #6b7280; margin: 0; }
+      nav .nav-links { display: none; }
+      @media (min-width: 768px) { nav .nav-links { display: flex; align-items: center; gap: 1rem; } }
+      nav a { color: #374151; text-decoration: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+      nav a:hover { color: #111827; background: #f3f4f6; }
+      nav .btn-primary { background: #2563eb; color: white; }
+      nav .btn-primary:hover { background: #1d4ed8; color: white; }
 
-        @keyframes pulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
+      .max-w-7xl { max-width: 80rem; margin: 0 auto; padding: 0 1rem; }
+      @media (min-width: 640px) { .max-w-7xl { padding: 0 1.5rem; } }
+      @media (min-width: 1024px) { .max-w-7xl { padding: 0 2rem; } }
 
-        .animate-fadeIn {
-            animation: fadeIn 0.8s ease-out;
-        }
+      .py-24 { padding-top: 6rem; padding-bottom: 6rem; }
+      .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+      .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+      .px-4 { padding-left: 1rem; padding-right: 1rem; }
+      .p-8 { padding: 2rem; }
+      .p-6 { padding: 1.5rem; }
+      .mb-16 { margin-bottom: 4rem; }
+      .mb-12 { margin-bottom: 3rem; }
+      .mb-8 { margin-bottom: 2rem; }
+      .mb-6 { margin-bottom: 1.5rem; }
+      .mb-4 { margin-bottom: 1rem; }
+      .mb-2 { margin-bottom: 0.5rem; }
+      .mt-2 { margin-top: 0.5rem; }
+      .mt-6 { margin-top: 1.5rem; }
+      .mr-2 { margin-right: 0.5rem; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .pt-16 { padding-top: 4rem; }
 
-        .animate-slideInLeft {
-            animation: slideInLeft 0.6s ease-out;
-        }
+      .text-center { text-align: center; }
+      .text-xs { font-size: 0.75rem; }
+      .text-sm { font-size: 0.875rem; }
+      .text-lg { font-size: 1.125rem; }
+      .text-xl { font-size: 1.25rem; }
+      .text-2xl { font-size: 1.5rem; }
+      .text-3xl { font-size: 1.875rem; }
+      .text-4xl { font-size: 2.25rem; }
+      .font-medium { font-weight: 500; }
+      .font-semibold { font-weight: 600; }
+      .font-bold { font-weight: 700; }
 
-        .animate-slideInRight {
-            animation: slideInRight 0.6s ease-out;
-        }
+      .grid { display: grid; gap: 2rem; }
+      .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+      @media (min-width: 768px) { .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); } }
+      @media (min-width: 1024px) { .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); } .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); } }
 
-        .animate-pulse {
-            animation: pulse 2s infinite;
-        }
+      .card-hover { transition: all 0.3s ease; border-radius: 0.75rem; }
+      .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
 
-        .hero-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+      .feature-icon {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px auto;
+      }
+      .feature-icon i { color: white; font-size: 1.5rem; }
 
-        .card-hover {
-            transition: all 0.3s ease;
-        }
+      .bg-white { background: white; }
+      .bg-gray-50 { background: #f9fafb; }
+      .bg-gray-900 { background: #111827; }
+      .text-white { color: white; }
+      .text-gray-400 { color: #9ca3af; }
+      .text-gray-600 { color: #4b5563; }
+      .text-gray-900 { color: #111827; }
+      .text-blue-600 { color: #2563eb; }
+      .text-green-600 { color: #16a34a; }
+      .text-purple-600 { color: #9333ea; }
+      .text-orange-600 { color: #ea580c; }
 
-        .card-hover:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
+      .rounded-lg { border-radius: 0.5rem; }
+      .rounded-xl { border-radius: 0.75rem; }
+      .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+      .transition { transition: all 0.3s ease; }
 
-        .feature-icon {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            transition: all 0.3s ease;
-        }
+      footer a { color: #9ca3af; text-decoration: none; transition: color 0.2s; }
+      footer a:hover { color: white; }
+      footer ul { list-style: none; padding: 0; margin: 0; }
+      footer li { margin-bottom: 0.5rem; }
 
-        .feature-icon:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
+      .max-w-3xl { max-width: 48rem; margin-left: auto; margin-right: auto; }
+      .space-y-2 > * + * { margin-top: 0.5rem; }
+      .gap-4 { gap: 1rem; }
+      .gap-6 { gap: 1.5rem; }
+      .gap-8 { gap: 2rem; }
     </style>
-</head>
+  </head>
 
-<body class="bg-gray-50 pt-16">
-
+  <body class="bg-gray-50 pt-16">
     <!-- Fixed Navbar -->
     <nav class="bg-white shadow-lg fixed top-0 left-0 w-full z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <div class="ml-4">
+              <h1 class="text-xl font-bold text-black">UniHub</h1>
 
-                <div class="flex items-center">
-                    <div class="ml-4">
-                        <h1 class="text-xl font-bold text-black">
-                            UniHub
-                        </h1>
-
-                        <p class="text-sm text-black">
-                            Event Management System
-                        </p>
-                    </div>
-                </div>
-
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-
-                        <a
-                            href="/auth/login"
-                            class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition"
-                        >
-                            Login
-                        </a>
-
-                        <a
-                            href="/auth/register"
-                            class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
-                        >
-                            Get Started
-                        </a>
-
-                    </div>
-                </div>
-
+              <p class="text-sm text-black">Event Management System</p>
             </div>
+          </div>
+
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="/auth/login"
+                class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition"
+              >
+                Login
+              </a>
+
+              <a
+                href="/auth/register"
+                class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
+              >
+                Get Started
+              </a>
+            </div>
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero-gradient text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+          <h1 class="text-4xl md:text-5xl font-bold mb-6">
+            Welcome to UniHub
+          </h1>
 
-            <div class="text-center">
+          <p
+            class="text-xl md:text-2xl mb-8"
+          >
+            Your Complete Event Management Solution
+          </p>
 
-                <h1 class="text-4xl md:text-5xl font-bold mb-6 animate-fadeIn">
-                    Welcome to UniHub
-                </h1>
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          >
+            <a
+              href="/auth/register"
+              class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105"
+            >
+              <i class="fas fa-user-plus mr-2"></i>
+              Register Now
+            </a>
 
-                <p
-                    class="text-xl md:text-2xl mb-8 animate-slideInLeft"
-                    style="animation-delay: 0.2s;"
-                >
-                    Your Complete Event Management Solution
-                </p>
-
-                <div
-                    class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slideInRight"
-                    style="animation-delay: 0.4s;"
-                >
-
-                    <a
-                        href="/auth/register"
-                        class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105"
-                    >
-                        <i class="fas fa-user-plus mr-2"></i>
-                        Register Now
-                    </a>
-
-                    <a
-                        href="/auth/login"
-                        class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition transform hover:scale-105"
-                    >
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        Sign In
-                    </a>
-
-                </div>
-
-            </div>
+            <a
+              href="/auth/login"
+              class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition transform hover:scale-105"
+            >
+              <i class="fas fa-sign-in-alt mr-2"></i>
+              Sign In
+            </a>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Features -->
     <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            Why Choose Our Platform?
+          </h2>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">
-                    Why Choose Our Platform?
-                </h2>
-
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Comprehensive event management for students, faculty, and administrators
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-                <div class="text-center p-8 card-hover">
-                    <div
-                        class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    >
-                        <i class="fas fa-calendar-check text-white text-2xl"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                        Smart Event Management
-                    </h3>
-
-                    <p class="text-gray-600">
-                        Manage college events, competitions, workshops, and university activities in one centralized platform. Designed to simplify event organization for students, coordinators, and administrators.
-                    </p>
-                </div>
-
-                <div class="text-center p-8 card-hover">
-                    <div
-                        class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    >
-                        <i class="fas fa-users text-white text-2xl"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                        Easy Student Registration
-                    </h3>
-
-                    <p class="text-gray-600">
-                        Students can quickly browse upcoming events, register online, receive instant confirmations, and track their participation without paperwork or manual processes.
-                    </p>
-                </div>
-
-                <div class="text-center p-8 card-hover">
-                    <div
-                        class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    >
-                        <i class="fas fa-chart-line text-white text-2xl"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                        Department Rankings & Points
-                    </h3>
-
-                    <p class="text-gray-600">
-                        Track department performance during versity week and competitions with a real-time points system, leaderboard, and top-performing department rankings.
-                    </p>
-                </div>
-
-                <div class="text-center p-8 card-hover">
-                    <div
-                        class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    >
-                        <i class="fas fa-bell text-white text-2xl"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                        Instant Notifications
-                    </h3>
-
-                    <p class="text-gray-600">
-                        Stay updated with real-time notifications for event approvals, cancellations, and reminders.
-                    </p>
-                </div>
-
-                <div class="text-center p-8 card-hover">
-                    <div
-                        class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    >
-                        <i class="fas fa-mobile-alt text-white text-2xl"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                        Mobile Friendly
-                    </h3>
-
-                    <p class="text-gray-600">
-                        Access and manage events from any device with our responsive design and mobile app support.
-                    </p>
-                </div>
-
-                <div class="text-center p-8 card-hover">
-                    <div
-                        class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    >
-                        <i class="fas fa-shield-alt text-white text-2xl"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                        Secure & Reliable
-                    </h3>
-
-                    <p class="text-gray-600">
-                        Enterprise-grade security with role-based access control and data protection for all users.
-                    </p>
-                </div>
-
-            </div>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Comprehensive event management for students, faculty, and
+            administrators
+          </p>
         </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="text-center p-8 card-hover">
+            <div
+              class="feature-icon"
+            >
+              <i class="fas fa-calendar-check text-white text-2xl"></i>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+              Smart Event Management
+            </h3>
+
+            <p class="text-gray-600">
+              Manage college events, competitions, workshops, and university
+              activities in one centralized platform. Designed to simplify event
+              organization for students, coordinators, and administrators.
+            </p>
+          </div>
+
+          <div class="text-center p-8 card-hover">
+            <div
+              class="feature-icon"
+            >
+              <i class="fas fa-users text-white text-2xl"></i>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+              Easy Student Registration
+            </h3>
+
+            <p class="text-gray-600">
+              Students can quickly browse upcoming events, register online,
+              receive instant confirmations, and track their participation
+              without paperwork or manual processes.
+            </p>
+          </div>
+
+          <div class="text-center p-8 card-hover">
+            <div
+              class="feature-icon"
+            >
+              <i class="fas fa-chart-line text-white text-2xl"></i>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+              Department Rankings & Points
+            </h3>
+
+            <p class="text-gray-600">
+              Track department performance during versity week and competitions
+              with a real-time points system, leaderboard, and top-performing
+              department rankings.
+            </p>
+          </div>
+
+          <div class="text-center p-8 card-hover">
+            <div
+              class="feature-icon"
+            >
+              <i class="fas fa-bell text-white text-2xl"></i>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+              Instant Notifications
+            </h3>
+
+            <p class="text-gray-600">
+              Stay updated with real-time notifications for event approvals,
+              cancellations, and reminders.
+            </p>
+          </div>
+
+          <div class="text-center p-8 card-hover">
+            <div
+              class="feature-icon"
+            >
+              <i class="fas fa-mobile-alt text-white text-2xl"></i>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+              Mobile Friendly
+            </h3>
+
+            <p class="text-gray-600">
+              Access and manage events from any device with our responsive
+              design and mobile app support.
+            </p>
+          </div>
+
+          <div class="text-center p-8 card-hover">
+            <div
+              class="feature-icon"
+            >
+              <i class="fas fa-shield-alt text-white text-2xl"></i>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+              Secure & Reliable
+            </h3>
+
+            <p class="text-gray-600">
+              Enterprise-grade security with role-based access control and data
+              protection for all users.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Statistics -->
     <section class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            Platform Statistics
+          </h2>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">
-                    Platform Statistics
-                </h2>
-
-                <p class="text-xl text-gray-600">
-                    Real-time metrics showing our growing community
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
-                    <div class="text-4xl font-bold text-blue-600 mb-2">
-                        1000+
-                    </div>
-
-                    <div class="text-gray-600">
-                        Active Users
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
-                    <div class="text-4xl font-bold text-green-600 mb-2">
-                        500+
-                    </div>
-
-                    <div class="text-gray-600">
-                        Events Created
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
-                    <div class="text-4xl font-bold text-purple-600 mb-2">
-                        10,000+
-                    </div>
-
-                    <div class="text-gray-600">
-                        Registrations
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-lg text-center">
-                    <div class="text-4xl font-bold text-orange-600 mb-2">
-                        98%
-                    </div>
-
-                    <div class="text-gray-600">
-                        Satisfaction Rate
-                    </div>
-                </div>
-
-            </div>
+          <p class="text-xl text-gray-600">
+            Real-time metrics showing our growing community
+          </p>
         </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+            <div class="text-4xl font-bold text-blue-600 mb-2">1000+</div>
+
+            <div class="text-gray-600">Active Users</div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+            <div class="text-4xl font-bold text-green-600 mb-2">500+</div>
+
+            <div class="text-gray-600">Events Created</div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+            <div class="text-4xl font-bold text-purple-600 mb-2">10,000+</div>
+
+            <div class="text-gray-600">Registrations</div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-lg text-center">
+            <div class="text-4xl font-bold text-orange-600 mb-2">98%</div>
+
+            <div class="text-gray-600">Satisfaction Rate</div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Platform</h3>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ul class="space-y-2">
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                  Features
+                </a>
+              </li>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <li>
+                <a
+                  href="/auth/register"
+                  class="text-gray-400 hover:text-white transition"
+                >
+                  Register
+                </a>
+              </li>
 
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">
-                        Platform
-                    </h3>
+              <li>
+                <a
+                  href="/auth/login"
+                  class="text-gray-400 hover:text-white transition"
+                >
+                  Login
+                </a>
+              </li>
+            </ul>
+          </div>
 
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="#" class="text-gray-400 hover:text-white transition">
-                                Features
-                            </a>
-                        </li>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Events</h3>
 
-                        <li>
-                            <a href="/auth/register" class="text-gray-400 hover:text-white transition">
-                                Register
-                            </a>
-                        </li>
+            <ul class="space-y-2">
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                  Browse Events
+                </a>
+              </li>
 
-                        <li>
-                            <a href="/auth/login" class="text-gray-400 hover:text-white transition">
-                                Login
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                  Create Event
+                </a>
+              </li>
 
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">
-                        Events
-                    </h3>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                  Calendar
+                </a>
+              </li>
+            </ul>
+          </div>
 
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="#" class="text-gray-400 hover:text-white transition">
-                                Browse Events
-                            </a>
-                        </li>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Support</h3>
 
-                        <li>
-                            <a href="#" class="text-gray-400 hover:text-white transition">
-                                Create Event
-                            </a>
-                        </li>
+            <ul class="space-y-2">
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                  Help Center
+                </a>
+              </li>
 
-                        <li>
-                            <a href="#" class="text-gray-400 hover:text-white transition">
-                                Calendar
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                  Documentation
+                </a>
+              </li>
 
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">
-                        Support
-                    </h3>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white transition">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
 
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="#" class="text-gray-400 hover:text-white transition">
-                                Help Center
-                            </a>
-                        </li>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Connect</h3>
 
-                        <li>
-                            <a href="#" class="text-gray-400 hover:text-white transition">
-                                Documentation
-                            </a>
-                        </li>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-400 hover:text-white transition">
+                <i class="fab fa-facebook text-xl"></i>
+              </a>
 
-                        <li>
-                            <a href="#" class="text-gray-400 hover:text-white transition">
-                                Contact
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+              <a href="#" class="text-gray-400 hover:text-white transition">
+                <i class="fab fa-twitter text-xl"></i>
+              </a>
 
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">
-                        Connect
-                    </h3>
+              <a href="#" class="text-gray-400 hover:text-white transition">
+                <i class="fab fa-instagram text-xl"></i>
+              </a>
 
-                    <div class="flex space-x-4">
-
-                        <a href="#" class="text-gray-400 hover:text-white transition">
-                            <i class="fab fa-facebook text-xl"></i>
-                        </a>
-
-                        <a href="#" class="text-gray-400 hover:text-white transition">
-                            <i class="fab fa-twitter text-xl"></i>
-                        </a>
-
-                        <a href="#" class="text-gray-400 hover:text-white transition">
-                            <i class="fab fa-instagram text-xl"></i>
-                        </a>
-
-                        <a href="#" class="text-gray-400 hover:text-white transition">
-                            <i class="fab fa-linkedin text-xl"></i>
-                        </a>
-
-                    </div>
-                </div>
-
+              <a href="#" class="text-gray-400 hover:text-white transition">
+                <i class="fab fa-linkedin text-xl"></i>
+              </a>
             </div>
-
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
-                <p class="text-gray-400">
-                    &copy; 2026 NLU Campus Event Management System. All rights reserved.
-                </p>
-            </div>
-
+          </div>
         </div>
+
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+          <p class="text-gray-400">
+            &copy; 2026 NLU Campus Event Management System. All rights reserved.
+          </p>
+        </div>
+      </div>
     </footer>
 
     <script>
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
 
-                const target = document.querySelector(this.getAttribute('href'));
+          const target = document.querySelector(this.getAttribute("href"));
 
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
             });
+          }
         });
+      });
 
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fadeIn');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.card-hover').forEach(card => {
-            observer.observe(card);
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-fadeIn");
+          }
         });
+      }, observerOptions);
+
+      document.querySelectorAll(".card-hover").forEach((card) => {
+        observer.observe(card);
+      });
     </script>
-
-</body>
+  </body>
 </html>

@@ -139,52 +139,13 @@
         .overlay.show { opacity: 1; visibility: visible; }
 
         .preload * { transition: none !important; animation: none !important; }
-    </style>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#0ea5a4',
-                        secondary: '#64748b',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .navbar-enhanced {
-            background: #ffffff;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .navbar-enhanced.scrolled {
-            background: #ffffff;
-            backdrop-filter: blur(25px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-            border-bottom: 1px solid #d1d5db;
-        }
-        
-        .navbar-transition {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .navbar-z-index {
-            z-index: 1030;
-        }
-        
         .nav-button {
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
         }
-        
+
         .nav-link {
             position: relative;
             transition: all 0.2s ease;
@@ -192,7 +153,7 @@
             display: flex;
             align-items: center;
         }
-        
+
         .nav-link::after {
             content: '';
             position: absolute;
@@ -720,6 +681,22 @@
         }
         
     </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0ea5a4',
+                        secondary: '#64748b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="preload bg-gray-50">
     <script>
