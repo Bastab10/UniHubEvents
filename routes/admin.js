@@ -857,7 +857,6 @@ router.get('/results/:id/edit', async (req, res) => {
     }
 });
 
-// Admin Edit Result - POST
 router.post('/results/:id/edit', async (req, res) => {
     try {
         const resultId = req.params.id;
@@ -871,7 +870,6 @@ router.post('/results/:id/edit', async (req, res) => {
             return res.redirect('/admin/results');
         }
 
-        // Store old positions for point recalculation
         const isVersityEvent = result.event.eventMode === 'versity';
         const oldPositions = isVersityEvent ? {
             first: result.firstPosition.department,
@@ -879,7 +877,6 @@ router.post('/results/:id/edit', async (req, res) => {
             third: result.thirdPosition.department
         } : null;
 
-        // Update result
         result.firstPosition = {
             name: firstName,
             department: firstDepartment,
@@ -901,11 +898,9 @@ router.post('/results/:id/edit', async (req, res) => {
 
         await result.save();
 
-        // Recalculate department points for Versity Week events
         if (isVersityEvent) {
             const pointValues = { first: 10, second: 7, third: 5 };
 
-            // Remove old points
             if (oldPositions) {
                 for (const [position, dept] of Object.entries(oldPositions)) {
                     if (dept) {
@@ -919,9 +914,7 @@ router.post('/results/:id/edit', async (req, res) => {
                     }
                 }
             }
-
-            // Add new points
-            const newPositions = {
+                const newPositions = {
                 first: firstDepartment,
                 second: secondDepartment,
                 third: thirdDepartment
@@ -959,7 +952,6 @@ router.post('/results/:id/edit', async (req, res) => {
     }
 });
 
-// Admin Delete Result
 router.post('/results/:id/delete', async (req, res) => {
     try {
         const result = await Result.findById(req.params.id).populate('event');
@@ -968,7 +960,6 @@ router.post('/results/:id/delete', async (req, res) => {
             return res.redirect('/admin/results');
         }
 
-        // Remove department points for Versity Week events
         if (result.event.eventMode === 'versity') {
             const pointValues = { first: 10, second: 7, third: 5 };
             const positions = {
@@ -1002,45 +993,37 @@ router.post('/results/:id/delete', async (req, res) => {
     }
 });
 
-// Admin Reports/Analytics Route
 router.get('/reports', async (req, res) => {
     try {
-        // Get statistics
         const totalEvents = await Event.countDocuments();
         const totalStudents = await User.countDocuments({ role: 'student' });
         const totalFaculty = await User.countDocuments({ role: 'faculty', isApproved: true });
 
-        // Category-wise events
         const categoryStats = await Event.aggregate([
             { $group: { _id: '$category', count: { $sum: 1 } } },
             { $sort: { count: -1 } }
         ]);
 
-        // Event mode distribution
         const eventModeStats = await Event.aggregate([
             { $group: { _id: '$eventMode', count: { $sum: 1 } } }
         ]);
 
-        // Total registrations
         const totalRegistrations = await Event.aggregate([
             { $unwind: '$registrations' },
             { $group: { _id: null, count: { $sum: 1 } } }
         ]);
 
-        // Registration status breakdown
         const registrationStats = await Event.aggregate([
             { $unwind: '$registrations' },
             { $group: { _id: '$registrations.status', count: { $sum: 1 } } }
         ]);
 
-        // Department-wise student count
         const departmentStats = await User.aggregate([
             { $match: { role: 'student' } },
             { $group: { _id: '$profile.department', count: { $sum: 1 } } },
             { $sort: { count: -1 } }
         ]);
 
-        // Monthly events (last 6 months)
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -1080,7 +1063,6 @@ router.get('/reports', async (req, res) => {
     }
 });
 
-// Admin Notifications Management
 router.get('/notifications', async (req, res) => {
     try {
         const notifications = await Notification.find()
@@ -1100,7 +1082,6 @@ router.get('/notifications', async (req, res) => {
     }
 });
 
-// Admin Delete Notification
 router.post('/notifications/:id/delete', async (req, res) => {
     try {
         await Notification.findByIdAndDelete(req.params.id);
@@ -1113,7 +1094,6 @@ router.post('/notifications/:id/delete', async (req, res) => {
     }
 });
 
-// Admin Events with Filter
 router.get('/events-filter', async (req, res) => {
     try {
         const { category, eventMode, dateFrom, dateTo, search } = req.query;

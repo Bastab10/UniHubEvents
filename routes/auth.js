@@ -36,8 +36,8 @@ router.post('/login', [
         }
 
         const { username, password, role } = req.body;
-        
-        const user = await User.findOne({ 
+
+        const user = await User.findOne({
             $or: [{ username }, { email: username }],
             role: role
         }).populate('createdEvents registeredEvents');
@@ -55,7 +55,7 @@ router.post('/login', [
 
         if (!isMatch) {
             req.session.error = 'Invalid username, email, or password';
-            return res.render('auth/login', { 
+            return res.render('auth/login', {
                 title: 'Login',
                 username,
                 selectedRole: role
@@ -64,7 +64,7 @@ router.post('/login', [
 
         if (!user.isActive) {
             req.session.error = 'Your account has been deactivated. Please contact the administrator.';
-            return res.render('auth/login', { 
+            return res.render('auth/login', {
                 title: 'Login',
                 username,
                 selectedRole: role
@@ -74,13 +74,20 @@ router.post('/login', [
         if (!user.isApproved && user.role !== 'admin') {
             if (user.role === 'student') {
                 req.session.error = 'Your account is pending approval. Please contact the administrator.';
-                return res.render('auth/login', { 
+                return res.render('auth/login', {
+                    title: 'Login',
+                    username,
+                    selectedRole: role
+                });
+            } else if (user.role === 'faculty') {
+                req.session.error = 'Your account is pending admin approval.';
+                return res.render('auth/login', {
                     title: 'Login',
                     username,
                     selectedRole: role
                 });
             } else {
-                return res.render('auth/login', { 
+                return res.render('auth/login', {
                     title: 'Login',
                     username,
                     selectedRole: role
@@ -90,19 +97,32 @@ router.post('/login', [
 
         req.session.user = user;
 
-        switch(user.role) {
-            case 'admin':
-                res.redirect('/admin/dashboard');
-                break;
-            case 'faculty':
-                res.redirect('/faculty/dashboard');
-                break;
-            case 'student':
-                res.redirect('/student/dashboard');
-                break;
-            default:
-                res.redirect('/');
-        }
+        const intendedUrl = req.session.intendedUrl;
+        delete req.session.intendedUrl;
+
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+            }
+
+            if (intendedUrl) {
+                return res.redirect(intendedUrl);
+            }
+
+            switch(user.role) {
+                case 'admin':
+                    res.redirect('/admin/dashboard');
+                    break;
+                case 'faculty':
+                    res.redirect('/faculty/dashboard');
+                    break;
+                case 'student':
+                    res.redirect('/student/dashboard');
+                    break;
+                default:
+                    res.redirect('/');
+            }
+        });
 
     } catch (error) {
         console.error('Login error:', error);
@@ -207,13 +227,21 @@ router.post('/register', [
         });
 
         await newUser.save();
-        
+
         if (role === 'student') {
             req.session.success = 'Registration successful! Your account has been activated and you can now login.';
         } else if (role === 'faculty') {
             req.session.success = 'Registration successful! Your faculty account is pending admin approval. You will be able to login once approved.';
         } else {
             req.session.success = 'Registration successful! You can now login to your account.';
+        }
+
+        const intendedUrl = req.session.intendedUrl;
+        delete req.session.intendedUrl;
+
+        if (intendedUrl) {
+            req.session.success += ' Please login to continue.';
+            return res.redirect('/auth/login');
         }
         
         res.redirect('/auth/login');

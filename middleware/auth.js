@@ -4,12 +4,20 @@ exports.isAuthenticated = (req, res, next) => {
     if (req.session.user) {
         return next();
     }
+    req.session.error = 'Please login to access this feature.';
     res.redirect('/auth/login');
+};
+
+exports.optionalAuth = (req, res, next) => {
+    // Allow access whether authenticated or not
+    // Sets req.session.user if authenticated, null otherwise
+    next();
 };
 
 exports.checkRole = (...roles) => {
     return (req, res, next) => {
         if (!req.session.user) {
+            req.session.error = 'Please login to access this feature.';
             return res.redirect('/auth/login');
         }
 

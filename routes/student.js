@@ -5,9 +5,9 @@ const User = require('../models/User');
 const Result = require('../models/Result');
 const Notification = require('../models/Notification');
 const DepartmentPoints = require('../models/DepartmentPoints');
-const { isAuthenticated, checkRole, isApproved, isActive } = require('../middleware/auth');
+const { isAuthenticated, checkRole, isApproved, isActive, optionalAuth } = require('../middleware/auth');
 
-router.get('/events/:id', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
+router.get('/events/:id', optionalAuth, async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
             .populate('organizer', 'profile.firstName profile.lastName email')
@@ -18,31 +18,34 @@ router.get('/events/:id', isAuthenticated, checkRole('student'), isApproved, isA
             return res.redirect('/student/events');
         }
 
-        let isRegistered = event.registrations.some(
-            reg => reg.student._id.toString() === req.session.user._id.toString()
-        );
-
+        let isRegistered = false;
         let maxDeptTeams = 0;
         let deptTeamsCount = 0;
         let remainingTeamSlots = 0;
         let hasDepartmentTeams = false;
-        
-        if (event.eventType === 'team') {
-            maxDeptTeams = event.maxTeamsPerDepartment || 0;
-            
-            const student = await User.findById(req.session.user._id);
-            const studentDept = student?.profile?.department || '';
-            
-            if (studentDept && maxDeptTeams > 0) {
-                deptTeamsCount = event.registrations.filter(
-                    reg => reg.teamLeaderDepartment && 
-                           reg.teamLeaderDepartment.toLowerCase() === studentDept.toLowerCase()
-                ).length;
-                remainingTeamSlots = maxDeptTeams - deptTeamsCount;
-                hasDepartmentTeams = deptTeamsCount > 0;
-            } else if (maxDeptTeams === 0) {
-                remainingTeamSlots = -1;
-                hasDepartmentTeams = isRegistered;
+
+        if (req.session.user && req.session.user.role === 'student') {
+            isRegistered = event.registrations.some(
+                reg => reg.student._id.toString() === req.session.user._id.toString()
+            );
+
+            if (event.eventType === 'team') {
+                maxDeptTeams = event.maxTeamsPerDepartment || 0;
+                
+                const student = await User.findById(req.session.user._id);
+                const studentDept = student?.profile?.department || '';
+                
+                if (studentDept && maxDeptTeams > 0) {
+                    deptTeamsCount = event.registrations.filter(
+                        reg => reg.teamLeaderDepartment && 
+                               reg.teamLeaderDepartment.toLowerCase() === studentDept.toLowerCase()
+                    ).length;
+                    remainingTeamSlots = maxDeptTeams - deptTeamsCount;
+                    hasDepartmentTeams = deptTeamsCount > 0;
+                } else if (maxDeptTeams === 0) {
+                    remainingTeamSlots = -1;
+                    hasDepartmentTeams = isRegistered;
+                }
             }
         }
 
@@ -62,12 +65,8 @@ router.get('/events/:id', isAuthenticated, checkRole('student'), isApproved, isA
     }
 });
 
-router.use(isAuthenticated, checkRole('student'), isApproved, isActive);
-
-router.get('/dashboard', async (req, res) => {
+router.get('/dashboard', optionalAuth, async (req, res) => {
     try {
-        const studentId = req.session.user._id;
-        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
@@ -77,36 +76,44 @@ router.get('/dashboard', async (req, res) => {
             .populate('organizer', 'profile.firstName profile.lastName')
             .sort({ createdAt: -1 });
         
-        const registeredEvents = await Event.find({
-            'registrations.student': studentId,
-            'registrations.status': 'approved'
-        }).populate('organizer', 'profile.firstName profile.lastName');
-        
-        const upcomingRegistered = registeredEvents.filter(event => 
-            new Date(event.date) >= new Date()
-        );
-        
-        const stats = await Promise.all([
-            Event.countDocuments(),
-            Event.countDocuments({ 
-                'registrations.student': studentId,
-                'registrations.status': 'approved' 
-            }),
-            Event.countDocuments({ 
-                'registrations.student': studentId,
-                'registrations.status': 'pending' 
-            })
-        ]);
+        let registeredEvents = [];
+        let upcomingRegistered = [];
+        let stats = {
+            availableEvents: await Event.countDocuments(),
+            registeredEvents: 0,
+            pendingEvents: 0
+        };
 
-        const [availableEvents, registeredEventsCount, pendingEvents] = stats;
+        if (req.session.user && req.session.user.role === 'student') {
+            const studentId = req.session.user._id;
+            
+            registeredEvents = await Event.find({
+                'registrations.student': studentId,
+                'registrations.status': 'approved'
+            }).populate('organizer', 'profile.firstName profile.lastName');
+            
+            upcomingRegistered = registeredEvents.filter(event => 
+                new Date(event.date) >= new Date()
+            );
+            
+            const userStats = await Promise.all([
+                Event.countDocuments({ 
+                    'registrations.student': studentId,
+                    'registrations.status': 'approved' 
+                }),
+                Event.countDocuments({ 
+                    'registrations.student': studentId,
+                    'registrations.status': 'pending' 
+                })
+            ]);
+
+            stats.registeredEvents = userStats[0];
+            stats.pendingEvents = userStats[1];
+        }
 
         res.render('student/dashboard', {
             title: 'Student Dashboard',
-            stats: {
-                availableEvents,
-                registeredEvents: registeredEventsCount,
-                pendingEvents
-            },
+            stats,
             allEvents, 
             upcomingRegistered
         });
@@ -118,6 +125,24 @@ router.get('/dashboard', async (req, res) => {
 });
 
 router.post('/events/:id/register', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'student') {
+        req.session.intendedUrl = `/student/events/${req.params.id}`;
+        req.session.error = 'Please login to register for events';
+        return res.redirect('/auth/login');
+    }
+
+    try {
+        const user = await User.findById(req.session.user._id);
+        if (!user || !user.isApproved || !user.isActive) {
+            req.session.error = 'Your account is not active or approved. Please contact administrator.';
+            return res.redirect('/auth/login');
+        }
+    } catch (error) {
+        console.error('User validation error:', error);
+        req.session.error = 'Error validating your account';
+        return res.redirect('/auth/login');
+    }
+
     try {
         const event = await Event.findById(req.params.id);
         
@@ -418,7 +443,7 @@ router.get('/history', async (req, res) => {
     }
 });
 
-router.get('/past-events', async (req, res) => {
+router.get('/past-events', optionalAuth, async (req, res) => {
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -455,7 +480,7 @@ router.get('/profile', (req, res) => {
     res.render('student/profile', { title: 'My Profile' });
 });
 
-router.get('/events/:id/result', async (req, res) => {
+router.get('/events/:id/result', optionalAuth, async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
             .populate('organizer', 'profile.firstName profile.lastName profile.department');
@@ -501,6 +526,9 @@ router.post('/profile', async (req, res) => {
 
 router.get('/notifications', async (req, res) => {
     try {
+        if (!req.session.user) {
+            return res.json({ success: false, message: 'Please login to view notifications' });
+        }
         const userId = req.session.user._id;
         
         const user = await User.findById(userId);
@@ -547,6 +575,9 @@ router.get('/notifications', async (req, res) => {
 
 router.get('/events/:eventId/notifications', async (req, res) => {
     try {
+        if (!req.session.user) {
+            return res.json({ success: false, message: 'Please login to view notifications' });
+        }
         const { eventId } = req.params;
         const userId = req.session.user._id;
         
@@ -571,9 +602,9 @@ router.get('/events/:eventId/notifications', async (req, res) => {
     }
 });
 
-router.get('/leaderboard', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
+router.get('/leaderboard', optionalAuth, async (req, res) => {
     try {
-        const userDepartment = req.session.user.profile.department;
+        const userDepartment = req.session.user?.profile?.department || null;
 
         const allDepartments = await DepartmentPoints.find()
             .sort({ totalPoints: -1 })
@@ -614,11 +645,11 @@ router.get('/leaderboard', isAuthenticated, checkRole('student'), isApproved, is
     }
 });
 
-router.get('/leaderboard/department/:departmentName', isAuthenticated, checkRole('student'), isApproved, isActive, async (req, res) => {
+router.get('/leaderboard/department/:departmentName', optionalAuth, async (req, res) => {
     try {
         const { departmentName } = req.params;
         const decodedDept = decodeURIComponent(departmentName);
-        const userDepartment = req.session.user.profile.department;
+        const userDepartment = req.session.user?.profile?.department || null;
 
         const departmentData = await DepartmentPoints.findOne({ department: decodedDept })
             .populate('eventBreakdown.event', 'title date category');

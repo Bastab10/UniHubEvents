@@ -754,13 +754,18 @@
                             <i class="fas fa-bell text-base sm:text-lg"></i>
                             <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                         </button>
-                        
+
                         <a href="/auth/logout" class="logout-btn-nav hidden sm:flex items-center px-2 py-1 rounded-lg border border-[#0ea5a4] text-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white transition-all duration-200 font-medium text-xs">
                             <i class="fas fa-sign-out-alt text-xs"></i>
                             <span class="ml-1.5">Logout</span>
                         </a>
+                    <% } else { %>
+                        <a href="/auth/login" class="hidden sm:flex items-center px-2 py-1 rounded-lg border border-[#0ea5a4] text-[#0ea5a4] hover:bg-[#0ea5a4] hover:text-white transition-all duration-200 font-medium text-xs">
+                            <i class="fas fa-sign-in-alt text-xs"></i>
+                            <span class="ml-1.5">Login</span>
+                        </a>
                     <% } %>
-                    
+
                 </div>
             </div>
             
@@ -846,7 +851,7 @@
                 <% } %>
                 
                 <div style="margin: 1.5rem 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
-                
+
                 <a href="/auth/logout" class="mobile-logout-btn">
                     <i class="fas fa-sign-out-alt text-base sm:text-lg"></i>
                     <span class="text-sm sm:text-base">Logout</span>
@@ -855,10 +860,6 @@
                 <a href="/auth/login">
                     <i class="fas fa-sign-in-alt text-base sm:text-lg"></i>
                     <span class="text-sm sm:text-base">Login</span>
-                </a>
-                <a href="/auth/register">
-                    <i class="fas fa-user-plus text-base sm:text-lg"></i>
-                    <span class="text-sm sm:text-base">Register</span>
                 </a>
             <% } %>
         </nav>

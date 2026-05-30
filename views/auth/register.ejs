@@ -112,7 +112,7 @@
                         <input id="password" name="password" type="password" required
                                class="form-input w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg text-sm transition-all"
                                placeholder="Create a password">
-                        <button type="button" id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <button type="button" id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10 cursor-pointer">
                             <i class="fas fa-eye" id="eyeIcon"></i>
                         </button>
                     </div>
@@ -313,7 +313,6 @@
                 return false;
             }
             
-            // Validate designation for coordinator
             if (role === 'faculty' && !document.getElementById('designation').value.trim()) {
                 e.preventDefault();
                 alert('Please enter your designation');
@@ -321,15 +320,11 @@
                 return false;
             }
         });
-        
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             const roleSelect = document.getElementById('role');
             if (roleSelect.value) {
                 roleSelect.dispatchEvent(new Event('change'));
             }
-
-            // Toggle password visibility
             const togglePassword = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -338,7 +333,6 @@
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 
-                // Toggle eye icon
                 eyeIcon.classList.toggle('fa-eye');
                 eyeIcon.classList.toggle('fa-eye-slash');
             });

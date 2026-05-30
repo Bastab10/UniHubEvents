@@ -43,15 +43,15 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
-    
+
     res.locals.success = req.session.success || null;
     req.session.success = null;
     req.session.eventSuccess = null;
-    
+
     res.locals.error = req.session.error || null;
     req.session.error = null;
     req.session.eventError = null;
-    
+
     next();
 });
 
@@ -68,17 +68,7 @@ app.use('/student', studentRoutes);
 app.use('/events', eventRoutes);
 
 app.get('/', (req, res) => {
-    if (req.session.user) {
-        switch(req.session.user.role) {
-            case 'admin':
-                return res.redirect('/admin/dashboard');
-            case 'faculty':
-                return res.redirect('/faculty/dashboard');
-            case 'student':
-                return res.redirect('/student/dashboard');
-        }
-    }
-    res.render('home', { title: 'Welcome to Campus Events' });
+    res.redirect('/student/dashboard');
 });
 
 app.get('/about', (req, res) => {

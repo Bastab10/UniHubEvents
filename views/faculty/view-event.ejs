@@ -439,7 +439,6 @@
                                 alert('Error: ' + result.message);
                             }
                         } catch (error) {
-                            console.error('Error:', error);
                             alert('Failed to create notification');
                         }
                     }
@@ -474,7 +473,6 @@
                                 alert('Error: ' + result.message);
                             }
                         } catch (error) {
-                            console.error('Error:', error);
                             alert('Failed to declare winner');
                         }
                     }
@@ -514,7 +512,7 @@
                                 document.getElementById('notificationsList').innerHTML = '<p class="text-gray-500 text-sm">No notifications yet</p>';
                             }
                         } catch (error) {
-                            console.error('Error loading notifications:', error);
+                            // Error handled silently, UI shows 'No notifications yet'
                         }
                     }
                     
@@ -540,7 +538,6 @@
                                 alert('Failed to delete update: ' + result.message);
                             }
                         } catch (error) {
-                            console.error('Error deleting notification:', error);
                             alert('Error deleting update');
                         }
                     }
@@ -988,7 +985,6 @@ function deleteDepartmentTeams(eventId, departmentName) {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             alert('Error deleting department teams');
         });
     }
@@ -1012,7 +1008,6 @@ function deleteRegistration(registrationId) {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             alert('Error cancelling registration');
         });
     }
